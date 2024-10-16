@@ -6,6 +6,8 @@ import json
 from django.views.decorators.http import require_POST
 from  Exskilencebackend160924.Blob_service import *
 from rest_framework.decorators import api_view 
+from datetime import datetime
+ 
 @csrf_exempt
 def create_student_details(request):
     if request.method == 'POST':
@@ -71,7 +73,6 @@ def create_student_details_days_questions(request):
             return JsonResponse({"error": "An error occurred: " + str(e)}, status=400)
  
     return JsonResponse({"error": "Invalid request method"}, status=405)
-
 from Exskilence.views import rankings
 @csrf_exempt
 def frontpagedeatialsmethod(request):
@@ -94,7 +95,7 @@ def frontpagedeatialsmethod(request):
                 "id": student_ID,
                 "totalScore": scorescumulation(student),
                 "overallScore": overallscore(student)["totalscore"],
-                "totalNumberOFQuesAns": f"{total_number_of_questions_completed(student)}/{overallscore(student)['totalnumofquestionassigned']}",
+                "totalNumberOFQuesAns": total_number_of_questions_completed(student),
                 "no_of_hrs": get_total_duration(student_ID),
                 "Delay":calculate_course_delay(student_ID),
                 "rank": student_rank
@@ -115,6 +116,9 @@ def frontpagedeatialsmethod(request):
  
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+ 
+ 
+ 
 def overallscore(student):
     easy = 0
     medium = 0
@@ -130,7 +134,7 @@ def overallscore(student):
         questionsperlist = student['Qns_lists'].get(i)
         if questionsperlist is not None:
             for i in questionsperlist:
-                # # print(number_quesitions_assgned)
+                # print(number_quesitions_assgned)
                 number_quesitions_assgned +=1
                 if i[-4] == "E":
                     easy += 1
@@ -184,17 +188,25 @@ def scorescumulation(student):
         'Total_Score': score_sum,
         'Score_Breakdown': score_breakdown
     }
- 
-   
- 
 def total_number_of_questions_completed(student):
-    categories = ["CSS", "Python", "SQL", "Java_Script"]
-    per_student_detail = QuestionDetails_Days.objects.filter(
-        Student_id=student['Student_id'],
-        Subject__in=categories
-    ).values('Subject')
-    total_questions = per_student_detail.count()
-    return total_questions
+    categories = ["HTML", "Python", "SQL", "Java_Script"]
+   
+    # Fetch all relevant QuestionDetails_Days entries for the student
+    questions = QuestionDetails_Days.objects.filter(
+        Student_id=student['Student_id']
+    ).values_list('Subject', flat=True)
+   
+    subject_counts = {}
+   
+    for subject in categories:
+        completed_questions = questions.filter(Subject=subject).count()
+       
+        if(subject=="HTML"or subject=="Java_Script"):
+            subject_counts[subject] = f"{completed_questions}/30"
+        else:
+            subject_counts[subject] = f"{completed_questions}/200"
+   
+    return subject_counts
    
 @api_view(['GET'])
 def getSTdDaysdetailes(req):
@@ -338,8 +350,8 @@ def per_student_ques_detials(request):
                 'ans':stduentHTMLAns["Ans"]
             }
             stduentHTMLAns = HTMLdict
-        # else :
-            # print("no data found" + str(stduentHTMLAns))
+        else :
+            print("no data found" + str(stduentHTMLAns))
  
         if len(studentCSS_queryset)>0:
             studentCSSAns = studentCSS_queryset[0]
@@ -350,8 +362,8 @@ def per_student_ques_detials(request):
                 'ans':studentCSSAns["Ans"]
             }
             studentCSSAns = CSSdict
-        # else :
-            # print("no data found" + str(studentCSSAns))
+        else :
+            print("no data found" + str(studentCSSAns))
         return JsonResponse({
                 'student_id': student_id,
                 'Name':studenttsdata['name'],
@@ -389,9 +401,9 @@ def per_student_JS_ques_detials(request):
                 'ans':stduentJavaScriptAns["Ans"]
             }
             stduentJavaScriptAns = JSdict
-            # print(stduentJavaScriptAns)
-        # else :
-            # print("no data found" + str(stduentJavaScriptAns))
+            print(stduentJavaScriptAns)
+        else :
+            print("no data found" + str(stduentJavaScriptAns))
         return JsonResponse({
                 'student_id': student_id,
                 'Name':studenttsdata['name'],
@@ -432,7 +444,11 @@ def get_total_duration(student_id):
         total_duration_in_seconds += record.Duration
     total_duration_in_hours = round(total_duration_in_seconds / 3600, 2)
     return total_duration_in_hours
+from datetime import datetime
 from django.utils import timezone
+from datetime import datetime
+from django.utils import timezone
+ 
 def calculate_course_delay(student_id):
     try:
         student = StudentDetails.objects.get(StudentId=student_id)
@@ -488,4 +504,3 @@ def calculate_questions_completed(data,subject):
         }
        
     return results
- 
