@@ -1,0 +1,982 @@
+[
+    {
+        "Sl NO": 1.0,
+        "Email address": "abhiabhi2964@gmail.com",
+        "Student Full Name": "ABHISHEKA B C ",
+        "Branch": "CSE",
+        "Contact Number": 8431511986.0,
+        "CGPA": 8.35,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 2.0,
+        "Email address": "benakar2514@gmail.com",
+        "Student Full Name": "Benaka R",
+        "Branch": "CSE",
+        "Contact Number": 9663466581.0,
+        "CGPA": 9.2,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 3.0,
+        "Email address": "bharathj2306@gmail.com",
+        "Student Full Name": "Bharath J",
+        "Branch": "CSE",
+        "Contact Number": 9686452002.0,
+        "CGPA": 8.63,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 4.0,
+        "Email address": "bhavanamnbhavanamn24@gmail.com",
+        "Student Full Name": "Bhavana MN",
+        "Branch": "CSE",
+        "Contact Number": 8147427139.0,
+        "CGPA": 9.0,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 5.0,
+        "Email address": "bhomikan5@gmail.com",
+        "Student Full Name": "Bhoomika N",
+        "Branch": "CSE",
+        "Contact Number": 8073509840.0,
+        "CGPA": 7.67,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 6.0,
+        "Email address": "girishbs06@gmail.com",
+        "Student Full Name": "Girish B S",
+        "Branch": "CSE",
+        "Contact Number": 9535703087.0,
+        "CGPA": 7.5,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 7.0,
+        "Email address": "gowthamgowdajm2003@gmail.com",
+        "Student Full Name": "Gowtham Gowda JM",
+        "Branch": "CSE",
+        "Contact Number": 8431729582.0,
+        "CGPA": 7.9,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 8.0,
+        "Email address": "jaismithas646@gmail.com",
+        "Student Full Name": "Jaismitha s",
+        "Branch": "CSE",
+        "Contact Number": 9844393666.0,
+        "CGPA": 8.5,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 9.0,
+        "Email address": "jeevaraj5802@gmail.com",
+        "Student Full Name": "Jeevaraj N",
+        "Branch": "CSE",
+        "Contact Number": 8431927478.0,
+        "CGPA": 8.2,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 10.0,
+        "Email address": "karthikgr1908@gmail.com",
+        "Student Full Name": "Karthik G ",
+        "Branch": "CSE",
+        "Contact Number": 7483119609.0,
+        "CGPA": 7.93,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 11.0,
+        "Email address": "lavanya7215@gmail.com",
+        "Student Full Name": "Lavanya A N",
+        "Branch": "CSE",
+        "Contact Number": 9972202740.0,
+        "CGPA": 7.7,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 12.0,
+        "Email address": "naiknita2004@gmail.com",
+        "Student Full Name": "M Nirmitha ",
+        "Branch": "CSE",
+        "Contact Number": 9535292816.0,
+        "CGPA": 8.5,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 13.0,
+        "Email address": "mnstarshines@gmail.com",
+        "Student Full Name": "Madhuri M",
+        "Branch": "CSE",
+        "Contact Number": 9916869875.0,
+        "CGPA": 8.2,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 14.0,
+        "Email address": "manushree699@gmail.com",
+        "Student Full Name": "Manushree M",
+        "Branch": "AI ML",
+        "Contact Number": 9353740845.0,
+        "CGPA": 8.6,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 15.0,
+        "Email address": "mithunkumarupadhyaya@gmail.com",
+        "Student Full Name": "Mithun Kumar",
+        "Branch": "CSE",
+        "Contact Number": 7760770691.0,
+        "CGPA": 9.0,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 16.0,
+        "Email address": "monikahsmonu@gmail.com",
+        "Student Full Name": "Monika HS",
+        "Branch": "CSE",
+        "Contact Number": 9148845802.0,
+        "CGPA": 9.37,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 17.0,
+        "Email address": "niranjan2003kashyap@gmail.com",
+        "Student Full Name": "Niranjan kashyap k s ",
+        "Branch": "AI ML",
+        "Contact Number": 9632954863.0,
+        "CGPA": 8.2,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 18.0,
+        "Email address": "nithinsiddu03@gmail.com",
+        "Student Full Name": "NITHIN S",
+        "Branch": "CSE",
+        "Contact Number": 9380187679.0,
+        "CGPA": 7.7,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 19.0,
+        "Email address": "pranitaprani988@gmail.com",
+        "Student Full Name": "Pranita R",
+        "Branch": "CSE",
+        "Contact Number": 9164211396.0,
+        "CGPA": 8.5,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 20.0,
+        "Email address": "vinutha.gangadharappa27@gmail.com",
+        "Student Full Name": "Vinutha K G",
+        "Branch": "CSE",
+        "Contact Number": 7899511934.0,
+        "CGPA": 9.24,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 21.0,
+        "Email address": "yeshumanju2003@gmail.com",
+        "Student Full Name": "Yeshwanth M ",
+        "Branch": "AI ML",
+        "Contact Number": 9972267911.0,
+        "CGPA": 8.59,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 22.0,
+        "Email address": "chandananagaraju13@gmail.com",
+        "Student Full Name": "Chandana N",
+        "Branch": "AI DS",
+        "Contact Number": 9742287076.0,
+        "CGPA": 9.4,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 23.0,
+        "Email address": "bhavanak677@gmail.com",
+        "Student Full Name": "Bhavana K",
+        "Branch": "AI DS",
+        "Contact Number": 9538816832.0,
+        "CGPA": 8.0,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 24.0,
+        "Email address": "2004harshithav@gmail.com",
+        "Student Full Name": "HARSHITHA V",
+        "Branch": "AI DS",
+        "Contact Number": 7676720727.0,
+        "CGPA": 9.07,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 25.0,
+        "Email address": "mgowritrivedi234@gmail.com",
+        "Student Full Name": "M GOWRI TRIVEDI",
+        "Branch": "ISE",
+        "Contact Number": 9148103147.0,
+        "CGPA": 8.8,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 26.0,
+        "Email address": "harshithgowda4623@gmail.com",
+        "Student Full Name": "HARSHITH M L ",
+        "Branch": "ISE",
+        "Contact Number": 8792174538.0,
+        "CGPA": 8.3,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 27.0,
+        "Email address": "mallikarjunakadiwal86@gmail.com",
+        "Student Full Name": "Mallikarjuna Kadiwal",
+        "Branch": "ISE",
+        "Contact Number": 6361771566.0,
+        "CGPA": 7.88,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 28.0,
+        "Email address": "shreyasridhar1721@gmail.com",
+        "Student Full Name": "Shreya S",
+        "Branch": "ISE",
+        "Contact Number": 9535975415.0,
+        "CGPA": 8.5,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 29.0,
+        "Email address": "mohanbabup236@gmail.com",
+        "Student Full Name": "MohanBabu",
+        "Branch": "ISE",
+        "Contact Number": 7022521820.0,
+        "CGPA": 8.5,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 30.0,
+        "Email address": "swatianami487@gmail.com",
+        "Student Full Name": "Swati Ramesh Anami",
+        "Branch": "ISE",
+        "Contact Number": 9110278500.0,
+        "CGPA": 8.0,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 31.0,
+        "Email address": "vadanatvadanat452003@gmail.com",
+        "Student Full Name": "VandanaT",
+        "Branch": "ISE",
+        "Contact Number": 9019813889.0,
+        "CGPA": 8.0,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 32.0,
+        "Email address": "murthy.ganesh03@gmail.com",
+        "Student Full Name": "Ganesh MS ",
+        "Branch": "ISE",
+        "Contact Number": 7483349002.0,
+        "CGPA": 8.4,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 33.0,
+        "Email address": "srinithyas97@gmail.com",
+        "Student Full Name": "Srinithya S ",
+        "Branch": "ISE",
+        "Contact Number": 8431546183.0,
+        "CGPA": 8.5,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 34.0,
+        "Email address": "ananyainamadar4567@gmail.com",
+        "Student Full Name": "Ananya DI",
+        "Branch": "ISE",
+        "Contact Number": 9731055189.0,
+        "CGPA": 8.3,
+        "College": "EWIT",
+        "null": null
+    },
+    {
+        "Sl NO": 35.0,
+        "Email address": "kalpanablathi2003@gmail.com",
+        "Student Full Name": "Kalpana B Lathi ",
+        "Branch": "CSE",
+        "Contact Number": 9019689962.0,
+        "CGPA": 7.78,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 36.0,
+        "Email address": "gcnanditha4@gmail.com ",
+        "Student Full Name": "Nanditha GC ",
+        "Branch": "CSE",
+        "Contact Number": 9110414920.0,
+        "CGPA": 8.7,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 37.0,
+        "Email address": "radhikakn8867@gmail.com",
+        "Student Full Name": "Radhika K N",
+        "Branch": "CSE",
+        "Contact Number": 8867062031.0,
+        "CGPA": 8.2,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 38.0,
+        "Email address": "sahanabc03@gmail.com",
+        "Student Full Name": "Sahana B C ",
+        "Branch": "CSE",
+        "Contact Number": 9901019770.0,
+        "CGPA": 9.1,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 39.0,
+        "Email address": "swathigwda1@gmail.com",
+        "Student Full Name": "Swathi T D ",
+        "Branch": "CSE",
+        "Contact Number": 6364265087.0,
+        "CGPA": 8.4,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 40.0,
+        "Email address": "manjumanju92704@gmail.com",
+        "Student Full Name": "Yashaswini m ",
+        "Branch": "CSE",
+        "Contact Number": 9113261112.0,
+        "CGPA": 8.5,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 41.0,
+        "Email address": "deepikagowda1513@gmail.com",
+        "Student Full Name": "Deepika N N ",
+        "Branch": "CSE",
+        "Contact Number": 9148153291.0,
+        "CGPA": 8.6,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 42.0,
+        "Email address": "kavyakr003@gmail.com",
+        "Student Full Name": "Kavya K R",
+        "Branch": "CSE",
+        "Contact Number": 8971603957.0,
+        "CGPA": 9.0,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 43.0,
+        "Email address": "monishakhushal9090@gmail.com",
+        "Student Full Name": "Monisha K N ",
+        "Branch": "CSE",
+        "Contact Number": 9148306380.0,
+        "CGPA": 8.52,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 44.0,
+        "Email address": "darshangk11@gmail.com",
+        "Student Full Name": "Dharshan Gowda G K",
+        "Branch": "CSE",
+        "Contact Number": 6360521121.0,
+        "CGPA": 7.45,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 45.0,
+        "Email address": "avaishwarya153@gmail.com",
+        "Student Full Name": "Aishwarya A V ",
+        "Branch": "CSE",
+        "Contact Number": 9606441454.0,
+        "CGPA": 8.2,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 46.0,
+        "Email address": "vaishgowda13@gmail.com",
+        "Student Full Name": "Vaishnavi R",
+        "Branch": "CSE",
+        "Contact Number": 9739249997.0,
+        "CGPA": 8.7,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 47.0,
+        "Email address": "pdjnanavi@gmail.com",
+        "Student Full Name": "Jnanavi PD ",
+        "Branch": "ECE",
+        "Contact Number": 9148376819.0,
+        "CGPA": 8.96,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 48.0,
+        "Email address": "rajumpel@gmail.com",
+        "Student Full Name": "Likith DR ",
+        "Branch": "ECE",
+        "Contact Number": 9019698678.0,
+        "CGPA": 9.17,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 49.0,
+        "Email address": "rr7900240@gmail.com",
+        "Student Full Name": "Reshma I V",
+        "Branch": "ECE",
+        "Contact Number": 8618317389.0,
+        "CGPA": 8.98,
+        "College": "CIT",
+        "null": null
+    },
+    {
+        "Sl NO": 50.0,
+        "Email address": "anushaanu15082003@gmail.com",
+        "Student Full Name": "Anusha J ",
+        "Branch": "CSE",
+        "Contact Number": 8073519006.0,
+        "CGPA": 8.57,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 51.0,
+        "Email address": "hithaishimd11@gmail.com",
+        "Student Full Name": "Hithaishi M D ",
+        "Branch": "CSE",
+        "Contact Number": 8095522405.0,
+        "CGPA": 8.7,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 52.0,
+        "Email address": "khushivraj2003@gmail.com",
+        "Student Full Name": "Khushi V Raj ",
+        "Branch": "CSE",
+        "Contact Number": null,
+        "CGPA": 8.0,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 53.0,
+        "Email address": "kumariak0721@gmail.com",
+        "Student Full Name": "Kumari A K",
+        "Branch": "CSE",
+        "Contact Number": 6361548642.0,
+        "CGPA": 9.15,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 54.0,
+        "Email address": "mohanapriyam3042004@gmail.com",
+        "Student Full Name": "Mohanapriya M",
+        "Branch": "CSE",
+        "Contact Number": null,
+        "CGPA": 8.2,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 55.0,
+        "Email address": "sonikabpsonikabp@gmail.com",
+        "Student Full Name": "Sonika B P",
+        "Branch": "CSE",
+        "Contact Number": 7204162388.0,
+        "CGPA": 8.66,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 56.0,
+        "Email address": "sspoorthi439@gmail.com",
+        "Student Full Name": "Spoorthi H R",
+        "Branch": "CSE",
+        "Contact Number": null,
+        "CGPA": 8.0,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 57.0,
+        "Email address": "chandanags611@gmail.com",
+        "Student Full Name": "Chandana G S ",
+        "Branch": "ECE",
+        "Contact Number": 9900269254.0,
+        "CGPA": 8.6,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 58.0,
+        "Email address": "keerthanagr2205@gmail.com",
+        "Student Full Name": "Keerthana GR ",
+        "Branch": "ECE",
+        "Contact Number": null,
+        "CGPA": 8.32,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 59.0,
+        "Email address": "lakshminagaraju020@gmail.com",
+        "Student Full Name": "Lakshmi N ",
+        "Branch": "ECE",
+        "Contact Number": 9611535946.0,
+        "CGPA": 8.85,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 60.0,
+        "Email address": "sadhanakrishna05@gmail.com",
+        "Student Full Name": "Sadhana K",
+        "Branch": "ECE",
+        "Contact Number": 8904117731.0,
+        "CGPA": 8.6,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 61.0,
+        "Email address": "hpr.usha2002@gmail.com",
+        "Student Full Name": "USHA N",
+        "Branch": "ECE",
+        "Contact Number": 8951375208.0,
+        "CGPA": 8.43,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 62.0,
+        "Email address": "srushtimp2003@gmail.com",
+        "Student Full Name": "SRUSHTI M P",
+        "Branch": "EEE",
+        "Contact Number": null,
+        "CGPA": 9.1,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 63.0,
+        "Email address": "muthuvarun31@gmail.com",
+        "Student Full Name": "VARUN S",
+        "Branch": "EEE",
+        "Contact Number": 7349498926.0,
+        "CGPA": 8.364,
+        "College": "GMIT",
+        "null": null
+    },
+    {
+        "Sl NO": 64.0,
+        "Email address": "akashhanumanthappa.official@gmail.com",
+        "Student Full Name": "Akash H",
+        "Branch": "CSE",
+        "Contact Number": 7337720395.0,
+        "CGPA": 7.3,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 65.0,
+        "Email address": "aliyamohammadi043@gmail.com",
+        "Student Full Name": "Aliya",
+        "Branch": "CSE",
+        "Contact Number": 6362874561.0,
+        "CGPA": 8.13,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 66.0,
+        "Email address": "shariffayan91@gmail.com",
+        "Student Full Name": "AYAN SHARIFF",
+        "Branch": "CSE",
+        "Contact Number": 6366199482.0,
+        "CGPA": 7.2,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 67.0,
+        "Email address": "bhoomikabhoomi611@gmail.com",
+        "Student Full Name": "Bhoomika C C",
+        "Branch": "CSE",
+        "Contact Number": 9880224905.0,
+        "CGPA": 7.6,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 68.0,
+        "Email address": "chaithrakrishnegowda0@gmail.com ",
+        "Student Full Name": "Chaithra. M.K",
+        "Branch": "CSE",
+        "Contact Number": 8073540248.0,
+        "CGPA": 7.0,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 69.0,
+        "Email address": "hemashreebr273@gmail.com",
+        "Student Full Name": "Hemashree BR ",
+        "Branch": "CSE",
+        "Contact Number": 7619568349.0,
+        "CGPA": 8.77,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 70.0,
+        "Email address": "ranimadegowda2003@gmail.com",
+        "Student Full Name": "K M Suhas ",
+        "Branch": "CSE",
+        "Contact Number": 8618653586.0,
+        "CGPA": 8.53,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 71.0,
+        "Email address": "krupaprakash83@gmail.com",
+        "Student Full Name": "Krupa P",
+        "Branch": "CSE",
+        "Contact Number": 7019473299.0,
+        "CGPA": 8.16,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 72.0,
+        "Email address": "manoharpm6@gmail.com",
+        "Student Full Name": "Manohar P M ",
+        "Branch": "CSE",
+        "Contact Number": 9535959852.0,
+        "CGPA": 8.22,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 73.0,
+        "Email address": "monisha152717@gmail.com",
+        "Student Full Name": "Monisha S",
+        "Branch": "CSE",
+        "Contact Number": 7892850928.0,
+        "CGPA": 8.33,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 74.0,
+        "Email address": "blnamitha123@gmail.com",
+        "Student Full Name": "Namitha BL ",
+        "Branch": "CSE",
+        "Contact Number": 7019799728.0,
+        "CGPA": 8.79,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 75.0,
+        "Email address": "abburinikitha@gmail.com",
+        "Student Full Name": "Nikhitha Sai.A ",
+        "Branch": "CSE",
+        "Contact Number": 6366604403.0,
+        "CGPA": 7.66,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 76.0,
+        "Email address": "nitheshml2002@gmail.com",
+        "Student Full Name": "Nithesh ML",
+        "Branch": "CSE",
+        "Contact Number": 7760609465.0,
+        "CGPA": 7.65,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 77.0,
+        "Email address": "prajnapapu2004@gmail.com",
+        "Student Full Name": "Prajna S ",
+        "Branch": "CSE",
+        "Contact Number": 7348918493.0,
+        "CGPA": 8.05,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 78.0,
+        "Email address": "rohanmsgowda76@gmail.com",
+        "Student Full Name": "Rohan M.S",
+        "Branch": "CSE",
+        "Contact Number": 8197792949.0,
+        "CGPA": 8.3,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 79.0,
+        "Email address": "shobhapn25@gmail.com",
+        "Student Full Name": "Shobha P N",
+        "Branch": "CSE",
+        "Contact Number": 9591789398.0,
+        "CGPA": 8.64,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 80.0,
+        "Email address": "shruthakeerthi2003@gmail.com",
+        "Student Full Name": "Shrutha Keerthi.C",
+        "Branch": "CSE",
+        "Contact Number": 6362033680.0,
+        "CGPA": 7.8,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 81.0,
+        "Email address": "sonusonal214@gmail.com",
+        "Student Full Name": "Sonal S",
+        "Branch": "CSE",
+        "Contact Number": 8970998641.0,
+        "CGPA": 7.9,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 82.0,
+        "Email address": "sreenivasprasad185@gmail.com",
+        "Student Full Name": "Sreenivas Prasad V  ",
+        "Branch": "CSE",
+        "Contact Number": 8123430047.0,
+        "CGPA": 7.0,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 83.0,
+        "Email address": "thanushreethanushree738@gmail.com",
+        "Student Full Name": "Thanushree H M ",
+        "Branch": "CSE",
+        "Contact Number": 8050679206.0,
+        "CGPA": 8.15,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 84.0,
+        "Email address": "thrisha6860@gmail.com",
+        "Student Full Name": "Thrisha. K.P ",
+        "Branch": "CSE",
+        "Contact Number": 7676280609.0,
+        "CGPA": 7.45,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 85.0,
+        "Email address": "utkarshanerle@gmail.com",
+        "Student Full Name": "Utkarsha Nerle ",
+        "Branch": "CSE",
+        "Contact Number": 7019002675.0,
+        "CGPA": 7.9,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 86.0,
+        "Email address": "varshithasvarshu452003@gmail.com",
+        "Student Full Name": "Varshitha S",
+        "Branch": "CSE",
+        "Contact Number": 9019708781.0,
+        "CGPA": 9.04,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 87.0,
+        "Email address": "varunkvarun95@gmail.com",
+        "Student Full Name": "Varun K",
+        "Branch": "CSE",
+        "Contact Number": 9353157122.0,
+        "CGPA": 8.54,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 88.0,
+        "Email address": "vijjuvijetha05@gmail.com",
+        "Student Full Name": "VIJETHA PRASAD SM",
+        "Branch": "CSE",
+        "Contact Number": 8660494413.0,
+        "CGPA": 7.11,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 89.0,
+        "Email address": "myashaswini09@gmail.com",
+        "Student Full Name": "Yashaswini M ",
+        "Branch": "CSE",
+        "Contact Number": 9844612428.0,
+        "CGPA": 8.16,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 90.0,
+        "Email address": "yashupriyakg@gmail.com ",
+        "Student Full Name": "Yashupriya.K.G ",
+        "Branch": "CSE",
+        "Contact Number": 7795026895.0,
+        "CGPA": 6.94,
+        "College": "MRIT",
+        "null": null
+    },
+    {
+        "Sl NO": 91.0,
+        "Email address": "kriti098dev@gmail.com",
+        "Student Full Name": "Kagitha Kriti Dev ",
+        "Branch": "CSE",
+        "Contact Number": 7892553045.0,
+        "CGPA": 8.07,
+        "College": "MYCEM",
+        "null": null
+    },
+    {
+        "Sl NO": 92.0,
+        "Email address": "kcdeepika74@gmail.com",
+        "Student Full Name": "Deepika K C ",
+        "Branch": "CSE",
+        "Contact Number": 7795805358.0,
+        "CGPA": 8.52,
+        "College": "MYCEM",
+        "null": null
+    },
+    {
+        "Sl NO": 93.0,
+        "Email address": "hamsagowda104@gmail.com",
+        "Student Full Name": "Hamsa M K ",
+        "Branch": "CSE",
+        "Contact Number": 8310418463.0,
+        "CGPA": 8.95,
+        "College": "MYCEM",
+        "null": null
+    },
+    {
+        "Sl NO": 94.0,
+        "Email address": "abhishekmys03@gmail.com",
+        "Student Full Name": "Abhishek S ",
+        "Branch": "CSE",
+        "Contact Number": 8861298407.0,
+        "CGPA": 7.6,
+        "College": "MYCEM",
+        "null": null
+    },
+    {
+        "Sl NO": 95.0,
+        "Email address": "srivathsams2903@gmail.com",
+        "Student Full Name": "Srivathsa Acharya MS",
+        "Branch": "CSE",
+        "Contact Number": 8971621615.0,
+        "CGPA": 7.9,
+        "College": "MYCEM",
+        "null": null
+    },
+    {
+        "Sl NO": 96.0,
+        "Email address": "yuvalakshmimagnificent@gmail.com",
+        "Student Full Name": "Yuva Lakshmi S",
+        "Branch": "ISE",
+        "Contact Number": 7204185394.0,
+        "CGPA": 7.99,
+        "College": "MYCEM",
+        "null": null
+    },
+    {
+        "Sl NO": 97.0,
+        "Email address": "kirankochana6@gmail.com",
+        "Student Full Name": "Kiran K M",
+        "Branch": "ISE",
+        "Contact Number": 8904827395.0,
+        "CGPA": 8.93,
+        "College": "MYCEM",
+        "null": null
+    },
+    {
+        "Sl NO": 98.0,
+        "Email address": "aishwaryakl613@gmail.com",
+        "Student Full Name": "Aishwarya K L",
+        "Branch": "ISE",
+        "Contact Number": 8073090534.0,
+        "CGPA": 8.72,
+        "College": "MYCEM",
+        "null": null
+    }
+]
