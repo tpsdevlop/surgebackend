@@ -59,7 +59,7 @@ def no_of_q_ans(data):
     ended_courses=data['Ended_Courses']
     list_of_course=data['list_of_course']
     result={
-        "StudentId":student_id,
+        # "StudentId":student_id,
     }
     days=StudentDetails_Days_Questions.objects.filter(Student_id=student_id).first()
     if days:
@@ -137,7 +137,7 @@ def last_submit(ex):
         end=datetime.strptime(str(end).split(' ')[0], "%Y-%m-%d")
        
         if (end-existing).days>=0:
-            delay="no"
+            delay="N/A"
         elif (end-existing).days<0:
             print("heyu")
             delay=(existing-end).days
