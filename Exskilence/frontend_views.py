@@ -17,7 +17,9 @@ def frontend_Questions_page(req):
     try:
         data = json.loads(req.body)
         Subject = data.get("Subject")
+        ctime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
         qnsdata = download_list_blob2('Internship_days_schema/'+Subject+'/','',CONTAINER)
+        btime =(datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-ctime).total_seconds()
         user ,created = StudentDetails_Days_Questions.objects.get_or_create(Student_id = data.get('StudentId'),
             defaults = {'Start_Course':{data.get('Course'):str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))},
                         'Days_completed':{data.get('Course'):0},
@@ -119,6 +121,7 @@ def frontend_Questions_page(req):
                     'Qnslist' : out,
                     'Day_Score' : str(htcTotal)+'/'+str(htcTotaloff),
                     'Completed' : str(solved)+"/"+str(len(user.Qns_lists.get(Subject ,[]))),
+                    'BlobTime': btime
                 }
             else:
                 # print(getDayScore(anslist.filter( Subject = Subject),i.get("Qn_name")))
@@ -135,6 +138,7 @@ def frontend_Questions_page(req):
                     'Qnslist' : out,
                     'Day_Score' : dayinfo[0],
                     'Completed' : dayinfo[1],
+                    'BlobTime': btime
                 }
         attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(output), content_type='application/json')

@@ -21,7 +21,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse("Welcome to the Home Page of Exskilence 018")
+    return HttpResponse("Welcome to the Home Page of Exskilence 019")
 
 
 @api_view(['POST'])
@@ -101,6 +101,7 @@ def get_duration(req):
 def getcourse(req):
     try:
         data = json.loads(req.body)
+        allusers = StudentDetails.objects.all()
         allusersranks = StudentDetails_Days_Questions.objects.all()
         for i in allusersranks:
             if i.Student_id == data.get('StudentId'):
@@ -108,7 +109,11 @@ def getcourse(req):
                 break
         if userscore is None:
             return HttpResponse('Error! User does not exist', status=404)
-        user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
+        # user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
+        for u in allusers:
+            if u.StudentId == data.get('StudentId'):
+                user = u
+                break
         # userscore, created = StudentDetails_Days_Questions.objects.get_or_create(
                         #     Student_id=data.get('StudentId'),
                         #     defaults={
@@ -173,10 +178,10 @@ def getcourse(req):
                 if course.get('SubjectName') in user.Courses  :
                     starttime = timestart.get(course.get('SubjectName')).get('Start')
                     endtime = timestart.get(course.get('SubjectName')).get('End')
-                    if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) :
-                        allrdata = getRanksbyCourse(allusersranks ,course.get('SubjectName'))
-                        userRank = [ i.get('StudentId') for i in allrdata  ]
-                        Rank.update({course.get('SubjectName'):int(userRank.index(data.get('StudentId')))+1 if data.get('StudentId') in userRank else 'N/A'})
+                    # if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) :
+                        # allrdata = getRanksbyCourse(allusersranks ,course.get('SubjectName'))
+                        # userRank = [ i.get('StudentId') for i in allrdata  ]
+                        # Rank.update({course.get('SubjectName'):int(userRank.index(data.get('StudentId')))+1 if data.get('StudentId') in userRank else 'N/A'})
                         
                     if course.get('SubjectName') == "HTMLCSS":
                         Enrolled_courses.append({
@@ -224,7 +229,7 @@ def getcourse(req):
                     Duration = Duration + (i.Last_update - i.Login_time).total_seconds()
             intcourse.get('Score').append(str(Total_Score)+"/"+str(Total_Score_Outof))
             Total_Rank = getRanks(allusersranks, data.get('StudentId'))
-            ranking= rankings()
+            ranking= rankings(filterQueryTodict(allusers))
             userrank = [ i.get('Rank') for i in ranking  if i.get('StudentId') == data.get('StudentId') ]
             print(userrank)
             Rank.update({'HTMLCSS':userrank[0] if userrank else 'N/A'})
@@ -246,8 +251,8 @@ def getcourse(req):
             attendance_update(data.get('StudentId'))
             return HttpResponse('Error! User does not exist', status=404)
     except Exception as e:
-        ErrorLog(req,e)
-        attendance_update(data.get('StudentId'))
+        # ErrorLog(req,e)
+        # attendance_update(data.get('StudentId'))
         return HttpResponse(f"An error occurred: {e}", status=500)
 
 
@@ -881,24 +886,28 @@ def test (req):
         return HttpResponse('An error occurred'+str(e))
 from django.db.models import Sum
 from django.db.models import Q, Sum
-def rankings():
+def rankings(allusers):
     try:
-        ranks = StudentDetails.objects.all()
+        allmainQns = QuestionDetails_Days.objects.all()
+        ranks = allusers
         if ranks is None:
             HttpResponse('No data found')
         out ={}
         noDAta = []
         for i in ranks:
-         if str(i.StudentId)[2:].startswith("ADMI") or str(i.StudentId)[2:].startswith("TRAI") or str(i.StudentId)[2:].startswith("TEST"):
+         if str(i.get('StudentId'))[2:].startswith("ADMI") or str(i.get('StudentId'))[2:].startswith("TRAI") or str(i.get('StudentId'))[2:].startswith("TEST"):
             continue
-         user = QuestionDetails_Days.objects.filter(Student_id=i.StudentId)
+        #  user = QuestionDetails_Days.objects.filter(Student_id=i.get('StudentId'))
+         user = filterQuery(allmainQns, 'Student_id',  i.get('StudentId'))
          if user is None:
-            noDAta.append(i.StudentId)
+            noDAta.append(i.get('StudentId'))
             continue
-         HTML = filterQuery(user, 'Subject',  'HTML')
-         CSS = filterQuery(user, 'Subject',  'CSS')
+        #  HTML = filterQuery(user, 'Subject',  'HTML')
+        #  CSS = filterQuery(user, 'Subject',  'CSS')
+         HTML = filterQueryfromdict(user, 'Subject',  'HTML')
+         CSS = filterQueryfromdict(user, 'Subject',  'CSS')
          if HTML is None or CSS is None or len(HTML) == 0 or len(CSS) == 0:
-            noDAta.append(i.StudentId)
+            noDAta.append(i.get('StudentId'))
             continue
          HTMLCSSSCORE =0
          HTMLLASTTIME = HTML[0].get('DateAndTime')
@@ -911,16 +920,14 @@ def rankings():
             HTMLCSSSCORE += i2.get('Score')
             if i2.get('DateAndTime') > HTMLLASTTIME:
                 HTMLLASTTIME = i2.get('DateAndTime')
-        #  print(HTMLCSSSCORE)#,QuestionDetails_Days.objects.filter(    Q(Student_id=i.Student_id) & (Q(Subject='HTML') | Q(Subject='CSS'))).aggregate(total_score=Sum('Score'))['total_score'] or 0 )
          
-         out.update({i.StudentId: {
+         out.update({i.get('StudentId'): {
             "HTMLCSS":   HTMLCSSSCORE,
             'HTML_last_Question':   HTMLLASTTIME,
 
         }
     })
         ranks = sorted(    out.items(),     key=lambda x: (-x[1]['HTMLCSS'], x[1]['HTML_last_Question']))  
-        # print(ranks)
         res = []
         for i in ranks:
             res.append({'Rank':ranks.index(i)+1,"StudentId":i [0],"Total":i[1]['HTMLCSS'], "LastTime":i[1]['HTML_last_Question']})

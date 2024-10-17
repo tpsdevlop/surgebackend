@@ -38,3 +38,24 @@ def filterQueryOrderby(user,Sortkey ,order):
                 filtered_records.append(jdata)
         filtered_records = sorted(filtered_records, key=lambda k: k[Sortkey] , reverse = order)
         return  (filtered_records)
+     
+def filterQueryTodict(user ):
+     
+    if isinstance(user, QuerySet):
+        filtered_records = []
+        for record in user:
+                jdata ={}
+                for i in record.__dict__.keys():
+                    if i == '_state':
+                        continue
+                    jdata.update({i:record.__dict__.get(i)})
+                
+                filtered_records.append(jdata)
+        return  (filtered_records)
+    
+def  filterQueryfromdict(user,key,value):
+     filtered_records = []
+     for i in user:
+        if i.get(key) == value:
+           filtered_records.append(i)
+     return  (filtered_records)

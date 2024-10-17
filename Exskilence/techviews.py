@@ -77,16 +77,10 @@ from Exskilence.views import rankings
 @csrf_exempt
 def frontpagedeatialsmethod(request):
     try:
-        student_details = list(StudentDetails.objects.all().values(
-            'StudentId',
-            'firstName',
-            'college_Id',
-            'branch',
-            'CGPA',
-            'score'
-        ))
+        allusers = StudentDetails.objects.all().values('StudentId','firstName','college_Id','branch','CGPA','score')
+        student_details = list(allusers)
         mainuser = list(StudentDetails_Days_Questions.objects.all().values())
-        student_ranks = rankings()
+        student_ranks = rankings(allusers)
         userprogress = []
         for student in mainuser:
             student_ID = student['Student_id']
@@ -96,7 +90,7 @@ def frontpagedeatialsmethod(request):
                 "totalScore": scorescumulation(student),
                 "overallScore": overallscore(student)["totalscore"],
                 "totalNumberOFQuesAns": total_number_of_questions_completed(student),
-                "no_of_hrs": get_total_duration(student_ID),
+                "no_of_hrs": get_total_durations_for_subjects(student_ID),
                 "Delay":calculate_course_delay(student_ID),
                 "rank": student_rank
             }
@@ -504,3 +498,23 @@ def calculate_questions_completed(data,subject):
         }
        
     return results
+
+def get_total_durations_for_subjects(student_id):
+    subjects_date_ranges = {
+        "HTMLCSS": ("2024-10-03", "2024-10-12"),
+        "JavaScript": ("2024-10-14", "2024-11-02"),
+        "SQL": ("2024-11-04", "2024-11-13"),
+        "Python": ("2024-11-15", "2024-11-24"),
+        "Internship": ("2024-11-26", "2024-12-31")
+    }
+    subject_durations = {}
+    for subject, (start_date_str, end_date_str) in subjects_date_ranges.items():
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+        attendance_records = Attendance.objects.filter(SID=student_id,
+                                                       Login_time__gte=start_date,
+                                                       Last_update__lte=end_date)
+        total_duration_in_seconds = sum(record.Duration for record in attendance_records)
+        total_duration_in_hours = round(total_duration_in_seconds / 3600, 2)
+        subject_durations[subject] = total_duration_in_hours
+    return subject_durations
