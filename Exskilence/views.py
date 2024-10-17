@@ -21,7 +21,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse("Welcome to the Home Page of Exskilence 019")
+    return HttpResponse("Welcome to the Home Page of Exskilence 20",content='application/json')
 
 
 @api_view(['POST'])
