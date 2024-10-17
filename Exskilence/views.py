@@ -21,7 +21,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse("Welcome to the Home Page of Exskilence 22" )
+    return HttpResponse("Welcome to the Home Page of Exskilence 23" )
 
 
 @api_view(['POST'])
@@ -240,7 +240,7 @@ def getcourse(req):
             Total_Rank = getRanks(allusersranks, data.get('StudentId'))
             dbtime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
             ranking= rankings(filterQueryTodict(allusers))
-            bdttime = dbttime + (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-dbtime).total_seconds()
+            dbttime = dbttime + (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-dbtime).total_seconds()
             userrank = [ i.get('Rank') for i in ranking  if i.get('StudentId') == data.get('StudentId') ]
             print(userrank)
             Rank.update({'HTMLCSS':userrank[0] if userrank else 'N/A'})
