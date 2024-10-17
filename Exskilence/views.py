@@ -21,7 +21,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse("Welcome to the Home Page of Exskilence 20",content='application/json')
+    return HttpResponse("Welcome to the Home Page of Exskilence 21" )
 
 
 @api_view(['POST'])
@@ -100,9 +100,12 @@ def get_duration(req):
 @api_view(['POST'])
 def getcourse(req):
     try:
+        otime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
         data = json.loads(req.body)
+        dbtime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
         allusers = StudentDetails.objects.all()
         allusersranks = StudentDetails_Days_Questions.objects.all()
+        dbttime = (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-dbtime).total_seconds()
         for i in allusersranks:
             if i.Student_id == data.get('StudentId'):
                 userscore = i
@@ -148,7 +151,9 @@ def getcourse(req):
                 else:
                     if userscore.Score_lists.get(str(i)+"Score",None) is None:
                         userscore.Score_lists.update({str(i)+"Score":"0/0"})
+            dbtime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
             userscore.save()
+            dbttime = dbttime + (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-dbtime).total_seconds()
         out = {}
         Rank = {}
         intcourse ={
@@ -172,7 +177,9 @@ def getcourse(req):
                         suffix = ["st", "nd", "rd"][day % 10 - 1]
                     formatted_date =  (f"{day}{suffix} {calendar.month_abbr[month]}")
                     return formatted_date
+            dbtime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
             courses=CourseDetails.objects.filter().order_by('SubjectId').values()
+            dbttime = dbttime + (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-dbtime).total_seconds()
             timestart = user.Course_Time
             for course in courses:
                 if course.get('SubjectName') in user.Courses  :
@@ -222,7 +229,9 @@ def getcourse(req):
                             Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
                     if Startmost > starttime:
                         Startmost = starttime
+            dbtime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
             spent = Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, Endmost],Last_update__range=[Startmost, Endmost])  
+            dbttime = dbttime + (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-dbtime).total_seconds()
             Duration = 0 
             if spent:
                 for i in spent:
@@ -244,7 +253,10 @@ def getcourse(req):
                         "Rank": Rank,
                         "StudentName":user.firstName})
             user.score =round(float(str(intcourse.get('Score')[0]).split('/')[0]),2)
+            dbtime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
             user.save()
+            dbttime = dbttime + (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-dbtime).total_seconds()
+            out.update({"DBTime":dbttime,'Otime':(datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-otime).total_seconds()-dbttime,'TotalTime':(datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-otime).total_seconds()})
             attendance_update(data.get('StudentId'))
             return HttpResponse(json.dumps(out), content_type='application/json')
         else:
