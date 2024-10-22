@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
@@ -73,14 +74,46 @@ def create_student_details_days_questions(request):
             return JsonResponse({"error": "An error occurred: " + str(e)}, status=400)
  
     return JsonResponse({"error": "Invalid request method"}, status=405)
-from Exskilence.views import rankings
+ 
+def get_student_rank(students_data, student_id, ranking_subjects):
+    def get_combined_score(student):
+        score = 0
+        for subject in ranking_subjects:
+            subject_score = student['Score_lists'].get(f"{subject}Score", "0/0").split('/')[0]
+            score += float(subject_score)
+        return score
+ 
+    def is_valid_student(id):
+        return not any(keyword in id for keyword in ["ADMI", "TRAI", "TEST"])
+ 
+    scores = [(student['Student_id'], get_combined_score(student))
+              for student in students_data
+              if is_valid_student(student['Student_id'])]
+   
+    sorted_scores = sorted(scores, key=lambda x: x[1], reverse=True)
+    ranks = {}
+    current_rank = 1
+    for i, (id, score) in enumerate(sorted_scores):
+        if i > 0 and score < sorted_scores[i-1][1]:
+            current_rank = i + 1
+        ranks[id] = (current_rank, score)
+   
+    return ranks.get(student_id, (None, None))
+ 
 @csrf_exempt
 def frontpagedeatialsmethod(request):
     try:
-        allusers = StudentDetails.objects.all().values('StudentId','firstName','college_Id','branch','CGPA','score')
-        student_details = list(allusers)
+        student_details = list(StudentDetails.objects.all().values(
+            'StudentId',
+            'firstName',
+            'lastName',
+            'college_Id',
+            'branch',
+            'CGPA',
+            'score'
+        ))
         mainuser = list(StudentDetails_Days_Questions.objects.all().values())
-        student_ranks = rankings(allusers)
+        student_ranks = rankings()
         userprogress = []
         for student in mainuser:
             student_ID = student['Student_id']
@@ -91,7 +124,7 @@ def frontpagedeatialsmethod(request):
                 "overallScore": overallscore(student)["totalscore"],
                 "totalNumberOFQuesAns": total_number_of_questions_completed(student),
                 "no_of_hrs": get_total_durations_for_subjects(student_ID),
-                "Delay":calculate_course_delay(student_ID),
+                "Delay":delay(student_ID),
                 "rank": student_rank
             }
             userprogress.append(scores)
@@ -99,7 +132,7 @@ def frontpagedeatialsmethod(request):
             return JsonResponse({'message': 'No data found'}, status=404)
         result = [{
             'id': item['StudentId'],
-            'name': item['firstName'],
+            'name': item['firstName']+item['lastName'],
             'College': item['college_Id'],
             'Branch': item['branch'],
             'CGPA': item['CGPA']
@@ -114,30 +147,45 @@ def frontpagedeatialsmethod(request):
  
  
 def overallscore(student):
-    easy = 0
-    medium = 0
-    hard = 0
-    number_quesitions_assgned = 0
-    questionlist = ["HTMLCSS","Java_Script","SQL_Day_1","SQL_Day_2",
-                    "SQL_Day_3","SQL_Day_4","SQL_Day_5","SQL_Day_6",
-                    "SQL_Day_7","SQL_Day_8","SQL_Day_9","SQL_Day_10"
-                    ,"Python_Day_1","Python_Day_2","Python_Day_3",
-                    "Python_Day_4","Python_Day_5"
-                    ]
-    for i in questionlist:
-        questionsperlist = student['Qns_lists'].get(i)
-        if questionsperlist is not None:
-            for i in questionsperlist:
-                # print(number_quesitions_assgned)
-                number_quesitions_assgned +=1
-                if i[-4] == "E":
-                    easy += 1
-                elif i[-4] == "M":
-                    medium += 1
-                else:
-                    hard += 1
-    totalscore = (5*easy)+(10*medium)+(15*hard)
-    return {"totalscore":totalscore,"totalnumofquestionassigned":number_quesitions_assgned}
+    try:
+        easy = 0
+        medium = 0
+        hard = 0
+        number_quesitions_assgned = 0
+        questionlist = ["HTMLCSS", "Java_Script", "SQL_Day_1", "SQL_Day_2",
+                        "SQL_Day_3", "SQL_Day_4", "SQL_Day_5", "SQL_Day_6",
+                        "SQL_Day_7", "SQL_Day_8", "SQL_Day_9", "SQL_Day_10",
+                        "Python_Day_1", "Python_Day_2", "Python_Day_3",
+                        "Python_Day_4", "Python_Day_5"
+                        ]
+       
+        for i in questionlist:
+            questionsperlist = student['Qns_lists'].get(i)
+           
+            if questionsperlist is not None:
+                for question in questionsperlist:
+                    number_quesitions_assgned += 1
+                   
+                    # Check if the question string has at least 4 characters before checking the index
+                    if len(question) >= 4:
+                        if question[-4] == "E":
+                            easy += 1
+                        elif question[-4] == "M":
+                            medium += 1
+                        else:
+                            hard += 1
+                    else:
+                        print(f"Question {question} is too short to check difficulty level.")
+       
+        totalscore = (5 * easy) + (10 * medium) + (15 * hard)
+       
+        return {
+            "totalscore": totalscore,
+            "totalnumofquestionassigned": number_quesitions_assgned
+        }
+       
+    except Exception as e:
+        return JsonResponse({"error": str(e)})
 def combine_data(result, userprogress):
     userprogress_dict = {item['id']: item for item in userprogress}
     combined = []
@@ -182,10 +230,12 @@ def scorescumulation(student):
         'Total_Score': score_sum,
         'Score_Breakdown': score_breakdown
     }
+ 
+   
+ 
 def total_number_of_questions_completed(student):
     categories = ["HTML", "Python", "SQL", "Java_Script"]
    
-    # Fetch all relevant QuestionDetails_Days entries for the student
     questions = QuestionDetails_Days.objects.filter(
         Student_id=student['Student_id']
     ).values_list('Subject', flat=True)
@@ -345,7 +395,8 @@ def per_student_ques_detials(request):
             }
             stduentHTMLAns = HTMLdict
         else :
-            print("no data found" + str(stduentHTMLAns))
+            return("no data found + str(stduentHTMLAns)")
+            # print("no data found" + str(stduentHTMLAns))
  
         if len(studentCSS_queryset)>0:
             studentCSSAns = studentCSS_queryset[0]
@@ -357,7 +408,8 @@ def per_student_ques_detials(request):
             }
             studentCSSAns = CSSdict
         else :
-            print("no data found" + str(studentCSSAns))
+            pass
+            # print("no data found" + str(studentCSSAns))
         return JsonResponse({
                 'student_id': student_id,
                 'Name':studenttsdata['name'],
@@ -395,9 +447,10 @@ def per_student_JS_ques_detials(request):
                 'ans':stduentJavaScriptAns["Ans"]
             }
             stduentJavaScriptAns = JSdict
-            print(stduentJavaScriptAns)
+            # print(stduentJavaScriptAns)
         else :
-            print("no data found" + str(stduentJavaScriptAns))
+            return ("no data found")
+            # print("no data found" + str(stduentJavaScriptAns))
         return JsonResponse({
                 'student_id': student_id,
                 'Name':studenttsdata['name'],
@@ -431,13 +484,35 @@ def studentdata(studentid):
     except Exception as e:
         return {}
    
-def get_total_duration(student_id):
-    attendance_records = Attendance.objects.filter(SID=student_id)
-    total_duration_in_seconds = 0
+def get_total_durations_for_subjects(student_id):
+    subjects_date_ranges = {
+        "HTMLCSS": ("2024-10-03", "2024-10-12"),
+        "JavaScript": ("2024-10-14", "2024-11-02"),
+        "SQL": ("2024-11-04", "2024-11-13"),
+        "Python": ("2024-11-15", "2024-11-24"),
+        "Internship": ("2024-11-26", "2024-12-31")
+    }
+    subjects_date_ranges = {
+        subject: (
+            timezone.make_aware(datetime.strptime(start, '%Y-%m-%d')),
+            timezone.make_aware(datetime.strptime(end, '%Y-%m-%d'))
+        ) for subject, (start, end) in subjects_date_ranges.items()
+    }
+    all_start_date = min(start for start, _ in subjects_date_ranges.values())
+    all_end_date = max(end for _, end in subjects_date_ranges.values())
+    attendance_records = Attendance.objects.filter(
+        SID=student_id,
+        Login_time__gte=all_start_date,
+        Last_update__lte=all_end_date
+    )
+    subject_durations = defaultdict(float)
     for record in attendance_records:
-        total_duration_in_seconds += record.Duration
-    total_duration_in_hours = round(total_duration_in_seconds / 3600, 2)
-    return total_duration_in_hours
+        login_time = record.Login_time
+        for subject, (start_date, end_date) in subjects_date_ranges.items():
+            if start_date <= login_time <= end_date:
+                subject_durations[subject] += record.Duration
+    subject_durations = {subject: round(duration / 3600, 2) for subject, duration in subject_durations.items()}
+    return subject_durations
 from datetime import datetime
 from django.utils import timezone
 from datetime import datetime
@@ -498,23 +573,185 @@ def calculate_questions_completed(data,subject):
         }
        
     return results
+from Exskilence.filters import filterQuery  
+def rankings():
+    try:
+        ranks = StudentDetails.objects.all()
+        if ranks is None:
+            HttpResponse('No data found')
+        out ={}
+        noDAta = []
+        for i in ranks:
+         if str(i.StudentId)[2:].startswith("ADMI") or str(i.StudentId)[2:].startswith("TRAI") or str(i.StudentId)[2:].startswith("TEST"):
+            continue
+         user = QuestionDetails_Days.objects.filter(Student_id=i.StudentId)
+         if user is None:
+            noDAta.append(i.StudentId)
+            continue
+         HTML = filterQuery(user, 'Subject',  'HTML')
+         CSS = filterQuery(user, 'Subject',  'CSS')
+         if HTML is None or CSS is None or len(HTML) == 0 or len(CSS) == 0:
+            noDAta.append(i.StudentId)
+            continue
+         HTMLCSSSCORE =0
+         HTMLLASTTIME = HTML[0].get('DateAndTime')
+         for i1 in HTML:
+            # print(i)
+            HTMLCSSSCORE += i1.get('Score')
+            if i1.get('DateAndTime') > HTMLLASTTIME:
+                HTMLLASTTIME = i1.get('DateAndTime')
+         for i2 in CSS:
+            HTMLCSSSCORE += i2.get('Score')
+            if i2.get('DateAndTime') > HTMLLASTTIME:
+                HTMLLASTTIME = i2.get('DateAndTime')
+        #  print(HTMLCSSSCORE)#,QuestionDetails_Days.objects.filter(    Q(Student_id=i.Student_id) & (Q(Subject='HTML') | Q(Subject='CSS'))).aggregate(total_score=Sum('Score'))['total_score'] or 0 )
+         
+         out.update({i.StudentId: {
+            "HTMLCSS":   HTMLCSSSCORE,
+            'HTML_last_Question':   HTMLLASTTIME,
+ 
+        }
+    })
+        ranks = sorted(    out.items(),     key=lambda x: (-x[1]['HTMLCSS'], x[1]['HTML_last_Question']))  
+        # print(ranks)
+        res = []
+        for i in ranks:
+            res.append({'Rank':ranks.index(i)+1,"StudentId":i [0],"Total":i[1]['HTMLCSS'], "LastTime":i[1]['HTML_last_Question']})
+            # print({'Rank':ranks.index(i)+1,"StudentId":i [0], "LastTime":i[1]['HTML_last_Question'],"Total":i[1]['HTMLCSS']})
+        return res
+   
+    except Exception as e:
+        print(e)
+        return HttpResponse('An error occurred'+str(e))
+   
 
-def get_total_durations_for_subjects(student_id):
-    subjects_date_ranges = {
-        "HTMLCSS": ("2024-10-03", "2024-10-12"),
-        "JavaScript": ("2024-10-14", "2024-11-02"),
-        "SQL": ("2024-11-04", "2024-11-13"),
-        "Python": ("2024-11-15", "2024-11-24"),
-        "Internship": ("2024-11-26", "2024-12-31")
+     
+ 
+def delay(student_id):
+    try:
+        student_data = StudentDetails.objects.filter(StudentId=student_id).first()
+        list_of_course=[]
+        if student_data:
+            course_time = student_data.Course_Time
+            ended_courses = {}
+            current_time = datetime.now()
+            for course, timings in course_time.items():
+                start_time = timings['Start']  
+                end_time = timings['End']      
+                if end_time < current_time:
+                    duration = (end_time - start_time).days
+                    ended_courses[course] = {
+                        'End Time': end_time,
+                        'days': duration
+                    }
+                    list_of_course.append(course)
+            response_data = {
+                "StudentId": student_data.StudentId,
+                "Ended_Courses": ended_courses,
+                "list_of_course":list_of_course
+            }
+        else:
+            response_data = {
+                "StudentId": student_id,
+                "Ended_Courses": {}
+            }
+       
+        data=no_of_q_ans(response_data)
+        return data
+ 
+    except ValueError as ve:
+        # print(f"ValueError: {ve}")
+        return ve
+        # return HttpResponse({'error': 'Invalid date format'}, status=400)
+    except Exception as e:
+        # print(e)
+        pass
+        # return e
+        # return HttpResponse({'error': str(e)}, status=500)
+ 
+ 
+def no_of_q_ans(data):
+    student_id=data['StudentId']
+    ended_courses=data['Ended_Courses']
+    list_of_course=data['list_of_course']
+    result={
     }
-    subject_durations = {}
-    for subject, (start_date_str, end_date_str) in subjects_date_ranges.items():
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
-        attendance_records = Attendance.objects.filter(SID=student_id,
-                                                       Login_time__gte=start_date,
-                                                       Last_update__lte=end_date)
-        total_duration_in_seconds = sum(record.Duration for record in attendance_records)
-        total_duration_in_hours = round(total_duration_in_seconds / 3600, 2)
-        subject_durations[subject] = total_duration_in_hours
-    return subject_durations
+    days=StudentDetails_Days_Questions.objects.filter(Student_id=student_id).first()
+    if days:
+        for course in list_of_course:
+            total_days = ended_courses.get(course, {}).get('days', 0) +1
+            if course=="HTMLCSS":
+                if (len(days.Qns_lists[course])==len(days.Ans_lists["HTML"])):
+                    ex={
+                        "StudentId":student_id,
+                        "Course":course,
+                        "End_time":ended_courses.get(course, {}).get('End Time', 0)
+                    }
+                    delay=last_submit(ex)
+                    # result[course]={
+                    #     'total_days':total_days,
+                    #     'delay':delay,
+                    # }
+                    result[course]=delay
+                else:
+                    delay=compare_w_current(ended_courses[course]['End Time'])
+                    # result[course]={
+                    #     'total_days':total_days,
+                    #     'delay':delay,
+                    # }
+                    result[course]=delay
+            if course in days.Qns_lists and course in days.Ans_lists:
+                course_len=len(days.Qns_lists[course])
+                if (course_len==len(days.Ans_lists[course])):
+                    ex={
+                        "StudentId":student_id,
+                        "Course":course,
+                        "End_time":ended_courses.get(course, {}).get('End Time', 0)
+                    }
+                    delay=last_submit(ex)
+                    # result[course]={
+                    #     'total_days':total_days,
+                    #     'delay':delay,
+                    # }
+                    result[course]=delay
+                else:
+                    delay=compare_w_current(ended_courses[course]['End Time'])
+                    # result[course]={
+                    #     'total_days':total_days,
+                    #     'delayexist':delay,
+                    # }
+                    result[course]=delay
+    return result
+ 
+def compare_w_current(time):
+    current=datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
+    current=datetime.strptime(str(current).split(' ')[0],"%Y-%m-%d")
+    existing=datetime.strptime(str(time).split(' ')[0], "%Y-%m-%d")
+   
+    return ((current-existing).days)
+ 
+def last_submit(ex):
+    student_id = ex['StudentId']
+    all_submissions = QuestionDetails_Days.objects.filter(Student_id=student_id)
+    recent_times = []
+    course=ex['Course']
+    delay=0
+    if all_submissions:
+        current_course = "HTML" if course == "HTMLCSS" else course
+        for submission in all_submissions:
+            if submission.Subject == current_course:
+                submission_time = submission.DateAndTime
+                recent_times.append(submission_time)
+    if recent_times:
+        recent_time = max(recent_times)
+        current=datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
+        current=datetime.strptime(str(current).split(' ')[0],"%Y-%m-%d")
+        existing=datetime.strptime(str(recent_time).split(' ')[0], "%Y-%m-%d")
+        end=ex['End_time']
+        end=datetime.strptime(str(end).split(' ')[0], "%Y-%m-%d")
+       
+        if (end-existing).days>=0:
+            delay="N/A"
+        elif (end-existing).days<0:
+            delay=(existing-end).days
+    return delay

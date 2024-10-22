@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from Exskilence import views as ex,sqlviews as sql,pythonrun as ex_py,HTML_CSS_views as html_css,js_views as js , frontend_views as frontend
 from Exskilence import coursecreatiton as pkgs,trainerflowQn as tech ,ENYCRP as enc, Chatbox as chat ,adminflow as adminflow ,internship as intr
-from Exskilence import StudentDelay as delay
+from Exskilence import StudentDelay as delay ,Ranking as rank
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Swapnodayaplacements
@@ -30,7 +30,7 @@ urlpatterns = [
     # path('bugs/reported/<str:period>/', adminflow.get_bugs_reported_by_period, name='get_bugs_reported'),
     # path('bugs/resolved/<str:period>/', adminflow.get_bugs_resolved_by_period, name='get_bugs_resolved'),
     #test
-    # path ('test/', ex.updateScore),
+    # path ('test/', rank.updateRanks),
     path ('delay/<str:student_id>', delay.send),
     path('encode/', enc.EncodeView , name='encode'),
     path('decode/', enc.DecodeView , name='decode'),
@@ -72,7 +72,7 @@ urlpatterns = [
 
     path ('filter/', pkgs.filteringStudents),
 
-    path ('getranking/', ex.getRanks),
+    # path ('getranking/', ex.getRanks),
 
     # chatbox
     path ('chatbox/', chat.chatbox),

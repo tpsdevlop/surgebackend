@@ -1,4 +1,5 @@
     
+from datetime import datetime
 from django.db.models import QuerySet
 def filterQuery(user,key,value):
      if isinstance(user, QuerySet):
@@ -59,3 +60,43 @@ def  filterQueryfromdict(user,key,value):
         if i.get(key) == value:
            filtered_records.append(i)
      return  (filtered_records)
+
+def filterQueryMaxValueScore (all ,course):
+     if isinstance(all, QuerySet):
+        maxscore = -1
+      
+        for record in all:
+                for i in record.__dict__.keys():
+                    if i != 'Score_lists':
+                        continue
+                    if i == 'Score_lists':
+                        list = record.__dict__.get(i)
+                        if course == "HTMLCSS":
+                            score = float(str(list.get('HTMLScore',0)).split('/')[0]) + float(str(list.get('CSSScore',0)).split('/')[0])                               
+                            if maxscore < score:
+                                maxscore = score
+                        else:
+                            if maxscore < float(str(list.get(str(course)+'Score',0)).split('/')[0]):
+                                 maxscore = float(str(list.get(str(course)+'Score',0)).split('/')[0])
+        print('maxscore',maxscore)
+        return maxscore
+     
+def filterQueryMaxdelay (all , course):
+     if isinstance(all, QuerySet):
+        maxdate = None
+
+        for record in all:
+                for i in record.__dict__.keys():
+                    if i != 'End_Course':
+                        continue
+                    if i == 'End_Course':
+                         list = record.__dict__.get(i)
+                         if list.get(course) is not None:
+
+                                   if maxdate is None:
+                                        maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
+                                   if maxdate < datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S"):
+                                        maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
+                              
+        print('maxdate',maxdate)
+        return maxdate

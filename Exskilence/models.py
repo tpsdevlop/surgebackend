@@ -100,6 +100,7 @@ class StudentDetails_Days_Questions(models.Model):
     Ans_lists       = models.JSONField(default=dict)
     Score_lists     = models.JSONField(default=dict)
     Start_Course    = models.JSONField(default=dict)
+    End_Course      = models.JSONField (default=dict)
     
  
 class BugDetails(models.Model):
@@ -206,3 +207,13 @@ class userdetails(models.Model):
     register_date = models.DateField(auto_now_add=True)
     firstName = models.CharField(max_length=20)
     lastName = models.CharField(max_length=20)
+
+
+class Rankings(models.Model):
+    Rank_id      = models.AutoField(primary_key=True)
+    StudentId   = models.CharField(max_length=15)
+    Rank        = models.IntegerField()
+    Course      = models.CharField(max_length=100)
+    Score       = models.FloatField()
+    DateTime    = models.DateTimeField()
+    Delay       = models.FloatField()

@@ -11,6 +11,7 @@ from Exskilence.filters import *
 from Exskilence.ErrorLog import ErrorLog
 CONTAINER ="internship"
 from Exskilence.Attendance import  attendance_update
+from Exskilence.Ranking import getRankings, totalRanks ,UpdateTotalRanks,updateRanks
 
 @api_view(['POST'])
 def frontend_Questions_page(req):
@@ -231,10 +232,26 @@ def add_daysQN_db(data):
                     mainuser.Qns_status.get(data.get("Subject")).update({data.get("Qn"):3}) 
                 else:
                     mainuser.Qns_status.get(data.get("Subject")).update({data.get("Qn"):2})
+                if mainuser.End_Course is None:
+                    mainuser.End_Course = {}
+                mainuser.End_Course.update({data.get("Subject"):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
                 mainuser.save() 
-                   
+        print(data.get('Subject'))
+        if data.get('Subject') == 'HTML' or data.get('Subject') == 'CSS':
+            ln_htmlcss = len(mainuser.Qns_lists.get("HTMLCSS",[]))
+            ln_htmlAns = len(mainuser.Ans_lists.get("HTML",[]))
+            ln_cssAns = len(mainuser.Ans_lists.get("CSS",[]))
+            print(ln_htmlcss,ln_htmlAns,ln_cssAns)
+            if( ln_htmlcss == ln_htmlAns or ln_htmlcss == ln_cssAns) and ln_htmlcss > 0:
+                print('UPDATING RANKS...')
+                updateRanks( 'HTMLCSS' )
+        else:
+            if len(mainuser.Qns_lists.get(data.get("Subject"),[])) == len(mainuser.Ans_lists.get(data.get("Subject"),[])) and len(mainuser.Qns_lists.get(data.get("Subject"),[])) > 0:
+                print('UPDATING RANKS...')
+                updateRanks(data.get('Subject'))           
         return {'Result':"Answer has been submitted successfully"}
     except Exception as e:
+        print(e)
         return 'An error occurred'+str(e)
     
 @api_view(['POST']) 
