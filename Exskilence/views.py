@@ -22,7 +22,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse("Welcome to the Home Page of Exskilence 26" )
+    return HttpResponse("Welcome to the Home Page of Exskilence 27" )
 
 
 @api_view(['POST'])
@@ -856,18 +856,19 @@ def daycomplete(req):
         if days_completed < data.get("Day_no"):
             days_completed = data.get("Day_no")
             mainuser.Days_completed.update({data.get("Course"):days_completed}) #mainuser.Days_completed[data.get("Course")] = days_completed
+            mainuser.End_Course.update({data.get("Course")+'_Day_'+str(int(data.get("Day_no"))):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
             mainuser.save()
         if len(mainuser.Qns_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))))) == len(mainuser.Ans_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))))) and len(mainuser.Qns_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))))) > 0:
                 print('UPDATING RANKS...')
                 updateRanks((data.get('Course')) )
         else:
             print('NOT UPDATING RANKS...')
-        # attendance_update(data.get('StudentId'))
+        attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps({"Result":"Success"}), content_type='application/json')
     except Exception as e:
         print(e)
-        # ErrorLog(req ,e) 
-        # attendance_update(data.get('StudentId'))
+        ErrorLog(req ,e) 
+        attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps({"Result":"Failure"}), content_type='application/json')
 @api_view(['POST'])
 def updatestatues(req):
@@ -961,37 +962,37 @@ def get_bugs(req):
 #     except Exception as e:
 #         print(e)
 #         return  'An error occurred'+str(e) 
-def getRanksbyCourse(allusersranks,Course):
-    try:
-        # ranks = StudentDetails_Days_Questions.objects.all()
-        ranks = allusersranks
-        if ranks is None:
-            HttpResponse('No data found')
-        allRanks = []
-        for i in ranks:
-            if str(i.Student_id)[2:].startswith('ADMI') or str(i.Student_id)[2:].startswith('TRAI') or str(i.Student_id)[2:].startswith('TEST'):
-                continue
-            total = 0
-            Toff = 0
-            for j in i.Score_lists.keys():
-                if Course == 'HTMLCSS':
-                    if str(j).startswith('HTML') or str(j).startswith('CSS'):
-                        total += float(str(i.Score_lists[j]).split('/')[0])
-                        Toff += float(str(i.Score_lists[j]).split('/')[1])
-                else:
-                    if str(j).startswith(Course):
-                        total += float(str(i.Score_lists[j]).split('/')[0])
-                        Toff += float(str(i.Score_lists[j]).split('/')[1])
+# def getRanksbyCourse(allusersranks,Course):
+#     try:
+#         # ranks = StudentDetails_Days_Questions.objects.all()
+#         ranks = allusersranks
+#         if ranks is None:
+#             HttpResponse('No data found')
+#         allRanks = []
+#         for i in ranks:
+#             if str(i.Student_id)[2:].startswith('ADMI') or str(i.Student_id)[2:].startswith('TRAI') or str(i.Student_id)[2:].startswith('TEST'):
+#                 continue
+#             total = 0
+#             Toff = 0
+#             for j in i.Score_lists.keys():
+#                 if Course == 'HTMLCSS':
+#                     if str(j).startswith('HTML') or str(j).startswith('CSS'):
+#                         total += float(str(i.Score_lists[j]).split('/')[0])
+#                         Toff += float(str(i.Score_lists[j]).split('/')[1])
+#                 else:
+#                     if str(j).startswith(Course):
+#                         total += float(str(i.Score_lists[j]).split('/')[0])
+#                         Toff += float(str(i.Score_lists[j]).split('/')[1])
                  
-            allRanks.append({"StudentId":i.Student_id,"Total":total, "Toff":Toff})   
-        allRanks =  sorted(allRanks, key=lambda x: x["StudentId"], reverse=False)             
-        ranks =   sorted(allRanks, key=lambda x: x["Total"], reverse=True)
-        return ranks
-    except Exception as e:
-        print(e)
-        return  'An error occurred'+str(e)
+#             allRanks.append({"StudentId":i.Student_id,"Total":total, "Toff":Toff})   
+#         allRanks =  sorted(allRanks, key=lambda x: x["StudentId"], reverse=False)             
+#         ranks =   sorted(allRanks, key=lambda x: x["Total"], reverse=True)
+#         return ranks
+#     except Exception as e:
+#         print(e)
+#         return  'An error occurred'+str(e)
 @api_view(['GET'])
-def test (req):
+def test_add_new_stds (req):
     try:
         distinct = {}
         data = StudentDetails.objects.all() 

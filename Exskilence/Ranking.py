@@ -74,6 +74,8 @@ def updateRanks(COURSE):
             maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('Start')).total_seconds()/60*60
 
         for user in std_days_all:
+            if str(user.Student_id)[2:].startswith("ADMI") or str(user.Student_id)[2:].startswith("TRAI") or str(user.Student_id)[2:].startswith("TEST"):
+                continue
             if COURSE == 'HTMLCSS' or COURSE == 'Java_Script':
                 if user.Qns_lists.get(COURSE) is None:
                     user.Qns_lists.update({COURSE:[]})
@@ -110,7 +112,7 @@ def updateRanks(COURSE):
         new_ranks = sorted(new_ranks, key=lambda x: x['Score'], reverse=True)
         for i in new_ranks:
             i['Rank'] = new_ranks.index(i)+1
-            # print(i.get('Rank'),'\t',i.get('StudentId'),'\t',i.get('Score'),'\t',i.get('Course'),'\t',i.get('DateTime'),'\t',i.get('userScore'),'\t',i.get('delay'))
+            print(i.get('Rank'),'\t',i.get('StudentId'),'\t',i.get('Score'),'\t',i.get('Course'),'\t',i.get('DateTime'),'\t',i.get('userScore'),'\t',i.get('delay'))
          
         oldranks = Rankings.objects.filter(Course = COURSE).order_by('-Rank')
         new_rankings = []
