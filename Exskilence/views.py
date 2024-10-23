@@ -796,7 +796,9 @@ def add_daysQN_db(data):
                     mainuser.End_Course = {}
                 mainuser.End_Course.update({data.get("Subject"):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
                 mainuser.save()
-        
+        if len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) == len(mainuser.Ans_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) and len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) > 0:
+                print('UPDATING RANKS...')
+                updateRanks((data.get('Subject')) )        
         return {'Result':"Answer has been submitted successfully"}
     except Exception as e:
         return 'An error occurred'+str(e)

@@ -113,20 +113,17 @@ def filterQueryMaxdelay (all , course):
                             lenQn = len(QNlists.get(course,[]))
                             lenAns = len(Anslists.get(course,[]))
                          else:
-                            l =0
-                            a = 0
-                            for i1 in QNlists.keys():
-                                 if str(i1).startswith(course):
-                                      l = l + len(QNlists.get(i1,[]))
-                            for i2 in Anslists.keys():
-                                 if str(i2).startswith(course):
-                                      a = a + len(Anslists.get(i2,[]))
-                            lenQn = l
-                            lenAns = a
+                            list = record.__dict__.get(i)
+                            if list.get(course) is not None:
+                                    if maxdate is None:
+                                            maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
+                                    if maxdate < datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S"):
+                                            maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
+                            lenQn =0
+                            lenAns =0
                          if lenQn == lenAns and lenQn != 0 and lenAns != 0 :
                             list = record.__dict__.get(i)
                             if list.get(course) is not None:
-
                                     if maxdate is None:
                                             maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
                                     if maxdate < datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S"):
