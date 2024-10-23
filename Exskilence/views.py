@@ -15,14 +15,14 @@ from Exskilence.sqlrun import *
 from django.core.cache import cache
 from Exskilence.filters import *
 from Exskilence.ErrorLog import ErrorLog
-from Exskilence.Ranking import getRankings, totalRanks ,UpdateTotalRanks,updateRanks
+from Exskilence.Ranking import *
 CONTAINER ="internship"
 # Create your views here.
 from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse("Welcome to the Home Page of Exskilence 25" )
+    return HttpResponse("Welcome to the Home Page of Exskilence 26" )
 
 
 @api_view(['POST'])
@@ -796,9 +796,6 @@ def add_daysQN_db(data):
                     mainuser.End_Course = {}
                 mainuser.End_Course.update({data.get("Subject"):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
                 mainuser.save()
-        if len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) == len(mainuser.Ans_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) and len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) > 0:
-            print('UPDATING RANKS...')
-            updateRanks(data.get('Subject'))
         
         return {'Result':"Answer has been submitted successfully"}
     except Exception as e:
@@ -858,11 +855,17 @@ def daycomplete(req):
             days_completed = data.get("Day_no")
             mainuser.Days_completed.update({data.get("Course"):days_completed}) #mainuser.Days_completed[data.get("Course")] = days_completed
             mainuser.save()
-        attendance_update(data.get('StudentId'))
+        if len(mainuser.Qns_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))))) == len(mainuser.Ans_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))))) and len(mainuser.Qns_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))))) > 0:
+                print('UPDATING RANKS...')
+                updateRanks((data.get('Course')) )
+        else:
+            print('NOT UPDATING RANKS...')
+        # attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps({"Result":"Success"}), content_type='application/json')
     except Exception as e:
-        ErrorLog(req ,e) 
-        attendance_update(data.get('StudentId'))
+        print(e)
+        # ErrorLog(req ,e) 
+        # attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps({"Result":"Failure"}), content_type='application/json')
 @api_view(['POST'])
 def updatestatues(req):

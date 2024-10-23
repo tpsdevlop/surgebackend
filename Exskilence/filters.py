@@ -62,7 +62,7 @@ def  filterQueryfromdict(user,key,value):
      return  (filtered_records)
 
 def filterQueryMaxValueScore (all ,course):
-     if isinstance(all, QuerySet):
+    if isinstance(all, QuerySet):
         maxscore = -1
       
         for record in all:
@@ -75,6 +75,18 @@ def filterQueryMaxValueScore (all ,course):
                             score = float(str(list.get('HTMLScore',0)).split('/')[0]) + float(str(list.get('CSSScore',0)).split('/')[0])                               
                             if maxscore < score:
                                 maxscore = score
+                        elif course == "Java_Script":
+                            score = float(str(list.get('Java_ScriptScore',0)).split('/')[0])                               
+                            if maxscore < score:
+                                maxscore = score
+                        elif course == "SQL":
+                            score = float(str(list.get('SQLScore',0)).split('/')[0])                               
+                            if maxscore < score:
+                                maxscore = score
+                        elif course == "Python":
+                            score = float(str(list.get('PythonScore',0)).split('/')[0])                               
+                            if maxscore < score:
+                                maxscore = score
                         else:
                             if maxscore < float(str(list.get(str(course)+'Score',0)).split('/')[0]):
                                  maxscore = float(str(list.get(str(course)+'Score',0)).split('/')[0])
@@ -82,6 +94,7 @@ def filterQueryMaxValueScore (all ,course):
         return maxscore
      
 def filterQueryMaxdelay (all , course):
+     print('in delay filter')
      if isinstance(all, QuerySet):
         maxdate = None
 
@@ -90,13 +103,34 @@ def filterQueryMaxdelay (all , course):
                     if i != 'End_Course':
                         continue
                     if i == 'End_Course':
-                         list = record.__dict__.get(i)
-                         if list.get(course) is not None:
+                         QNlists = record.__dict__.get('Qns_lists')
+                         Anslists = record.__dict__.get('Ans_lists')
+                        #  print('QNlists',QNlists)
+                         if course == "HTMLCSS":
+                            lenQn = len(QNlists.get('HTMLCSS',[]))
+                            lenAns = len(Anslists.get('HTML',[]))
+                         elif course == "Java_Script":
+                            lenQn = len(QNlists.get(course,[]))
+                            lenAns = len(Anslists.get(course,[]))
+                         else:
+                            l =0
+                            a = 0
+                            for i1 in QNlists.keys():
+                                 if str(i1).startswith(course):
+                                      l = l + len(QNlists.get(i1,[]))
+                            for i2 in Anslists.keys():
+                                 if str(i2).startswith(course):
+                                      a = a + len(Anslists.get(i2,[]))
+                            lenQn = l
+                            lenAns = a
+                         if lenQn == lenAns and lenQn != 0 and lenAns != 0 :
+                            list = record.__dict__.get(i)
+                            if list.get(course) is not None:
 
-                                   if maxdate is None:
-                                        maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
-                                   if maxdate < datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S"):
-                                        maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
+                                    if maxdate is None:
+                                            maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
+                                    if maxdate < datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S"):
+                                            maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
                               
         print('maxdate',maxdate)
         return maxdate
