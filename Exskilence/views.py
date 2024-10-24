@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # d= addnewRows("Java_Script")
-    return HttpResponse("Welcome to the Home Page of Exskilence 29" )
+    return HttpResponse("Welcome to the Home Page of Exskilence 30" )
 
 
 @api_view(['POST'])
@@ -617,6 +617,7 @@ def getQnslist(req):
             'Qnslist' : Qnslist,
             'Day_Score' : dayinfo[0],
             'Completed' : dayinfo[1],
+            'Rank':getRankings(data.get('Course'),data.get('StudentId'))
         })
         attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(out), content_type='application/json')

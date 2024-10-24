@@ -16,21 +16,16 @@ from Exskilence.Ranking import getRankings, totalRanks ,UpdateTotalRanks,updateR
 @api_view(['POST'])
 def frontend_Questions_page(req):
     try:
-        otime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
         data = json.loads(req.body)
         Subject = data.get("Subject")
-        ctime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
         qnsdata = download_list_blob2('Internship_days_schema/'+Subject+'/','',CONTAINER)
-        btime =(datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-ctime).total_seconds()
-        dbtime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
         user ,created = StudentDetails_Days_Questions.objects.get_or_create(Student_id = data.get('StudentId'),
-            defaults = {'Start_Course':{data.get('Course'):str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))},
-                        'Days_completed':{data.get('Course'):0},
+            defaults = {'Start_Course':{data.get('Subject'):str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))},
+                        'Days_completed':{data.get('Subject'):0},
                         'Qns_lists':{ },
                         'Qns_status':{ },
                         'Ans_lists':{ },
                         'Score_lists':{data.get('Subject')+'Score':"0/0"}})
-        dbttime = (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-dbtime).total_seconds()
         if user.Qns_lists.get(Subject,None) is None:
             Easy = [j.get('Qn_name') for j in qnsdata if str(j.get('Qn_name'))[-4] == 'E']
             Medium = [j.get('Qn_name') for j in qnsdata if str(j.get('Qn_name'))[-4] == 'M']
@@ -56,9 +51,7 @@ def frontend_Questions_page(req):
             qlist = user.Qns_lists.get(Subject)
         arranged_list = sorted(qnsdata, key=lambda x: qlist.index(x['Qn_name']))
         Qnslist = arranged_list
-        dbtime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
         anslist = QuestionDetails_Days.objects.filter(Student_id = data.get('StudentId')).all()
-        dbttime = dbttime + (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-dbtime).total_seconds()
         out = []
         htcTotal = 0
         htcTotaloff = 0
@@ -127,11 +120,7 @@ def frontend_Questions_page(req):
                     'Qnslist' : out,
                     'Day_Score' : str(htcTotal)+'/'+str(htcTotaloff),
                     'Completed' : str(solved)+"/"+str(len(user.Qns_lists.get(Subject ,[]))),
-                    'BlobTime': btime,
-                    'dbTime': dbttime,
-                    'OTime':  (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-otime).total_seconds()-dbttime-btime,
-                    'time':  (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-otime).total_seconds()
-                    
+                    'Rank':getRankings(data.get('Subject'),data.get('StudentId'))
                 }
             else:
                 # print(getDayScore(anslist.filter( Subject = Subject),i.get("Qn_name")))
@@ -148,10 +137,7 @@ def frontend_Questions_page(req):
                     'Qnslist' : out,
                     'Day_Score' : dayinfo[0],
                     'Completed' : dayinfo[1],
-                    'BlobTime': btime,
-                    'dbTime': dbttime,
-                    'OTime':  (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-otime).total_seconds()-dbttime-btime,
-                    'time':  (datetime.utcnow().__add__(timedelta(hours=5,minutes=30))-otime).total_seconds()
+                    'Rank':getRankings(data.get('Subject'),data.get('StudentId'))
                 }
         attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(output), content_type='application/json')
