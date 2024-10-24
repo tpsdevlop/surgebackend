@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # d= addnewRows("Java_Script")
-    return HttpResponse("Welcome to the Home Page of Exskilence 28" )
+    return HttpResponse("Welcome to the Home Page of Exskilence 29" )
 
 
 @api_view(['POST'])
@@ -462,7 +462,18 @@ def getdays(req):
             if user.Start_Course.get(data.get('Course'),0) == 0:
                 for day in range(1,json_content.get('Total_Days')+1):
                     qnsdata = download_list_blob2('Internship_days_schema/'+data.get('Course')+'/Day_'+str(day)+'/','',CONTAINER)
-                    user.Qns_lists.update({data.get('Course')+'_Day_'+str(day):random.sample([j.get('Qn_name') for j in qnsdata], len(qnsdata))})
+                    Easy = [j.get('Qn_name') for j in qnsdata if str(j.get('Qn_name'))[-4] == 'E']
+                    Medium = [j.get('Qn_name') for j in qnsdata if str(j.get('Qn_name'))[-4] == 'M']
+                    Hard = [j.get('Qn_name') for j in qnsdata if str(j.get('Qn_name'))[-4] == 'H']
+                    Easy = random.sample(Easy, len(Easy))
+                    Medium = random.sample(Medium, len(Medium))
+                    Hard = random.sample(Hard, len(Hard))
+                    qlist =[]
+                    [qlist.append(i) for i in Easy]
+                    [qlist.append(i) for i in Medium]   
+                    [qlist.append(i) for i in Hard]
+                    # user.Qns_lists.update({data.get('Course')+'_Day_'+str(day):random.sample([j.get('Qn_name') for j in qnsdata], len(qnsdata))})
+                    user.Qns_lists.update({data.get('Course')+'_Day_'+str(day): qlist})
                     user.Qns_status.update({data.get('Course')+'_Day_'+str(day):{i:0 for i in user.Qns_lists.get(data.get('Course')+'_Day_'+str(day))}})
                 user.Start_Course.update({data.get('Course'):str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))})
                 user.Days_completed.update({data.get('Course'):0})
@@ -859,7 +870,7 @@ def daycomplete(req):
             mainuser.Days_completed.update({data.get("Course"):days_completed}) #mainuser.Days_completed[data.get("Course")] = days_completed
             mainuser.End_Course.update({data.get("Course")+'_Day_'+str(int(data.get("Day_no"))):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
             mainuser.save()
-        if len(mainuser.Qns_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))))) == len(mainuser.Ans_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))))) and len(mainuser.Qns_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))))) > 0:
+        if len(mainuser.Qns_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))),[])) == len(mainuser.Ans_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))),[])) and len(mainuser.Qns_lists.get(data.get("Course")+'_Day_'+str(int(data.get("Day_no"))),[])) > 0:
                 print('UPDATING RANKS...')
                 updateRanks((data.get('Course')) )
         else:
