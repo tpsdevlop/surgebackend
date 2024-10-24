@@ -578,3 +578,28 @@ def TutorDetails(request):
     except Exception as e:
       print(e)
       return JsonResponse({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+def mark_as_read(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  
+            message_data = json.loads(data['data'])  
+            Message_Id = message_data.get('Message_Id')
+            Content = message_data.get('Content')
+            Subject = message_data.get('Subject')
+            message = Chatbox.objects.filter(
+                Message_Id=Message_Id,
+                Content=Content,
+                Subject=Subject
+            ).first()
+            if message:
+               
+                message.Seen = True
+                message.save()  
+ 
+            print(f'Marked message as read: {Message_Id}, Subject: {Subject}')
+            return HttpResponse(json.dumps({"success": True}), content_type='application/json')
+        except Exception as e:
+            print(f'Error: {e}')
+            return HttpResponse(json.dumps({"error": "Invalid request"}), content_type='application/json')

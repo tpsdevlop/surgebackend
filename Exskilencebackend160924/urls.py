@@ -82,6 +82,7 @@ urlpatterns = [
     path('inbox/<str:id>', chat.Inbox, name='Inbox'),
     #for both
       path ('send_email_to_tutor/', chat.send_email_to_tutor),
+    path('mark-as-read/',chat.mark_as_read,name='mark_as_read'),
 
 
       # for students

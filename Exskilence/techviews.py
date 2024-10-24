@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from  Exskilencebackend160924.Blob_service import *
 from rest_framework.decorators import api_view 
 from datetime import datetime
- 
+from Exskilence.Ranking import getRankings
 @csrf_exempt
 def create_student_details(request):
     if request.method == 'POST':
@@ -113,11 +113,11 @@ def frontpagedeatialsmethod(request):
             'score'
         ))
         mainuser = list(StudentDetails_Days_Questions.objects.all().values())
-        student_ranks = rankings()
+        # student_ranks = rankings()
         userprogress = []
         for student in mainuser:
             student_ID = student['Student_id']
-            student_rank = next((rank['Rank'] for rank in student_ranks if rank['StudentId'] == student_ID), None)
+            # student_rank = next((rank['Rank'] for rank in student_ranks if rank['StudentId'] == student_ID), None)
             scores = {
                 "id": student_ID,
                 "totalScore": scorescumulation(student),
@@ -125,7 +125,7 @@ def frontpagedeatialsmethod(request):
                 "totalNumberOFQuesAns": total_number_of_questions_completed(student),
                 "no_of_hrs": get_total_durations_for_subjects(student_ID),
                 "Delay":delay(student_ID),
-                "rank": student_rank
+                "rank":  getRankings("HTMLCSS",student_ID)
             }
             userprogress.append(scores)
         if not student_details:

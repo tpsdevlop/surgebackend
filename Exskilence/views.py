@@ -22,7 +22,8 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse("Welcome to the Home Page of Exskilence 27" )
+    # d= addnewRows("Java_Script")
+    return HttpResponse("Welcome to the Home Page of Exskilence 28" )
 
 
 @api_view(['POST'])

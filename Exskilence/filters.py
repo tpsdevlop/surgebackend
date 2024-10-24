@@ -100,11 +100,14 @@ def filterQueryMaxdelay (all , course):
 
         for record in all:
                 for i in record.__dict__.keys():
+                    if str(record.__dict__.get('Student_id'))[2:].startswith('TRAI') or str(record.__dict__.get('Student_id'))[2:].startswith('ADMI') or str(record.__dict__.get('Student_id'))[2:].startswith('TEST'):
+                        continue
                     if i != 'End_Course':
                         continue
                     if i == 'End_Course':
                          QNlists = record.__dict__.get('Qns_lists')
                          Anslists = record.__dict__.get('Ans_lists')
+                        #  print('SID',record.__dict__.get('Student_id'))
                         #  print('QNlists',QNlists)
                          if course == "HTMLCSS":
                             lenQn = len(QNlists.get('HTMLCSS',[]))
