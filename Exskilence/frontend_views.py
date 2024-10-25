@@ -245,7 +245,7 @@ def frontend_getQn(req):
     try:
         data = json.loads(req.body)
         course = data.get('Course')
-        if data.get('Qn_name') == None or data.get('Qn_name') == "undefined":
+        if data.get('Qn_name') == None or data.get('Qn_name') == "undefined" or data.get('Qn_name') == "" or data.get('Qn_name') == "None" :
             return HttpResponse(f"An error occurred: Qn_name is undefined or None", status=500)
         if data.get('StudentId') == "trainer":
             print('admin')

@@ -22,9 +22,9 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    # d= OverallRankings (["HTMLCSS", "Java_Script"], 1)
+    # d= OverallRankings (["HTMLCSS","Java_Script","Python"], '24MRIT0010')
     # print('Youre rankings are',d)
-    return HttpResponse("Welcome to the Home Page of Exskilence 32" )
+    return HttpResponse("Welcome to the Home Page of Exskilence 33" )
 
 
 @api_view(['POST'])
