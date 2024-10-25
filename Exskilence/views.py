@@ -22,8 +22,9 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    # d= updateRanks("Java_Script")
-    return HttpResponse("Welcome to the Home Page of Exskilence 31" )
+    # d= OverallRankings (["HTMLCSS", "Java_Script"], 1)
+    # print('Youre rankings are',d)
+    return HttpResponse("Welcome to the Home Page of Exskilence 32" )
 
 
 @api_view(['POST'])
@@ -215,7 +216,7 @@ def getcourse(req):
                 for i in spent:
                     Duration = Duration + (i.Last_update - i.Login_time).total_seconds()
             intcourse.get('Score').append(str(Total_Score)+"/"+str(Total_Score_Outof))
-            Total_Rank = totalRanks( data.get('StudentId'))
+            Total_Rank = OverallRankings( intcourse.get('Sub'),data.get('StudentId'))
             # ranking= rankings(filterQueryTodict(allusers))
             # userrank = [ i.get('Rank') for i in ranking  if i.get('StudentId') == data.get('StudentId') ]
             # print(userrank)
@@ -686,50 +687,60 @@ def submit(request)  :
         ErrorLog(request,e) 
         attendance_update(jsondata.get('StudentId'))
         return HttpResponse(f"An error occurred: {e}", status=500)
-
 def Scoring_logic(passedcases,data):
     attempt = data.get("Attempt")
-    if str(data.get('Qn'))[-4]=="E":
-        if attempt == 1:
-            score = 5
-        elif attempt == 2:
-            score = 3
-        elif attempt == 3:
-            score = 2
-        else:
-            score = 0
-    elif str(data.get('Qn'))[-4]=="M":
-        if attempt == 1 or attempt == 2:
-            score = 10
-        elif attempt == 3:
-            score = 8
-        elif attempt == 4:
-            score = 6
-        elif attempt == 5:
-            score = 4
-        elif attempt == 6:
-            score = 2
-        else:
-            score = 0
-    elif str(data.get('Qn'))[-4]=="H":
-        if attempt == 1 or attempt == 2 or attempt == 3:
-            score = 15
-        elif attempt == 4 or attempt == 5:
-            score = 12
-        elif attempt == 6 :
-            score = 10
-        elif attempt == 7:
-            score = 8
-        elif attempt == 8:
-            score = 6
-        elif attempt == 9:
-            score = 4
-        elif attempt == 10:
-            score = 2
-        else:
-            score = 0
-    # return math.floor(score*passedcases)
-    return round(score*passedcases ,2)
+    attempt_scores = {
+    "E": {1: 5, 2: 5, 3: 3, 4: 2},
+    "M": {1: 10, 2: 10, 3: 10,  4: 8, 5: 6, 6: 4, 7: 2},
+    "H": {1: 15, 2: 15, 3: 15, 4: 15 ,5: 15, 6: 12, 7: 12, 8: 10, 9: 8, 10: 6, 11: 4, 12: 2},
+    }
+    qn_type = str(data.get('Qn'))[-4]
+    score = attempt_scores.get(qn_type, {}).get(attempt, 0)
+    print(score)
+    return   round(score*passedcases ,2)
+# def Scoring_logic(passedcases,data):
+#     attempt = data.get("Attempt")
+#     if str(data.get('Qn'))[-4]=="E":
+#         if attempt == 1:
+#             score = 5
+#         elif attempt == 2:
+#             score = 3
+#         elif attempt == 3:
+#             score = 2
+#         else:
+#             score = 0
+#     elif str(data.get('Qn'))[-4]=="M":
+#         if attempt == 1 or attempt == 2:
+#             score = 10
+#         elif attempt == 3:
+#             score = 8
+#         elif attempt == 4:
+#             score = 6
+#         elif attempt == 5:
+#             score = 4
+#         elif attempt == 6:
+#             score = 2
+#         else:
+#             score = 0
+#     elif str(data.get('Qn'))[-4]=="H":
+#         if attempt == 1 or attempt == 2 or attempt == 3:
+#             score = 15
+#         elif attempt == 4 or attempt == 5:
+#             score = 12
+#         elif attempt == 6 :
+#             score = 10
+#         elif attempt == 7:
+#             score = 8
+#         elif attempt == 8:
+#             score = 6
+#         elif attempt == 9:
+#             score = 4
+#         elif attempt == 10:
+#             score = 2
+#         else:
+#             score = 0
+#     # return math.floor(score*passedcases)
+#     return round(score*passedcases ,2)
 
 def add_daysQN_db(data):
     try:

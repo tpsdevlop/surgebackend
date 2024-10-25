@@ -5,6 +5,7 @@ from datetime import date, datetime, time, timedelta
 from Exskilence.models import *
 from Exskilence.filters import *
 from Exskilence.ErrorLog import ErrorLog
+from django.db.models import Sum
 # from Exskilence.views import rankings
 STARTTIMES = {
             'HTMLCSS':{
@@ -221,21 +222,6 @@ def updateRanks2(COURSE):
         print(e) 
         return  'An error occurred  :'+str(e) 
 
-def updateRanksDaywise(COURSE,DAY):
-    try:
-        print('Updating Rank for course : '+COURSE+' and day : '+str(DAY))
-        std_days_all = StudentDetails_Days_Questions.objects.all()
-        std_all = StudentDetails.objects.all()
-        allmainQns = QuestionDetails_Days.objects.all()
-        maxscore = filterQueryMaxValueScore(std_days_all,COURSE)
-        maxdelay = filterQueryMaxdelay(std_days_all,COURSE)
-
-        # userRank = Rankings.objects.filter(Course = COURSE)
-        # if userRank is not None:
-        #     for i in userRank:
-        #         i.delete()
-    except Exception as e:
-        print(e)
 def getRankings(COURSE,SID):
     try:
         userRank = Rankings.objects.filter(Course = COURSE,StudentId = SID).first()
@@ -245,30 +231,7 @@ def getRankings(COURSE,SID):
             return 'N/A'
     except Exception as e:
         print(e)
-def UpdateTotalRanks ():
-    try:
-        userRank = Rankings.objects.filter( Course = 'TOTAL') 
-        maxDelay = filterQueryMaxdelay(QuestionDetails_Days.objects.all(),'TOTAL')
-        print(maxDelay)
-        maxvalue = filterQueryMaxValueScore(QuestionDetails_Days.objects.all(),'TOTAL')
-        print(maxvalue)
-        maxDelay = (datetime.strptime('2024-10-12 23:59:59', "%Y-%m-%d %H:%M:%S")-datetime.strptime(str(maxDelay).split('.')[0], "%Y-%m-%d %H:%M:%S")).total_seconds()/60*60
-        # if userRank is not None:
-        #     for i in userRank:
-        #         i.delete()
-    except Exception as e:
-        print(e)
 
-def totalRanks (SID):
-    try:
-        userRank = Rankings.objects.filter(StudentId = SID,Course = 'TOTAL').first()
-        if userRank is not None:
-            return userRank.Rank
-        else:
-            return 'N/A'
-    except Exception as e:
-        print(e)
-  
 def rankings(allusers,COURSE):
     try:
         allmainQns = QuestionDetails_Days.objects.all()
@@ -351,3 +314,18 @@ def rankings(allusers,COURSE):
         print(e)
         return  'An error occurred'+str(e)
     
+def  OverallRankings(COURSEs,SID):#COURSEs = ["HTMLCSS", "Java_Script"] , SID = "24ADMI0001"
+    try:
+        aggregate_scores = Rankings.objects.filter(Course__in=COURSEs).values('StudentId').annotate(total_score=Sum('Score')).order_by('-total_score')
+        rank = 1
+        for student_score in aggregate_scores:
+            if student_score['StudentId'] == SID:
+                print('Rank',rank,f"Student: {student_score['StudentId']}, Total Score: {student_score['total_score']}")
+                return  rank
+            else:
+                  print('Rank',rank,f"Student: {student_score['StudentId']}, Total Score: {student_score['total_score']}")
+            rank += 1
+        return  'N/A'
+    except Exception as e:
+        print(e)
+        return  'An error occurred'+str(e)

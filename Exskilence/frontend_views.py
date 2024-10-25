@@ -11,7 +11,7 @@ from Exskilence.filters import *
 from Exskilence.ErrorLog import ErrorLog
 CONTAINER ="internship"
 from Exskilence.Attendance import  attendance_update
-from Exskilence.Ranking import getRankings, totalRanks ,UpdateTotalRanks,updateRanks
+from Exskilence.Ranking import getRankings, updateRanks
 
 @api_view(['POST'])
 def frontend_Questions_page(req):
