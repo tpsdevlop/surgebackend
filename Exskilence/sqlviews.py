@@ -10,6 +10,8 @@ from Exskilence.models import *
 from Exskilencebackend160924.Blob_service import download_blob2, get_blob_service_client, download_list_blob2
 import pyodbc
 from Exskilence.sqlrun import *
+from Exskilence.ErrorLog import ErrorLog
+from Exskilence.Attendance import  attendance_update
 CONTAINER ="internship"
 # Create your views here.
 
@@ -20,7 +22,7 @@ def sql_query(req):
             current_time=datetime.now()
             data = req.body
             data = json.loads(data)
-            query = data.get('query')
+            query = str(data.get('query')).strip()
             out = local(query)
             result= out
             ExpectedOutput=data.get('ExpectedOutput')
@@ -30,9 +32,12 @@ def sql_query(req):
                 ,'data':out
                 ,'Time':[{"Execution_Time":str((datetime.now()-current_time).total_seconds())[0:-2]+" s"}]
             }
+            attendance_update(data.get('StudentId'))
             return HttpResponse(json.dumps(main), content_type='application/json')
 
         except Exception as e:  
+            ErrorLog(req,e)
+            attendance_update(data.get('StudentId'))
             return HttpResponse(f"An error occurred: {e}", status=500)
         
 def removespace(query_list):

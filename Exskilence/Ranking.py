@@ -37,9 +37,9 @@ def updateRanks(COURSE):
         maxdelay1 = filterQueryMaxdelay(std_days_all,COURSE)
         if COURSE == 'HTMLCSS' or COURSE == 'HTML' or COURSE == 'CSS' :
             COURSE = 'HTMLCSS'
-            maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('End')).total_seconds()/60*60
+            maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('Start')).total_seconds()/60*60
         elif COURSE == 'Java_Script' :
-            maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('End')).total_seconds()/60*60
+            maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('Start')).total_seconds()/60*60
         else:
             maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('Start')).total_seconds()/60*60
 
@@ -58,22 +58,24 @@ def updateRanks(COURSE):
                         userScore = float(str(user.Score_lists.get(str(COURSE)+'Score',0)).split('/')[0])
                     userDelay = user.End_Course.get(COURSE) if user.End_Course.get(COURSE) is not None else user.Start_Course.get(COURSE,STARTTIMES.get(COURSE).get('Start') if COURSE != 'HTMLCSS' and COURSE != 'Java_Script' else STARTTIMES.get(COURSE).get('End'))
                 else:
-                    print('Qns_lists',len(user.Qns_lists.get(COURSE,[]) ),'Ans_lists',len(user.Ans_lists.get(COURSE if COURSE != 'HTMLCSS' else 'HTML',[]) ),'SID',user.Student_id,"*******************************")
+                    # print('Qns_lists',len(user.Qns_lists.get(COURSE,[]) ),'Ans_lists',len(user.Ans_lists.get(COURSE if COURSE != 'HTMLCSS' else 'HTML',[]) ),'SID',user.Student_id,"*******************************")
                     continue
             else:
                     userScore = float(str(user.Score_lists.get(str(COURSE)+'Score',0)).split('/')[0])
                     userDelay = user.End_Course.get(COURSE) if user.End_Course.get(COURSE) is not None else user.Start_Course.get(COURSE,STARTTIMES.get(COURSE).get('Start') if COURSE != 'HTMLCSS' and COURSE != 'Java_Script' else STARTTIMES.get(COURSE).get('End'))
 
 
-            startdate = STARTTIMES.get(COURSE).get('Start') if COURSE != 'HTMLCSS' and COURSE != 'Java_Script' else STARTTIMES.get(COURSE).get('End')
+            startdate = STARTTIMES.get(COURSE).get('Start') #if COURSE != 'HTMLCSS' and COURSE != 'Java_Script' else STARTTIMES.get(COURSE).get('Start')
             delay =(datetime.strptime(str(userDelay).split('.')[0], "%Y-%m-%d %H:%M:%S")-startdate).total_seconds()/60*60
-            print('delay',delay,'maxdelay',maxdelay,'userScore',userScore,'maxscore',maxscore,'COURSE',COURSE,'startdate',startdate,'userDelay',userDelay,'delay',)
-            if delay < 0:
-                delay = 0
-            if  maxdelay == 0:  
-                Scorevalue = (0.8 * (userScore/maxscore))-0
-            else:
-                Scorevalue = (0.8 * (userScore/maxscore))-( (0.2) * (delay/maxdelay))
+            # print('delay',delay,'maxdelay',maxdelay,'userScore',userScore,'maxscore',maxscore,'COURSE',COURSE,'startdate',startdate,'userDelay',userDelay,'delay',)
+            # if delay < 0:
+            #     delay = 0
+            # if  maxdelay == 0:  
+            #     Scorevalue = (0.8 * (userScore/maxscore))-0
+            # else:
+            #     Scorevalue = (0.8 * (userScore/maxscore))-( (0.2) * (delay/maxdelay))
+ 
+            Scorevalue = (0.8 * (userScore/maxscore))-( (0.2) * (delay/maxdelay))
             new_ranks.append({
                 'StudentId':user.Student_id,
                 'Score':Scorevalue,

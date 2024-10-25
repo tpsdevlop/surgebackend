@@ -22,8 +22,8 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    # d= addnewRows("Java_Script")
-    return HttpResponse("Welcome to the Home Page of Exskilence 30" )
+    # d= updateRanks("Java_Script")
+    return HttpResponse("Welcome to the Home Page of Exskilence 31" )
 
 
 @api_view(['POST'])
@@ -204,7 +204,7 @@ def getcourse(req):
                         if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)):
                             intcourse.get('Sub').append(course.get('SubjectName'))
                             intcourse.get('SubScore').append(str(round(float(str(userscore.Score_lists.get(str(course.get('SubjectName'))+'Score')).split('/')[0]),2))+"/"+str(subScore(userscore.Qns_lists,course.get('SubjectName'))))
-                            Total_Score = float(Total_Score) + float(intcourse.get('SubScore')[-1].split('/')[0])
+                            Total_Score = round(float(Total_Score),2) + float(intcourse.get('SubScore')[-1].split('/')[0])
                             Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
                     if Startmost > starttime:
                         Startmost = starttime
@@ -232,14 +232,14 @@ def getcourse(req):
                         "StudentName":user.firstName})
             user.score =round(float(str(intcourse.get('Score')[0]).split('/')[0]),2)
             user.save()
-            # attendance_update(data.get('StudentId'))
+            attendance_update(data.get('StudentId'))
             return HttpResponse(json.dumps(out), content_type='application/json')
         else:
-            # attendance_update(data.get('StudentId'))
+            attendance_update(data.get('StudentId'))
             return HttpResponse('Error! User does not exist', status=404)
     except Exception as e:
-        # ErrorLog(req,e)
-        # attendance_update(data.get('StudentId'))
+        ErrorLog(req,e)
+        attendance_update(data.get('StudentId'))
         return HttpResponse(f"An error occurred: {e}", status=500)
 
 
