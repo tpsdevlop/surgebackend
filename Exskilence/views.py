@@ -22,10 +22,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    # d= OverallRankings (["HTMLCSS","Java_Script","Python"], '24MRIT0010')
-    # print('Youre rankings are',d)
-    return HttpResponse("Welcome to the Home Page of Exskilence 35" )
-
+    return HttpResponse("Welcome to the Home Page of STAGEING 01 30-10-2022")
 
 @api_view(['POST'])
 def fetch(request):
@@ -858,7 +855,10 @@ def nextQn(req):
         user = QuestionDetails_Days.objects.filter(Student_id=str(data.get("StudentId")),Subject=str(data.get("Subject")),Qn=str(qlist[nextQn])).first()
         if user:
             qnsdata.update({"UserAns":user.Ans })
-            qnsdata.update({"UserSubmited":"Yes" })
+            if mainuser.Qns_status.get(data.get('Subject')+'_Day_'+str(data.get('Day_no'))).get(data.get('Qn'))<2:
+                qnsdata.update({"UserSubmited":"No" })
+            else:
+                qnsdata.update({"UserSubmited":"Yes" })
         else:
             qnsdata.update({"UserAns":'' })
             qnsdata.update({"UserSubmited":'No' })
