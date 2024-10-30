@@ -24,7 +24,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 def home(request):
     # d= OverallRankings (["HTMLCSS","Java_Script","Python"], '24MRIT0010')
     # print('Youre rankings are',d)
-    return HttpResponse("Welcome to the Home Page of Exskilence 34" )
+    return HttpResponse("Welcome to the Home Page of Exskilence 35" )
 
 
 @api_view(['POST'])
@@ -655,7 +655,10 @@ def getQn(req):
                         "Qn_No": int(mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).index(data.get('Qn_name')))+1,})
         if user:
             qnsdata.update({"UserAns":user.Ans })
-            qnsdata.update({"UserSubmited":"Yes" })
+            if mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).get(data.get('Qn_name'))<2:
+                qnsdata.update({"UserSubmited":"No" })
+            else:
+                qnsdata.update({"UserSubmited":"Yes" })
         else:
             qnsdata.update({"UserAns":'' })
             qnsdata.update({"UserSubmited":'No' })
@@ -667,9 +670,9 @@ def getQn(req):
                 out.update({"Question":qnsdata})
         attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(out), content_type='application/json')
-
+ 
     except Exception as e:
-        ErrorLog(req ,e) 
+        ErrorLog(req ,e)
         attendance_update(data.get('StudentId'))
         return HttpResponse(f"An error occurred: {e}", status=500)
 
