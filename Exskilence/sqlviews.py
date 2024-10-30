@@ -15,6 +15,34 @@ from Exskilence.Attendance import  attendance_update
 CONTAINER ="internship"
 # Create your views here.
 
+def addAttempt (studentId,Subject,Qn,Attempt,Day_no):
+    try :
+        print()
+        mainuser = StudentDetails_Days_Questions.objects.filter(Student_id=str(studentId)).first()
+        if mainuser :
+            stat = mainuser.Qns_status.get(str(Subject)+'_Day_'+str(Day_no)).get(Qn)
+            if stat < 2 :
+                user = QuestionDetails_Days.objects.filter(Student_id=str( studentId),Subject=str( Subject ),Qn=str( Qn )).first()
+                if user is not None :
+                    user.Attempts=user.Attempts+1
+                    user.save()
+                    return user.Attempts
+                else:
+                    q = QuestionDetails_Days(
+                    Student_id=str(studentId),
+                    Subject=str( Subject),
+                    Score=0,
+                    Attempts=1,
+                    DateAndTime=datetime.utcnow().__add__(timedelta(hours=5,minutes=30)),
+                    Qn = str(Qn),
+                    Ans = ''
+                    )
+                    q.save()
+                    return 1
+            else:
+                return 0
+    except Exception as e:
+        return 'False'
 @api_view(['POST'])
 def sql_query(req):
     if req.method == 'POST':
@@ -23,6 +51,12 @@ def sql_query(req):
             data = req.body
             data = json.loads(data)
             query = str(data.get('query')).strip()
+            Attempt = data.get('Attempt')
+            Subject = data.get ('Subject')
+            studentId = data.get('studentId')
+            Qn = data.get('Qn')
+            Day_no = data.get('Day_no')
+            addAttempts = addAttempt(studentId,Subject,Qn,Attempt,Day_no)
             out = local(query)
             result= out
             ExpectedOutput=data.get('ExpectedOutput')
@@ -30,11 +64,13 @@ def sql_query(req):
             main ={
                 'TestCases':list(testcase_validation(query,result,ExpectedOutput,TestCases))
                 ,'data':out
-                ,'Time':[{"Execution_Time":str((datetime.now()-current_time).total_seconds())[0:-2]+" s"}]
+                ,'Time':[{"Execution_Time":str((datetime.now()-current_time).total_seconds())[0:-2]+" s"}],
+                'Attempt':addAttempts
+ 
             }
             attendance_update(data.get('StudentId'))
             return HttpResponse(json.dumps(main), content_type='application/json')
-
+ 
         except Exception as e:  
             ErrorLog(req,e)
             attendance_update(data.get('StudentId'))

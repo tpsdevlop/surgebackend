@@ -24,7 +24,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 def home(request):
     # d= OverallRankings (["HTMLCSS","Java_Script","Python"], '24MRIT0010')
     # print('Youre rankings are',d)
-    return HttpResponse("Welcome to the Home Page of Exskilence 33" )
+    return HttpResponse("Welcome to the Home Page of Exskilence 34" )
 
 
 @api_view(['POST'])
@@ -746,7 +746,7 @@ def add_daysQN_db(data):
     try:
         res = data.get("Result")
         attempt = data.get("Attempt")
-        i = 0 
+        i = 0
         passedcases = 0
         totalcases = 0
         result = {}
@@ -769,21 +769,21 @@ def add_daysQN_db(data):
                 score = 0
             else:
                 score = Scoring_logic(passedcases/totalcases,data)
-
+ 
         user = QuestionDetails_Days.objects.filter(Student_id=str(data.get("StudentId")),Subject=str(data.get("Subject")),Qn=str(data.get("Qn"))).first()
         mainuser = StudentDetails_Days_Questions.objects.filter(Student_id=str(data.get("StudentId"))).first()
         if mainuser is None:
             mainuser = StudentDetails_Days_Questions(
-                Student_id=str(data.get("StudentId")),   
+                Student_id=str(data.get("StudentId")),  
                 Days_completed = {data.get("Subject"):0},
                 Qns_lists = {data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))):[]},
                 Qns_status = {data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))):{}},
                 Ans_lists = {data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))):[]},
                 Score_lists = {data.get("Subject")+'Score':"0/0"},
-            )   
+            )  
             mainuser.save()
         if user is  None:
-
+ 
             q = QuestionDetails_Days(
                 Student_id=str(data.get("StudentId")),
                 Subject=str(data.get("Subject")),
@@ -795,27 +795,34 @@ def add_daysQN_db(data):
                 Result = {"TestCases":result}
                 )
             q.save()
-            if mainuser.Qns_status.get(data.get('Subject')+'_Day_'+str(data.get('Day_no'))) is None:
+        else:
+            user.Score = score
+            user.Attempts = attempt
+            user.DateAndTime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
+            user.Ans = str(data.get("Ans"))
+            user.Result = {"TestCases":result}
+            user.save()
+        if mainuser.Qns_status.get(data.get('Subject')+'_Day_'+str(data.get('Day_no'))) is None:
                 mainuser.Qns_status.update({data.get('Subject')+'_Day_'+str(data.get('Day_no')):{}})
-            if mainuser.Ans_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))) is None:
+        if mainuser.Ans_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))) is None:
                 mainuser.Ans_lists.update({data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))):[]}) #mainuser.Ans_lists[data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))]=[]
-            if mainuser.Score_lists.get(data.get("Subject")+'Score') is None or mainuser.Score_lists.get(data.get("Subject")+'Score')==[]:
+        if mainuser.Score_lists.get(data.get("Subject")+'Score') is None or mainuser.Score_lists.get(data.get("Subject")+'Score')==[]:
                 mainuser.Score_lists.update({data.get("Subject")+'Score':"0/0"}) #mainuser.Score_lists[data.get("Subject")+'Score']=0
-            oldscore =  mainuser.Score_lists.get(data.get("Subject")+'Score',"0/0").split('/')[0]
-            totaloff =  mainuser.Score_lists.get(data.get("Subject")+'Score',"0/0").split('/')[1]
-            if str(data.get("Qn"))[-4]=="E":
+        oldscore =  mainuser.Score_lists.get(data.get("Subject")+'Score',"0/0").split('/')[0]
+        totaloff =  mainuser.Score_lists.get(data.get("Subject")+'Score',"0/0").split('/')[1]
+        if str(data.get("Qn"))[-4]=="E":
                 outoff  = 5
-            elif str(data.get("Qn"))[-4]=="M":
+        elif str(data.get("Qn"))[-4]=="M":
                 outoff  = 10
-            else:
+        else:
                 outoff  = 15
-            if data.get("Qn") not in mainuser.Ans_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))):
+        if data.get("Qn") not in mainuser.Ans_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))):
                 mainuser.Score_lists.update({data.get("Subject")+'Score':str(float(oldscore)+float(score))+"/"+str(int(totaloff)+int(outoff))}) #if mainuser.Score_lists.get(data.get("Subject")+'Score') is None else mainuser.Score_lists[data.get("Subject")+'Score'] = (mainuser.Score_lists[key] if mainuser.Score_lists.get(key) else 0 )+ score
                 mainuser.Ans_lists[data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))].append(data.get("Qn"))
                 if result.get("Result") == 'True':
-                    mainuser.Qns_status.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))).update({data.get("Qn"):3}) 
+                    mainuser.Qns_status.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))).update({data.get("Qn"):3})
                 else:
-                    mainuser.Qns_status.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))).update({data.get("Qn"):2}) 
+                    mainuser.Qns_status.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no")))).update({data.get("Qn"):2})
                 if mainuser.End_Course is None:
                     mainuser.End_Course = {}
                 mainuser.End_Course.update({data.get("Subject"):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
@@ -826,7 +833,7 @@ def add_daysQN_db(data):
         return {'Result':"Answer has been submitted successfully"}
     except Exception as e:
         return 'An error occurred'+str(e)
-
+ 
 
 @api_view(['POST'])
 def nextQn(req):
