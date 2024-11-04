@@ -85,6 +85,7 @@ def updateRanks(COURSE):
                 'userScore':userScore,
                 'delay':(datetime.strptime(str(userDelay).split('.')[0], "%Y-%m-%d %H:%M:%S")-startdate).days
             })
+        new_ranks = [i for i in new_ranks if i.get('Score') != 0 ]
         new_ranks = sorted(new_ranks, key=lambda x: x['Score'], reverse=True)
         for i in new_ranks:
             i['Rank'] = new_ranks.index(i)+1

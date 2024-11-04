@@ -1,4 +1,3 @@
- 
 from django.shortcuts import render
 from datetime import datetime, timedelta
 from django.http import HttpResponse, JsonResponse
@@ -55,11 +54,9 @@ def send(request, student_id):
  
 def no_of_q_ans(data):
     student_id=data['StudentId']
-    print(data)
     ended_courses=data['Ended_Courses']
     list_of_course=data['list_of_course']
     result={
-        # "StudentId":student_id,
     }
     days=StudentDetails_Days_Questions.objects.filter(Student_id=student_id).first()
     if days:
@@ -73,14 +70,12 @@ def no_of_q_ans(data):
                         "End_time":ended_courses.get(course, {}).get('End Time', 0)
                     }
                     delay=last_submit(ex)
-                    print('delay',delay,"Course",course)
                     result[course]={
                         'total_days':total_days,
                         'delay':delay,
                     }
                 else:
                     delay=compare_w_current(ended_courses[course]['End Time'])
-                    print('delay',delay,"Course",course)
                     result[course]={
                         'total_days':total_days,
                         'delay':delay,
@@ -94,14 +89,12 @@ def no_of_q_ans(data):
                         "End_time":ended_courses.get(course, {}).get('End Time', 0)
                     }
                     delay=last_submit(ex)
-                    print('delay',delay,"Course",course)
                     result[course]={
                         'total_days':total_days,
                         'delay':delay,
                     }
                 else:
                     delay=compare_w_current(ended_courses[course]['End Time'])
-                    print('delay',delay,"Course",course)
                     result[course]={
                         'total_days':total_days,
                         'delayexist':delay,
@@ -110,7 +103,6 @@ def no_of_q_ans(data):
  
 def compare_w_current(time):
     current=datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
-    print(current)
     current=datetime.strptime(str(current).split(' ')[0],"%Y-%m-%d")
     existing=datetime.strptime(str(time).split(' ')[0], "%Y-%m-%d")
    
@@ -139,7 +131,6 @@ def last_submit(ex):
         if (end-existing).days>=0:
             delay="N/A"
         elif (end-existing).days<0:
-            print("heyu")
             delay=(existing-end).days
     return delay
  

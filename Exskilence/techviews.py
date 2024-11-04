@@ -9,7 +9,6 @@ from  Exskilencebackend160924.Blob_service import *
 from rest_framework.decorators import api_view 
 from datetime import datetime
 from Exskilence.Ranking import getRankings
-
 @csrf_exempt
 def create_student_details(request):
     if request.method == 'POST':
@@ -75,7 +74,59 @@ def create_student_details_days_questions(request):
             return JsonResponse({"error": "An error occurred: " + str(e)}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+ 
+ 
+def get_student_rank(students_data, student_id, ranking_subjects):
+    def get_combined_score(student):
+        score = 0
+        for subject in ranking_subjects:
+            subject_score = student['Score_lists'].get(f"{subject}Score", "0/0").split('/')[0]
+            score += float(subject_score)
+        return score
+ 
+    def is_valid_student(id):
+        return not any(keyword in id for keyword in ["ADMI", "TRAI", "TEST"])
+ 
+    scores = [(student['Student_id'], get_combined_score(student))
+              for student in students_data
+              if is_valid_student(student['Student_id'])]
+   
+    sorted_scores = sorted(scores, key=lambda x: x[1], reverse=True)
+    ranks = {}
+    current_rank = 1
+    for i, (id, score) in enumerate(sorted_scores):
+        if i > 0 and score < sorted_scores[i-1][1]:
+            current_rank = i + 1
+        ranks[id] = (current_rank, score)
+   
+    return ranks.get(student_id, (None, None))
+ 
 
+def get_student_rank(students_data, student_id, ranking_subjects):
+    def get_combined_score(student):
+        score = 0
+        for subject in ranking_subjects:
+            subject_score = student['Score_lists'].get(f"{subject}Score", "0/0").split('/')[0]
+            score += float(subject_score)
+        return score
+ 
+    def is_valid_student(id):
+        return not any(keyword in id for keyword in ["ADMI", "TRAI", "TEST"])
+ 
+    scores = [(student['Student_id'], get_combined_score(student))
+              for student in students_data
+              if is_valid_student(student['Student_id'])]
+   
+    sorted_scores = sorted(scores, key=lambda x: x[1], reverse=True)
+    ranks = {}
+    current_rank = 1
+    for i, (id, score) in enumerate(sorted_scores):
+        if i > 0 and score < sorted_scores[i-1][1]:
+            current_rank = i + 1
+        ranks[id] = (current_rank, score)
+   
+    return ranks.get(student_id, (None, None))
+ 
 @csrf_exempt
 def frontpagedeatialsmethod(request):
     try:
@@ -188,7 +239,7 @@ def getRankings(COURSE, student_ids):
         rankings = {rank.StudentId: str(rank.Rank) for rank in Rankings.objects.filter(Course=COURSE, StudentId__in=student_ids)}
         return rankings
     except Exception as e:
-        print(f"Error in getRankings: {str(e)}")
+        # print(f"Error in getRankings: {str(e)}")
         return {}
 
 
@@ -208,9 +259,8 @@ def scorescumulation(student):
     score_sum = 0
     score_HTMLCSS = 0
     score_breakdown = {}
-    
     score_lists = student.get('Score_lists', {})
-    
+
     for key, value in score_lists.items():
         if isinstance(value, str) and '/' in value:
             try:
@@ -510,7 +560,227 @@ from datetime import datetime
 from django.utils import timezone
 from datetime import datetime
 from django.utils import timezone
+ 
+ 
+def calculate_course_delay(student_id):
+    try:
+        student = StudentDetails.objects.get(StudentId=student_id)
+        studentansdetials = StudentDetails_Days_Questions.objects.filter(Student_id=student_id).values().first()
+        current_date = timezone.now().date()
+        total_delay = 0
+        delays = {}
+        for course, time_range in student.Course_Time.items():
+            end_date = time_range.get("End")
+ 
+            if end_date:
+                course_end_date = end_date.date() if isinstance(end_date, datetime) else end_date
+                question_data = calculate_questions_completed(studentansdetials, course)
+                question_data_course = question_data.get(course,{})
+                total_questions = question_data_course.get('total_assigned', 0)
+                answered_questions = question_data_course.get('total_answered', 0)
+                # if(course=="HTMLCSS"):
+                # print("nldmore"+str(student)+str(time_range)+"\t"+"the students questiondata"+str(question_data_course))
+                if answered_questions >= total_questions:
+                    delays[course] = 0
+                else:
+                    if current_date > course_end_date:
+                        delay_days = (current_date - course_end_date).days
+                        delays[course] = delay_days
+                        total_delay += delay_days
+                    else:
+                        delays[course] = 0
+        delays["total_delay"] = total_delay
+        return delays
+    except StudentDetails.DoesNotExist:
+        return {"error": "Student with the given ID does not exist."}
+ 
+def calculate_questions_completed(data,subject):
+    subjects = ['HTMLCSS', 'JavaScript', 'SQL', 'Python']  # Define your subjects
+    results = {}
+    assigned_html_css = data.get('Qns_lists', {}).get('HTMLCSS', [])
+    answered_html = data.get('Ans_lists', {}).get('HTML', [])
+    answered_css = data.get('Ans_lists', {}).get('CSS', [])
+    answered_html_css = set(answered_html + answered_css)
+    completed_html_css = [q for q in assigned_html_css if q in answered_html_css]
+    results['HTMLCSS'] = {
+        'total_assigned': len(assigned_html_css),
+        'total_answered': len(completed_html_css)
+    }
+    for subject in ['JavaScript', 'SQL', 'Python']:
+        assigned_questions = data.get('Qns_lists', {}).get(subject, [])
+        answered_questions = data.get('Ans_lists', {}).get(subject, [])
+        completed_questions = [q for q in assigned_questions if q in answered_questions]
+       
+        results[subject] = {
+            'total_assigned': len(assigned_questions),
+            'total_answered': len(completed_questions)
+        }
+       
+    return results
+from Exskilence.filters import filterQuery  
+def rankings():
+    try:
+        ranks = StudentDetails.objects.all()
+        if ranks is None:
+            HttpResponse('No data found')
+        out ={}
+        noDAta = []
+        for i in ranks:
+         if str(i.StudentId)[2:].startswith("ADMI") or str(i.StudentId)[2:].startswith("TRAI") or str(i.StudentId)[2:].startswith("TEST"):
+            continue
+         user = QuestionDetails_Days.objects.filter(Student_id=i.StudentId)
+         if user is None:
+            noDAta.append(i.StudentId)
+            continue
+         HTML = filterQuery(user, 'Subject',  'HTML')
+         CSS = filterQuery(user, 'Subject',  'CSS')
+         if HTML is None or CSS is None or len(HTML) == 0 or len(CSS) == 0:
+            noDAta.append(i.StudentId)
+            continue
+         HTMLCSSSCORE =0
+         HTMLLASTTIME = HTML[0].get('DateAndTime')
+         for i1 in HTML:
+            # print(i)
+            HTMLCSSSCORE += i1.get('Score')
+            if i1.get('DateAndTime') > HTMLLASTTIME:
+                HTMLLASTTIME = i1.get('DateAndTime')
+         for i2 in CSS:
+            HTMLCSSSCORE += i2.get('Score')
+            if i2.get('DateAndTime') > HTMLLASTTIME:
+                HTMLLASTTIME = i2.get('DateAndTime')
+        #  print(HTMLCSSSCORE)#,QuestionDetails_Days.objects.filter(    Q(Student_id=i.Student_id) & (Q(Subject='HTML') | Q(Subject='CSS'))).aggregate(total_score=Sum('Score'))['total_score'] or 0 )
+         
+         out.update({i.StudentId: {
+            "HTMLCSS":   HTMLCSSSCORE,
+            'HTML_last_Question':   HTMLLASTTIME,
+ 
+        }
+    })
+        ranks = sorted(    out.items(),     key=lambda x: (-x[1]['HTMLCSS'], x[1]['HTML_last_Question']))  
+        # print(ranks)
+        res = []
+        for i in ranks:
+            res.append({'Rank':ranks.index(i)+1,"StudentId":i [0],"Total":i[1]['HTMLCSS'], "LastTime":i[1]['HTML_last_Question']})
+            # print({'Rank':ranks.index(i)+1,"StudentId":i [0], "LastTime":i[1]['HTML_last_Question'],"Total":i[1]['HTMLCSS']})
+        return res
+   
+    except Exception as e:
+        print(e)
+        return HttpResponse('An error occurred'+str(e))
+   
 
+     
+ 
+
+def calculate_course_delay(student_id):
+    try:
+        student = StudentDetails.objects.get(StudentId=student_id)
+        studentansdetials = StudentDetails_Days_Questions.objects.filter(Student_id=student_id).values().first()
+        current_date = timezone.now().date()
+        total_delay = 0
+        delays = {}
+        for course, time_range in student.Course_Time.items():
+            end_date = time_range.get("End")
+ 
+            if end_date:
+                course_end_date = end_date.date() if isinstance(end_date, datetime) else end_date
+                question_data = calculate_questions_completed(studentansdetials, course)
+                question_data_course = question_data.get(course,{})
+                total_questions = question_data_course.get('total_assigned', 0)
+                answered_questions = question_data_course.get('total_answered', 0)
+                # if(course=="HTMLCSS"):
+                # print("nldmore"+str(student)+str(time_range)+"\t"+"the students questiondata"+str(question_data_course))
+                if answered_questions >= total_questions:
+                    delays[course] = 0
+                else:
+                    if current_date > course_end_date:
+                        delay_days = (current_date - course_end_date).days
+                        delays[course] = delay_days
+                        total_delay += delay_days
+                    else:
+                        delays[course] = 0
+        delays["total_delay"] = total_delay
+        return delays
+    except StudentDetails.DoesNotExist:
+        return {"error": "Student with the given ID does not exist."}
+ 
+def calculate_questions_completed(data,subject):
+    subjects = ['HTMLCSS', 'JavaScript', 'SQL', 'Python']  # Define your subjects
+    results = {}
+    assigned_html_css = data.get('Qns_lists', {}).get('HTMLCSS', [])
+    answered_html = data.get('Ans_lists', {}).get('HTML', [])
+    answered_css = data.get('Ans_lists', {}).get('CSS', [])
+    answered_html_css = set(answered_html + answered_css)
+    completed_html_css = [q for q in assigned_html_css if q in answered_html_css]
+    results['HTMLCSS'] = {
+        'total_assigned': len(assigned_html_css),
+        'total_answered': len(completed_html_css)
+    }
+    for subject in ['JavaScript', 'SQL', 'Python']:
+        assigned_questions = data.get('Qns_lists', {}).get(subject, [])
+        answered_questions = data.get('Ans_lists', {}).get(subject, [])
+        completed_questions = [q for q in assigned_questions if q in answered_questions]
+       
+        results[subject] = {
+            'total_assigned': len(assigned_questions),
+            'total_answered': len(completed_questions)
+        }
+       
+    return results
+from Exskilence.filters import filterQuery  
+def rankings():
+    try:
+        ranks = StudentDetails.objects.all()
+        if ranks is None:
+            HttpResponse('No data found')
+        out ={}
+        noDAta = []
+        for i in ranks:
+         if str(i.StudentId)[2:].startswith("ADMI") or str(i.StudentId)[2:].startswith("TRAI") or str(i.StudentId)[2:].startswith("TEST"):
+            continue
+         user = QuestionDetails_Days.objects.filter(Student_id=i.StudentId)
+         if user is None:
+            noDAta.append(i.StudentId)
+            continue
+         HTML = filterQuery(user, 'Subject',  'HTML')
+         CSS = filterQuery(user, 'Subject',  'CSS')
+         if HTML is None or CSS is None or len(HTML) == 0 or len(CSS) == 0:
+            noDAta.append(i.StudentId)
+            continue
+         HTMLCSSSCORE =0
+         HTMLLASTTIME = HTML[0].get('DateAndTime')
+         for i1 in HTML:
+            # print(i)
+            HTMLCSSSCORE += i1.get('Score')
+            if i1.get('DateAndTime') > HTMLLASTTIME:
+                HTMLLASTTIME = i1.get('DateAndTime')
+         for i2 in CSS:
+            HTMLCSSSCORE += i2.get('Score')
+            if i2.get('DateAndTime') > HTMLLASTTIME:
+                HTMLLASTTIME = i2.get('DateAndTime')
+        #  print(HTMLCSSSCORE)#,QuestionDetails_Days.objects.filter(    Q(Student_id=i.Student_id) & (Q(Subject='HTML') | Q(Subject='CSS'))).aggregate(total_score=Sum('Score'))['total_score'] or 0 )
+         
+         out.update({i.StudentId: {
+            "HTMLCSS":   HTMLCSSSCORE,
+            'HTML_last_Question':   HTMLLASTTIME,
+ 
+        }
+    })
+        ranks = sorted(    out.items(),     key=lambda x: (-x[1]['HTMLCSS'], x[1]['HTML_last_Question']))  
+        # print(ranks)
+        res = []
+        for i in ranks:
+            res.append({'Rank':ranks.index(i)+1,"StudentId":i [0],"Total":i[1]['HTMLCSS'], "LastTime":i[1]['HTML_last_Question']})
+            # print({'Rank':ranks.index(i)+1,"StudentId":i [0], "LastTime":i[1]['HTML_last_Question'],"Total":i[1]['HTMLCSS']})
+        return res
+   
+    except Exception as e:
+        print(e)
+        return HttpResponse('An error occurred'+str(e))
+   
+
+     
+ 
 def delay(student_id):
     try:
         student_data = StudentDetails.objects.filter(StudentId=student_id).first()
