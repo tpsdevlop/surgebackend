@@ -22,7 +22,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 04 04-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 05 04-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):

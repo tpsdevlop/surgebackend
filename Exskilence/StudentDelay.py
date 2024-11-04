@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 import json
 from django.http import HttpResponse
+from datetime import timedelta
 @api_view(['GET'])
 def send(request, student_id):
     try:
@@ -19,12 +20,20 @@ def send(request, student_id):
         if student_data:
             course_time = student_data.Course_Time
             ended_courses = {}
+            started_courses={}
             current_time = datetime.now()
             for course, timings in course_time.items():
                 start_time = timings['Start']  
-                end_time = timings['End']      
+                end_time = timings['End']    
+                if course=="SQL" or course=="Python":
+                    if current_time > start_time:
+                        duration = (end_time - start_time).days + 1
+                        started_courses[course]={
+                            'Start Time':start_time,
+                            'days':duration
+                        }
                 if end_time < current_time:
-                    duration = (end_time - start_time).days
+                    duration = (end_time - start_time).days + 1
                     ended_courses[course] = {
                         'End Time': end_time,
                         'days': duration
@@ -33,14 +42,14 @@ def send(request, student_id):
             response_data = {
                 "StudentId": student_data.StudentId,
                 "Ended_Courses": ended_courses,
-                "list_of_course":list_of_course
+                "list_of_course":list_of_course,
+                "Started_Courses":started_courses
             }
         else:
             response_data = {
                 "StudentId": student_id,
                 "Ended_Courses": {}
             }
-       
         data=no_of_q_ans(response_data)
         return HttpResponse(data, content_type='application/json')
  
@@ -56,12 +65,14 @@ def no_of_q_ans(data):
     student_id=data['StudentId']
     ended_courses=data['Ended_Courses']
     list_of_course=data['list_of_course']
+    started_courses=data['Started_Courses']
     result={
     }
     days=StudentDetails_Days_Questions.objects.filter(Student_id=student_id).first()
     if days:
         for course in list_of_course:
-            total_days = ended_courses.get(course, {}).get('days', 0) +1
+            print("fbs", list_of_course)
+            total_days = ended_courses.get(course, {}).get('days', 0)
             if course=="HTMLCSS":
                 if (len(days.Qns_lists[course])==len(days.Ans_lists["HTML"])):
                     ex={
@@ -80,7 +91,8 @@ def no_of_q_ans(data):
                         'total_days':total_days,
                         'delay':delay,
                     }
-            if course in days.Qns_lists and course in days.Ans_lists:
+           
+            if course!="HTMLCSS" and course in days.Qns_lists and course in days.Ans_lists:
                 course_len=len(days.Qns_lists[course])
                 if (course_len==len(days.Ans_lists[course])):
                     ex={
@@ -97,9 +109,61 @@ def no_of_q_ans(data):
                     delay=compare_w_current(ended_courses[course]['End Time'])
                     result[course]={
                         'total_days':total_days,
-                        'delayexist':delay,
+                        'delay':delay,
                     }
-    return HttpResponse(json.dumps(result), content_type='application/json')
+ 
+        for course in started_courses:
+            start=started_courses[course]['Start Time']
+            no=compare_w_current(start)
+            if no>10:
+                no=10
+            jam={}
+            for i in range(no):
+                d=course+'_Day_'+str(i+1)
+                current=datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
+                current=datetime.strptime(str(current).split(' ')[0],"%Y-%m-%d")
+                time=started_courses[course]['Start Time']
+                existing=datetime.strptime(str(time).split(' ')[0], "%Y-%m-%d")
+                d_days=(current-existing).days
+                jam[d]={
+                    "delay": d_days-(i),
+                    "total_days":1
+                }
+                result[d]=jam[d]
+               
+                # if d in days.Qns_lists and d in days.Ans_lists:
+                #     if (len(days.Qns_lists[d])==len(days.Ans_lists[d])):
+                #         time = days.End_Course[d]
+                #         updated_time=start + timedelta(days=(i+1))
+                #         print(time,updated_time)
+                #         delays = (time -updated_time).days
+                #         print('sdsf',start)
+                #         jam[d]['delay']=delays  
+                #         result[d]['delay']=delays
+                if d in days.Qns_lists and d in days.Ans_lists:
+                    if len(days.Qns_lists[d]) == len(days.Ans_lists[d]):
+                        time = days.End_Course[d]
+                        updated_time = start + timedelta(days=(i + 1))
+                        print(time, updated_time)
+                        print('sdsf', start)
+                        if updated_time < time:
+                            delays = (time - updated_time).days + 1  
+                        else:  
+                            delays = 0
+                        jam[d]['delay'] = delays
+                        result[d]['delay'] = delays
+ 
+ 
+ 
+            print('jam',jam)
+    out ={
+        "HTMLCSS":result.get("HTMLCSS"),
+        "Java_Script":result.get("Java_Script"),
+    }
+    for key in result.keys():
+         if key!="HTMLCSS" and key!="Java_Script":
+             out.update( {key:result.get(key)} )
+    return HttpResponse(json.dumps(out), content_type='application/json')
  
 def compare_w_current(time):
     current=datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
@@ -133,4 +197,3 @@ def last_submit(ex):
         elif (end-existing).days<0:
             delay=(existing-end).days
     return delay
- 
