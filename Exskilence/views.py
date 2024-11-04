@@ -22,7 +22,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse("Welcome to the Home Page of STAGEING 03 04-11-2022")
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 04 04-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):
@@ -642,8 +642,8 @@ def getQn(req):
             mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).update({data.get('Qn_name'):1})
         if mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day')),None) is None:
             mainUser.Qns_lists.update({data.get('Course')+'_Day_'+str(data.get('Day')):[]})
-        if mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).count(data.get('Qn_name')) < 1:
-            mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).append(data.get('Qn_name'))
+        # if mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).count(data.get('Qn_name')) < 1:
+        #     mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).append(data.get('Qn_name'))
         mainUser.save()
         user = QuestionDetails_Days.objects.filter(Student_id = data.get('StudentId'),Subject = course,Qn = data.get('Qn_name')).first()
         qnsdata = download_blob2('Internship_days_schema/'+course+'/Day_'+str(data.get('Day'))+'/'+data.get('Qn_name')+'.json',CONTAINER)
