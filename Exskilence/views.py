@@ -22,7 +22,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse("Welcome to the Home Page of STAGEING 02 04-11-2022")
+    return HttpResponse("Welcome to the Home Page of STAGEING 03 04-11-2022")
 
 @api_view(['POST'])
 def fetch(request):
@@ -826,6 +826,7 @@ def add_daysQN_db(data):
                 if mainuser.End_Course is None:
                     mainuser.End_Course = {}
                 mainuser.End_Course.update({data.get("Subject"):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
+                mainuser.End_Course.update({data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
                 mainuser.save()
         if len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) == len(mainuser.Ans_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) and len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) > 0:
                 print('UPDATING RANKS...')

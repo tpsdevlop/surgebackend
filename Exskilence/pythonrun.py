@@ -42,7 +42,7 @@ def submit_python(request):
             jsondata = json.loads(request.body)
             code=jsondata.get('Code')
             callfunc=jsondata.get('CallFunction')
-            code_data=(code+'\n'+callfunc).split('\n')
+            code_data=str(code+'\n'+callfunc).split('\n')
             result=jsondata.get('Result')
             TestCases=jsondata.get('TestCases')
             bol=True
@@ -61,6 +61,7 @@ def submit_python(request):
                     for u in unique_in_tc:
                         if str(code).__contains__(u):
                             boll.append({u:True,"val": str(u)})
+                    # print('boll',boll)
                     if len(boll)==len(tc):
                         t={"TestCase"+str(i+1) :"Passed"}
                         main.append(t)
@@ -81,10 +82,19 @@ def submit_python(request):
                             if str(val).replace(' ','').split('=')[0] in str(b.keys()): 
                                 newvalue=str(b['val'])[0:str(b['val']).index(key[0])]+val
                                 if str(val).startswith(key):
-                                    code_data[b[key]]=newvalue
+                                    if str(val).replace(' ','').split('=')[0]==code_data[b[key]].replace(' ','').split('=')[0]:
+                                        code_data[b[key]]=newvalue
+                                    else:
+                                        for c in code_data:
+                                            if str(c).replace(' ','').split('=')[0]==(str(val).replace(' ','').split('=')[0]):
+                                                # print(val,c ,code_data.index(c))
+                                                code_data[code_data.index(c)]=newvalue
+                                                break
+                                                
                     newcode=""
                     for c in code_data:
                         newcode=newcode+str(c)+'\n' 
+                    # print(newcode)
                     if str(slashNreplace(str(Output)).lower().replace(' ',''))==slashNreplace(str(com(newcode)).lower().replace(' ','')):
                         t={"TestCase"+str(i+1) :"Passed"}
                     else:

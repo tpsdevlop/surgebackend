@@ -53,6 +53,7 @@ class StudentDetails(models.Model):
     Courses         = models.JSONField(default=list)
     Course_Time     = models.JSONField(default=dict)
     CGPA            = models.FloatField()
+    user_Type       = models.CharField(max_length=3, default="SW")
 
 class InternshipDetails(models.Model):
     sl_id           = models.AutoField(primary_key=True)
