@@ -22,7 +22,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 05 04-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 05-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):
@@ -34,9 +34,9 @@ def fetch(request):
             if user:
                 bodydata = str(request.META) .replace('\'','"')
                 if attendance_create_login( user.User_ID) == "First":
-                    return HttpResponse(json.dumps({ "StudentId" : str(user.User_ID),"user_category" : user.User_catagory ,'Overview' : True ,'Body' : bodydata}), content_type='application/json')
+                    return HttpResponse(json.dumps({ "StudentId" : str(user.User_ID),"user_category" : user.User_category ,'Overview' : True ,'Body' : bodydata}), content_type='application/json')
                 else:
-                    return HttpResponse(json.dumps({ "StudentId" : str(user.User_ID),"user_category" : user.User_catagory ,'Overview' : False, 'Body' : bodydata}), content_type='application/json')                   
+                    return HttpResponse(json.dumps({ "StudentId" : str(user.User_ID),"user_category" : user.User_category ,'Overview' : False, 'Body' : bodydata}), content_type='application/json')                   
             else:
                 return HttpResponse('Error! User does not exist', status=404)
         else :
