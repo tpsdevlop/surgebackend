@@ -22,7 +22,8 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 05-11-2024'}), content_type='application/json')
+    # getcountQs()
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 05-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):
@@ -563,13 +564,6 @@ def getQnslist(req):
                         'Ans_lists':{ },
                         'Score_lists':{data.get('Course')+'Score':"0/0"}})
         Qlist = user.Qns_lists.get(course+'_Day_'+str(data.get('Day')),None)
-        if user.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))) is None:
-            user.Qns_status.update({data.get('Course')+'_Day_'+str(data.get('Day')):{}})
-        if Qlist is None:
-            user.Qns_lists.update({data.get('Course')+'_Day_'+str(data.get('Day')):random.sample([j.get('Qn_name') for j in qnsdata], len(qnsdata))})
-            user.Qns_status.update({data.get('Course')+'_Day_'+str(data.get('Day')):{}})
-            user.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).update({j:0 for j in user.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day')))})
-            user.save()
         Qnslist = []
         def getDayScore1(anslist,QName):
             u = anslist.filter(Qn = QName).first()
@@ -635,15 +629,15 @@ def getQn(req):
                         'Qns_status':{ },
                         'Ans_lists':{ },
                         'Score_lists':{data.get('Course')+'Score':"0/0"}})
-        if mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))) is None:
-            mainUser.Qns_status.update({data.get('Course')+'_Day_'+str(data.get('Day')):{}})
-        if mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).get(data.get('Qn_name'),0) < 1:
-            mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).update({data.get('Qn_name'):1})
-        if mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day')),None) is None:
-            mainUser.Qns_lists.update({data.get('Course')+'_Day_'+str(data.get('Day')):[]})
+        # if mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))) is None:
+        #     mainUser.Qns_status.update({data.get('Course')+'_Day_'+str(data.get('Day')):{}})
+        # if mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).get(data.get('Qn_name'),0) < 1:
+        #     mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).update({data.get('Qn_name'):1})
+        # if mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day')),None) is None:
+        #     mainUser.Qns_lists.update({data.get('Course')+'_Day_'+str(data.get('Day')):[]})
         # if mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).count(data.get('Qn_name')) < 1:
         #     mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).append(data.get('Qn_name'))
-        mainUser.save()
+        # mainUser.save()
         user = QuestionDetails_Days.objects.filter(Student_id = data.get('StudentId'),Subject = course,Qn = data.get('Qn_name')).first()
         qnsdata = download_blob2('Internship_days_schema/'+course+'/Day_'+str(data.get('Day'))+'/'+data.get('Qn_name')+'.json',CONTAINER)
         qnsdata = json.loads(qnsdata)
@@ -1161,7 +1155,27 @@ def rankings(allusers):
 
 
 ### TESTING SPACE ####
-
+def getcountQs():
+    try:
+        mainuser = StudentDetails_Days_Questions.objects.all()
+        if mainuser is None:
+            HttpResponse('No data found')
+        for i in mainuser:
+            data =[ i.Student_id]
+            for j in i.Qns_lists:
+                if j=='HTMLCSS' or j=='Java_Script' or str(j).startswith('Python') or j=='':
+                    continue
+                if len(i.Qns_lists.get(j,[])) > 15:
+                    data.append({j :len(i.Qns_lists.get(j,[])) })
+            if len(data)>1:
+                print(data)
+            else:
+                continue
+            
+        return  'Success'
+    except Exception as e:
+        print(e)
+        return  'An error occurred'+str(e)
 
 @api_view(['GET'])
 def updateScore(request):
