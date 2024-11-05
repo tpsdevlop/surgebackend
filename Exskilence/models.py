@@ -13,7 +13,7 @@ class ErrorLogs(models.Model):
     StudentId       = models.CharField(max_length=15)
     Email           = models.EmailField()
     Name            = models.CharField(max_length=25)
-    Occrued_time    = models.DateTimeField()
+    Occurred_time    = models.DateTimeField()####################
     Error_msg       = models.TextField()
     Stack_trace     = models.TextField()
     User_agent      = models.TextField()
@@ -23,13 +23,13 @@ class login_data(models.Model):
     User_ID         = models.CharField(max_length=25,primary_key=True)
     User_name       = models.CharField(max_length=25)
     User_emailID    = models.EmailField(unique=True,null=False)
-    User_catagory   = models.CharField(max_length=5)
+    User_category   = models.CharField(max_length=5)############
 
 class CourseDetails(models.Model):
     SubjectId       = models.CharField(max_length=5, primary_key=True)
     SubjectName     = models.CharField(max_length=20)
     path            = models.CharField(max_length=500)
-    Discription     = models.CharField(max_length=500,default='')#name of the course
+    Description     = models.CharField(max_length=500,default='')#name of the course############
     
 class StudentDetails(models.Model):
     StudentId       = models.CharField(max_length=15, primary_key=True)

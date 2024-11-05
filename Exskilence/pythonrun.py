@@ -35,7 +35,7 @@ def com(data):
             return 'Error:'+ str(e)+'\n'
 
 @api_view(['POST'])
-def submit_python(request):
+def run_python(request):
     if request.method == 'POST':
         try:
             current_time=datetime.now()
@@ -73,6 +73,8 @@ def submit_python(request):
                     Values=tc['Value']
                     Output=tc['Output']
                     def slashNreplace(string):
+                        if string=='':
+                            return string
                         if string[-1]=='\n':
                             string=slashNreplace(string[:-1])
                         return string
@@ -94,7 +96,6 @@ def submit_python(request):
                     newcode=""
                     for c in code_data:
                         newcode=newcode+str(c)+'\n' 
-                    # print(newcode)
                     if str(slashNreplace(str(Output)).lower().replace(' ',''))==slashNreplace(str(com(newcode)).lower().replace(' ','')):
                         t={"TestCase"+str(i+1) :"Passed"}
                     else:
