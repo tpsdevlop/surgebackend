@@ -28,7 +28,7 @@ def ErrorLog(req,e):
             StudentId=error.get('StudentId'),
             Email=std.email if std else json.loads(req.body).get('Email'),
             Name = str(std.firstName)+' '+str(std.lastName) if std else json.loads(req.body).get('Name'),
-            Occrued_time = Time,
+            Occurred_time = Time,
             Error_msg = error.get('Error_msg'),
             Stack_trace = error.get('Stack_trace'),
             User_agent = error.get('User_agent'),

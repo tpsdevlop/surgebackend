@@ -32,11 +32,10 @@ def fetch(request):
         if request.method == "POST": 
             user = login_data.objects.get(User_emailID=data.get('Email'))
             if user:
-                bodydata = str(request.META) .replace('\'','"')
                 if attendance_create_login( user.User_ID) == "First":
-                    return HttpResponse(json.dumps({ "StudentId" : str(user.User_ID),"user_category" : user.User_category ,'Overview' : True ,'Body' : bodydata}), content_type='application/json')
+                    return HttpResponse(json.dumps({ "StudentId" : str(user.User_ID),"user_category" : user.User_category ,'Overview' : True  }), content_type='application/json')
                 else:
-                    return HttpResponse(json.dumps({ "StudentId" : str(user.User_ID),"user_category" : user.User_category ,'Overview' : False, 'Body' : bodydata}), content_type='application/json')                   
+                    return HttpResponse(json.dumps({ "StudentId" : str(user.User_ID),"user_category" : user.User_category ,'Overview' : False }), content_type='application/json')                   
             else:
                 return HttpResponse('Error! User does not exist', status=404)
         else :
@@ -171,7 +170,7 @@ def getcourse(req):
                         Enrolled_courses.append({
                         "SubjectId":course.get('SubjectId')  ,
                         "SubjectName":course.get('SubjectName') ,
-                        "Name":course.get('Discription')  ,
+                        "Name":course.get('Description')  ,
                         "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
                         'Progress':str(round(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] ))/len(userscore.Qns_lists.get(course.get('SubjectName'),[]))*100))+"%" if len(userscore.Qns_lists.get(course.get('SubjectName'),[])) != 0 else '0%',
                         'Assignment':str(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] )))+"/"+str(len(userscore.Qns_lists.get(course.get('SubjectName'),[]))),
@@ -193,7 +192,7 @@ def getcourse(req):
                         Enrolled_courses.append({
                         "SubjectId":course.get('SubjectId')  ,
                         "SubjectName":course.get('SubjectName') ,
-                        "Name":course.get('Discription')  ,
+                        "Name":course.get('Description')  ,
                         "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
                         'Progress': str(round(sum(numAns)/sum(numQns)*100))+'%' if sum(numQns)!= 0 else "0%" ,
                         'Assignment':str(sum(numAns))+"/"+str(sum(numQns)),
@@ -1091,7 +1090,7 @@ def test_add_new_stds (req):
                 User_ID     = sid,
                 User_name   = i['Student Full Name'],
                 User_emailID= i.get('Email address'),
-                User_catagory = 's'
+                User_category = 's'
             )
             l1.save()
             sd1 =StudentDetails_Days_Questions(

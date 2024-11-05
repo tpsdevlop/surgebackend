@@ -128,7 +128,7 @@ def ErrorLog():
                 "StudentId": error.StudentId,
                 "Email": error.Email,
                 "Name": error.Name,
-                "Occrued_time": str (error.Occrued_time),
+                "Occrued_time": str (error.Occurred_time),
                 "Error_msg": error.Error_msg,
                 "Stack_trace": error.Stack_trace,
                 "User_agent": error.User_agent,
