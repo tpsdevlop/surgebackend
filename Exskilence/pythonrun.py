@@ -90,7 +90,8 @@ def run_python(request):
                                         for c in code_data:
                                             if str(c).replace(' ','').split('=')[0]==(str(val).replace(' ','').split('=')[0]):
                                                 # print(val,c ,code_data.index(c))
-                                                code_data[code_data.index(c)]=newvalue
+                                                newvalue = str(c)[0:str(c).index(key[0])]+val
+                                                code_data[code_data.index(c)]= newvalue
                                                 break
                                                 
                     newcode=""
