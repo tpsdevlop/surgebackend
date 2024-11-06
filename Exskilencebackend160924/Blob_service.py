@@ -30,23 +30,15 @@ def download_blob(blob_name):
     return blob_data
 
 def download_blob2(blob_name,container_client):
-
-    # cacheresponse = cache.get(blob_name)
-    # if cacheresponse:
-    #     # print('cache hit')
-    #     cache.set(blob_name,cacheresponse,60*60)
-    #     return cacheresponse
-    # print('cache miss')
-    container_client =  get_blob_service_client().get_container_client(container_client)
-    blob_client = container_client.get_blob_client(blob_name)
-    # ctime = datetime.now()
-    blob_data = blob_client.download_blob()#.readall()
-    # print((datetime.now()-ctime).total_seconds(),'download')
-    # ctime = datetime.now()
-    blob_data = blob_data.readall()
-    # print((datetime.now()-ctime).total_seconds(),'readall')
-    # cache.set(blob_name,blob_data,60*60)
-    return blob_data
+    try:
+        container_client =  get_blob_service_client().get_container_client(container_client)
+        blob_client = container_client.get_blob_client(blob_name)
+        blob_data = blob_client.download_blob()#.readall()
+        blob_data = blob_data.readall()
+        return blob_data
+    except Exception as e:
+        print(e)
+        return None
 
 def download_list_blob(blob_name,startwith):
     # cacheresponse = cache.get(blob_name)

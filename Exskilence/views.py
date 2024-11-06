@@ -22,8 +22,8 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 05-11-2024'}), content_type='application/json')
+    getcountQs()
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 06-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):
@@ -640,6 +640,8 @@ def getQn(req):
         # mainUser.save()
         user = QuestionDetails_Days.objects.filter(Student_id = data.get('StudentId'),Subject = course,Qn = data.get('Qn_name')).first()
         qnsdata = download_blob2('Internship_days_schema/'+course+'/Day_'+str(data.get('Day'))+'/'+data.get('Qn_name')+'.json',CONTAINER)
+        if qnsdata is None:
+            return HttpResponse(json.dumps({"Question":None }), content_type='application/json')
         qnsdata = json.loads(qnsdata)
         qnsdata.update({"Qn_name":data.get('Qn_name'),
                         "Qn_No": int(mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).index(data.get('Qn_name')))+1,})
@@ -658,12 +660,12 @@ def getQn(req):
                 out.update({"Tables":tabs,"Question":qnsdata})
         else:
                 out.update({"Question":qnsdata})
-        attendance_update(data.get('StudentId'))
+        # attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(out), content_type='application/json')
  
     except Exception as e:
-        ErrorLog(req ,e)
-        attendance_update(data.get('StudentId'))
+        # ErrorLog(req ,e)
+        # attendance_update(data.get('StudentId'))
         return HttpResponse(f"An error occurred: {e}", status=500)
 
 @api_view(['POST'])
