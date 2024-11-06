@@ -22,8 +22,8 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 06-11-2024'}), content_type='application/json')
+    # getcountQs()
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 02 06-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):

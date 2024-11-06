@@ -54,7 +54,7 @@ def send(request, student_id):
         return HttpResponse(data, content_type='application/json')
  
     except ValueError as ve:
-        print(f"ValueError: {ve}")
+        # print(f"ValueError: {ve}")
         return HttpResponse({'error': 'Invalid date format'}, status=400)
     except Exception as e:
         print(e)
@@ -71,7 +71,7 @@ def no_of_q_ans(data):
     days=StudentDetails_Days_Questions.objects.filter(Student_id=student_id).first()
     if days:
         for course in list_of_course:
-            print("fbs", list_of_course)
+            # print("fbs", list_of_course)
             total_days = ended_courses.get(course, {}).get('days', 0)
             if course=="HTMLCSS":
                 if (len(days.Qns_lists[course])==len(days.Ans_lists["HTML"])):
@@ -144,21 +144,17 @@ def no_of_q_ans(data):
                     if len(days.Qns_lists[d]) == len(days.Ans_lists[d]):
                         time = days.End_Course[d]
                         updated_time = start + timedelta(days=(i + 1))
-                        print(time, updated_time)
-                        print('sdsf', start)
+                        # print(time, updated_time)
+                        # print('sdsf', start)
                         if updated_time < time:
                             delays = (time - updated_time).days + 1  
                         else:  
                             delays = 0
                         jam[d]['delay'] = delays
                         result[d]['delay'] = delays
- 
- 
- 
-            print('jam',jam)
     out ={
-        "HTMLCSS":result.get("HTMLCSS"),
-        "Java_Script":result.get("Java_Script"),
+        "HTMLCSS":result.get("HTMLCSS",{}),
+        "Java_Script":result.get("Java_Script",{}),
     }
     for key in result.keys():
          if key!="HTMLCSS" and key!="Java_Script":
