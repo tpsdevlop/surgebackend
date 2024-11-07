@@ -28,8 +28,6 @@ def com(data):
             return "Error: Invalid code "
         # command = shlex.split(f'python -c "{data}"')
         # result = subprocess.run(command, capture_output=True, text=True)
-        if str(data).__contains__("reduce"):
-            data = "from functools import reduce\n" + data
         result = subprocess.run(['python', '-c', data], capture_output=True, text=True)
         output = result.stdout if result.stdout else result.stderr
         return output
@@ -56,12 +54,15 @@ def run_python(request):
                     boll=[]
                     for t in tc:
                         for c in code_data:
+                            if str(c).replace(' ','').startswith('#') or str(c).replace(' ','').startswith('"""') or str(c).replace(' ','').startswith("'''"):
+                                code_data.remove(c)
+                                continue
                             if str(c).replace(' ','').startswith(str(t).replace(' ','')):
                                 boll.append({t:code_data.index(c),"val": str(c)})
                                 break 
                     unique_in_tc = [item for item in tc if item not in {key for d in boll for key in d.keys()}]
                     for u in unique_in_tc:
-                        if str(code).__contains__(u):
+                        if str(code_data).__contains__(u):
                             boll.append({u:True,"val": str(u)})
                     # print('boll',boll)
                     if len(boll)==len(tc):
