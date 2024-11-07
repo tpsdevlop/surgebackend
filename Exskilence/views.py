@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 06-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 07-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):
@@ -629,15 +629,10 @@ def getQn(req):
                         'Qns_status':{ },
                         'Ans_lists':{ },
                         'Score_lists':{data.get('Course')+'Score':"0/0"}})
-        # if mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))) is None:
-        #     mainUser.Qns_status.update({data.get('Course')+'_Day_'+str(data.get('Day')):{}})
-        # if mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).get(data.get('Qn_name'),0) < 1:
-        #     mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).update({data.get('Qn_name'):1})
-        # if mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day')),None) is None:
-        #     mainUser.Qns_lists.update({data.get('Course')+'_Day_'+str(data.get('Day')):[]})
-        # if mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).count(data.get('Qn_name')) < 1:
-        #     mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).append(data.get('Qn_name'))
-        # mainUser.save()
+        if mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).get(data.get('Qn_name')) is not None:
+            if mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).get(data.get('Qn_name'),0) < 1:
+                mainUser.Qns_status.get(data.get('Course')+'_Day_'+str(data.get('Day'))).update({data.get('Qn_name'):1})
+                mainUser.save()
         user = QuestionDetails_Days.objects.filter(Student_id = data.get('StudentId'),Subject = course,Qn = data.get('Qn_name')).first()
         qnsdata = download_blob2('Internship_days_schema/'+course+'/Day_'+str(data.get('Day'))+'/'+data.get('Qn_name')+'.json',CONTAINER)
         if qnsdata is None:
@@ -1173,6 +1168,26 @@ def getcountQs():
                 print(data)
             else:
                 continue
+
+        # for i in mainuser:
+        #     data =[ i.Student_id]
+        #     for j in i.Qns_status:
+        #         if j=='HTMLCSS' or j=='HTML' or j=='CSS' or j=='Java_Script' or str(j).startswith('Python') or j=='':
+        #             continue
+        #         if len(i.Qns_status.get(j,[])) > 15:
+        #             data.append({j :len(i.Qns_status.get(j,[])) })
+        #             for k in i.Qns_status.get(j,[]).keys():
+        #                 if  k  in i.Qns_lists.get(j,[]) :
+        #                     continue
+        #                 else:
+        #                     # i.Qns_status.get(j,[]).pop(k)
+        #                     # i.save()
+        #                     print(k)
+
+        #     if len(data)>1:
+        #         print(data)
+        #     else:
+        #         continue
             
         return  'Success'
     except Exception as e:

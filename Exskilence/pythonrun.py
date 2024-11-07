@@ -28,6 +28,8 @@ def com(data):
             return "Error: Invalid code "
         # command = shlex.split(f'python -c "{data}"')
         # result = subprocess.run(command, capture_output=True, text=True)
+        if str(data).__contains__("reduce"):
+            data = "from functools import reduce\n" + data
         result = subprocess.run(['python', '-c', data], capture_output=True, text=True)
         output = result.stdout if result.stdout else result.stderr
         return output

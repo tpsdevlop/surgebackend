@@ -90,11 +90,11 @@ def filterQueryMaxValueScore (all ,course):
                         else:
                             if maxscore < float(str(list.get(str(course)+'Score',0)).split('/')[0]):
                                  maxscore = float(str(list.get(str(course)+'Score',0)).split('/')[0])
-        print('maxscore',maxscore)
+        # print('maxscore',maxscore)
         return maxscore
      
 def filterQueryMaxdelay (all , course):
-     print('in delay filter')
+    #  print('in delay filter')
      if isinstance(all, QuerySet):
         maxdate = None
 
@@ -132,5 +132,5 @@ def filterQueryMaxdelay (all , course):
                                     if maxdate < datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S"):
                                             maxdate = datetime.strptime(str(list.get(course)).split('.')[0], "%Y-%m-%d %H:%M:%S")
                               
-        print('maxdate',maxdate)
+        # print('maxdate',maxdate)
         return maxdate

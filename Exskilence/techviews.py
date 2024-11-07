@@ -182,7 +182,7 @@ def frontpagedeatialsmethod(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 def get_subject_counts(question_details):
-    categories = {"HTML": 30, "Python": 200, "SQL": 200, "Java_Script": 30}
+    categories = {"HTML": 30, "Python": 200, "SQL": 150, "Java_Script": 30}
     subject_counts_by_student = {}
     for question in question_details:
         student_id = question['Student_id']

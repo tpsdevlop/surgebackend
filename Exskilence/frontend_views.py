@@ -222,18 +222,18 @@ def add_daysQN_db(data):
                     mainuser.End_Course = {}
                 mainuser.End_Course.update({data.get("Subject"):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
                 mainuser.save() 
-        print(data.get('Subject'))
+        # print(data.get('Subject'))
         if data.get('Subject') == 'HTML' or data.get('Subject') == 'CSS':
             ln_htmlcss = len(mainuser.Qns_lists.get("HTMLCSS",[]))
             ln_htmlAns = len(mainuser.Ans_lists.get("HTML",[]))
             ln_cssAns = len(mainuser.Ans_lists.get("CSS",[]))
-            print(ln_htmlcss,ln_htmlAns,ln_cssAns)
+            # print(ln_htmlcss,ln_htmlAns,ln_cssAns)
             if( ln_htmlcss == ln_htmlAns or ln_htmlcss == ln_cssAns) and ln_htmlcss > 0:
-                print('UPDATING RANKS...')
+                # print('UPDATING RANKS...')
                 updateRanks( 'HTMLCSS' )
         else:
             if len(mainuser.Qns_lists.get(data.get("Subject"),[])) == len(mainuser.Ans_lists.get(data.get("Subject"),[])) and len(mainuser.Qns_lists.get(data.get("Subject"),[])) > 0:
-                print('UPDATING RANKS...')
+                # print('UPDATING RANKS...')
                 updateRanks(data.get('Subject'))           
         return {'Result':"Answer has been submitted successfully"}
     except Exception as e:
@@ -367,7 +367,7 @@ def frontend_nextQn(req):
             if change:
                 mainuser.save()
         else:
-            print('in')
+            # print('in')
             if user:
                 qnsdata.update({"UserAns":user.Ans })
                 qnsdata.update({"UserSubmited":"Yes" })
