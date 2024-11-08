@@ -25,22 +25,16 @@ def attendance_create_login(data):
         )
         return First
     except Exception as e:
-        print(e)
         return False
     
 def attendance_update(data):
     try:
-        print(data)
         old = Attendance.objects.filter(SID=data).order_by('-Login_time').first()
-        print('old')
         if old is not None:
             old.Last_update = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
             old.save()
         else:
             attendance_create_login(data)
-        print(True)
         return True
     except Exception as e:
-        print(e)
-        print(False)
         return False
