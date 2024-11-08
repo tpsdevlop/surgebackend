@@ -9,13 +9,13 @@ import traceback
 
 def ErrorLog(req,e):
     try:
-        # print(req.META )
+        # print('url:---------',req.build_absolute_uri())
         u_agent = str(req.META.get('HTTP_USER_AGENT'))
         os_info = str(u_agent)[u_agent.find("(")+1:u_agent.find(")")]
         error = {
             "StudentId": json.loads( req.body).get('StudentId'),
             "Error_msg": str(e),
-            "Stack_trace": str(traceback.format_exc())+'\nBody:-'+str(json.loads( req.body)),
+            "Stack_trace": str(traceback.format_exc())+'\nUrl:-'+str(req.build_absolute_uri())+'\nBody:-'+str(json.loads( req.body)),
             "User_agent": u_agent,
             "Operating_sys": os_info ,
         }
