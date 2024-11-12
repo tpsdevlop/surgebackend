@@ -10,6 +10,7 @@ admin.site.register(QuestionDetails_Days)
 admin.site.register(StudentDetails_Days_Questions)
 admin.site.register(BugDetails)
 admin.site.register(Rankings)
+admin.site.register(InternshipsDetails)
 
 admin.site.register(CoursePackages)
 admin.site.register(StudentProfile)

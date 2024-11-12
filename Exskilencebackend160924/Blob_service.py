@@ -22,7 +22,7 @@ def download_blob(blob_name):
     #     # print('cache hit')
     #     cache.set(blob_name,cacheresponse,60*60)
     #     return cacheresponse
-    print('cache miss')
+    # print('cache miss')
     container_client =  get_blob_container_client()
     blob_client = container_client.get_blob_client(blob_name)
     blob_data = blob_client.download_blob().readall()

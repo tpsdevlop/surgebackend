@@ -72,6 +72,7 @@ def run_python(request):
                         main.append(t)
                     else:
                         t={"TestCase"+str(i+1) :"Failed"}
+                        bol=False
                         main.append(t)
                 if i>0:
                     tc=tc['Testcase']
@@ -102,9 +103,9 @@ def run_python(request):
                     newcode=""
                     for c in code_data:
                         newcode=newcode+str(c)+'\n' 
-                    print(newcode)
-                    print(str(com(newcode)))
-                    print(slashNreplace(str(Output)))
+                    # print(newcode)
+                    # print(str(com(newcode)))
+                    # print(slashNreplace(str(Output)))
                     if str(slashNreplace(str(Output)).lower().replace(' ',''))==slashNreplace(str(com(newcode)).lower().replace(' ','')):
                         t={"TestCase"+str(i+1) :"Passed"}
                     else:

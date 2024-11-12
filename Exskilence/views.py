@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 02 08-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 12-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):
@@ -58,7 +58,7 @@ def logout(request):
         return HttpResponse(json.dumps({'Logout': 'Success'}), content_type='application/json')
     except Exception as e:
         ErrorLog(request,e)
-        print(e)
+        # print(e)
         return HttpResponse(f"An error occurred: {e}", status=500)
 def subScore(user,course):
     try:    
@@ -444,6 +444,7 @@ def getQn(req):
         if qnsdata is None:
             return HttpResponse(json.dumps({"Question":None }), content_type='application/json')
         qnsdata = json.loads(qnsdata)
+        qnsdata.update({"Query":""}) if data.get('Course') == 'SQL' else  qnsdata.update({"Ans":''})
         qnsdata.update({"Qn_name":data.get('Qn_name'),
                         "Qn_No": int(mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).index(data.get('Qn_name')))+1,})
         if user:
@@ -490,7 +491,7 @@ def Scoring_logic(passedcases,data):
     }
     qn_type = str(data.get('Qn'))[-4]
     score = attempt_scores.get(qn_type, {}).get(attempt, 0)
-    print(score)
+    # print(score)
     return   round(score*passedcases ,2)
 
 
@@ -581,17 +582,12 @@ def add_daysQN_db(data):
                 mainuser.End_Course.update({data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))):datetime.utcnow().__add__(timedelta(hours=5,minutes=30))})
                 if len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) == len(mainuser.Ans_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) and len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) > 0:
                     days_completed = mainuser.Days_completed.get(data.get("Course"),0)
-                    if days_completed < data.get("Day_no"):
-                        days_completed = data.get("Day_no")
-                        print('days_completed',days_completed)
+                    if days_completed < int(data.get("Day_no")):
+                        days_completed = int(data.get("Day_no"))
                         mainuser.Days_completed.update({data.get("Subject"):days_completed}) #mainuser.Days_completed[data.get("Course")] = days_completed
-                print('outt')
                 mainuser.save()
-        print('inside')
         if len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) == len(mainuser.Ans_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) and len(mainuser.Qns_lists.get(data.get("Subject")+'_Day_'+str(int(data.get("Day_no"))))) > 0:
-                print('UPDATING RANKS...')
                 updateRanks((data.get('Subject')) )
-        print("ANSWER HAS BEEN SUBMITTED SUCCESSFULLY")   
         return {'Result':"Answer has been submitted successfully"}
     except Exception as e:
         return 'An error occurred'+str(e)
@@ -659,7 +655,7 @@ def daycomplete(req):
         attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps({"Result":"Success"}), content_type='application/json')
     except Exception as e:
-        print(e)
+        # print(e)
         ErrorLog(req ,e) 
         attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps({"Result":"Failure"}), content_type='application/json')

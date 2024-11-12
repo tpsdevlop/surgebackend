@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from Exskilence import views as ex,sqlviews as sql,pythonrun as ex_py,HTML_CSS_views as html_css,js_views as js , frontend_views as frontend
 from Exskilence import coursecreatiton as pkgs,trainerflowQn as tech ,ENYCRP as enc, Chatbox as chat ,adminflow as adminflow ,internship as intr
-from Exskilence import StudentDelay as delay
+from Exskilence import StudentDelay as delay ,Internship_Views as internship
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Swapnodayaplacements
@@ -101,5 +101,7 @@ urlpatterns = [
     path('intr/project/score/',intr.project_score),
     path('intr/db/',intr.database_validation),
     path('test/exercise/', intr.test_questions,name= 'test_questions'),
+
+    path('intrernship/', internship.Internship_Home),
     
 ]
