@@ -45,25 +45,44 @@ def Internship_Home(request):
                 }},
         })
         tabs ={}
+        tabsScores ={}
         for i in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
             # print( (i))
             webpages= json.loads(download_blob('Concept/course/'+ str(i)+'.json'))            
             if str(i) == 'Database_setup':
-                tabs.update({
-                     (i):
-                    {
-                    webpages.get('Tabs')[t]:webpages.get('Table_Names')[t] for t in range(0,len(webpages.get('Tabs')))
+                tabs.update({(i):{webpages.get('Tabs')[t]:webpages.get('Table_Names')[t] for t in range(0,len(webpages.get('Tabs')))}})
+            else:
+                tabs.update({(i):{P : webpages.get('Tabs')for P in data.get('Internship_Tasks' ) if data.get('Internship_Tasks' ).get(P) == i}})
+            progress =[]
+            for t in range(0,len(webpages.get('Tabs'))):
+                if i == "Database_setup":
+                     progress.append({
+                                        "Tables": t+1,
+                                        "Name": webpages.get('Table_Names')[t],
+                                        "Score": user.DatabaseScore.get(str(projectName).replace(' ','')).get(str(webpages.get('Table_Names')[t])+'_Score','0/0')
+                                    })
+                else:
+                    switch = {
+                        'HTML': lambda: user.HTMLScore.get(str(projectName).replace(' ', '')).get(i,"0/0"),
+                        'CSS' : lambda: user.CSSScore.get(str(projectName).replace(' ', '')).get(i,"0/0"),
+                        'JS'  : lambda: user.JSScore.get(str(projectName).replace(' ', '')).get(i,"0/0"),
+                        'Python':lambda: user.PythonScore.get(str(projectName).replace(' ', '')).get(i,"0/0"),
+                        'app.py':lambda: user.AppPyScore.get(str(projectName).replace(' ', '')).get(i,"0/0"),
                     }
-                    })
-                continue
-            tabs.update({ (i):
-                         {
-                             P : webpages.get('Tabs')for P in data.get('Internship_Tasks' ) if data.get('Internship_Tasks' ).get(P) == i
-                         }
-                         })
+                    result = switch.get(webpages.get('Tabs')[t], lambda: "0/0")()
+                    progress.append({
+                                        "Sl_No": t+1,
+                                        "Pages": webpages.get('Tabs')[t],
+                                        "Score": result
+                                    })
+                tabsScores.update({str(i)+'_Score':progress})
+
         out ={
             "Sidebar":data,
-            "data":tabs
+            "data":tabs,
+            "Status":user.ProjectStatus.get(str(projectName).replace(' ',''),{}),
+            "Scores":tabsScores,
+            
         }
 
         return HttpResponse(json.dumps(out), content_type='application/json')

@@ -102,6 +102,6 @@ urlpatterns = [
     path('intr/db/',intr.database_validation),
     path('test/exercise/', intr.test_questions,name= 'test_questions'),
 
-    path('intrernship/', internship.Internship_Home),
+    path('internship/', internship.Internship_Home),
     
 ]

@@ -82,11 +82,12 @@ class InternshipDetails(models.Model):
 
     Score           = models.IntegerField(default=0)
 
-class InternshipsDetails(models.Model):
+class InternshipsDetails(models.Model):###
     ID             = models.AutoField( primary_key=True)
     StudentId      = models.CharField(max_length=25,unique=True)
     ProjectName    = models.JSONField(default=list)
     ProjectStatus  = models.JSONField(default=dict)
+    SubmissionDates = models.JSONField(default=dict)
     
     HTMLCode       = models.JSONField(default=dict)
     HTMLScore      = models.JSONField(default=dict)
