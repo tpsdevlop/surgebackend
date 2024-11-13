@@ -244,3 +244,31 @@ class Rankings(models.Model):
     Score       = models.FloatField()
     DateTime    = models.DateTimeField()
     Delay       = models.FloatField()
+
+class Session(models.Model):
+    id = models.IntegerField(primary_key=True)
+    Session_Topic = models.CharField(max_length=100)
+    Date = models.DateField()
+    Start_Time = models.CharField(max_length=20)
+    conductedby = models.CharField(max_length=50)
+    subject = models.CharField(max_length=100,default="")
+    meetlink = models.URLField()
+    Colleges = models.JSONField(default=list)  
+    Branches = models.JSONField(default=list)  
+    ended = models.BooleanField(default=False)
+    videoLink = models.URLField(default="")
+    studentsinvited = models.JSONField(default=list)
+
+    class Meta:
+        managed = False  
+        db_table = 'meetsessions_session'
+
+class Participant(models.Model):
+    session = models.ForeignKey(Session, related_name='participants', on_delete=models.CASCADE)  
+    student_id = models.CharField(max_length=50, null=True)  # Student ID
+    display_name = models.CharField(max_length=100)  # Student's display name
+    attended_time = models.CharField(max_length=20)  # Time attended by student
+
+    class Meta:
+        managed = False  
+        db_table = 'googleMeet_participant'

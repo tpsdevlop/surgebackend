@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 02 13-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 13-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):
@@ -253,6 +253,9 @@ def getdays(req):
         data =json.loads(req.body)
         blob_data = download_blob2('Internship_days_schema/'+data.get('Course')+'/Days.json',CONTAINER)
         json_content = json.loads(blob_data)
+        StudentObj = StudentDetails.objects.filter(StudentId = data.get('StudentId')).first()
+        if StudentObj is None:
+            return HttpResponse('Error! User does not exist', status=404)
         user ,created = StudentDetails_Days_Questions.objects.get_or_create(Student_id = data.get('StudentId'),
             defaults = {'Start_Course':{data.get('Course'):str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))},
                         'Days_completed':{data.get('Course'):0},
@@ -287,11 +290,12 @@ def getdays(req):
                     dayscore =getDaysScore(data.get('Course'),user,QNans,i+1)
                     ScoreList.append({'Score':dayscore[0],'Qn_Ans':dayscore[1]})            
         daysdata = json_content.get('Days')
-        date_obj = datetime.strptime(user.Start_Course.get(data.get('Course'),str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))), "%Y-%m-%d %H:%M:%S.%f")
+        # date_obj = datetime.strptime(user.Start_Course.get(data.get('Course'),str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))), "%Y-%m-%d %H:%M:%S.%f")
+        # date_obj = datetime.strptime(STARTTIMES.get(data.get('Course') ,str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))), "%Y-%m-%d %H:%M:%S.%f")
+        date_obj = datetime.strptime(str(dict(StudentObj.Course_Time.get(data.get('Course'))).get('Start'))+".000000", "%Y-%m-%d %H:%M:%S.%f")
         for i in daysdata:
             Uqnlist =user.Qns_lists.get(data.get('Course')+'_Day_'+str(i.get('Day_no')).split('-')[1],[]) 
             Uanslist =user.Ans_lists.get(data.get('Course')+'_Day_'+str(i.get('Day_no')).split('-')[1],[])
-
             if int (str(i.get('Day_no')).split('-')[1]) > user.Days_completed.get(data.get('Course'),0)+1:
                 Status ="Locked"
             elif int (str(i.get('Day_no')).split('-')[1]) == user.Days_completed.get(data.get('Course'),0) +1 :
@@ -306,8 +310,9 @@ def getdays(req):
             else:
                 Status ="Locked"
             i.update({'Due_date':str(date_obj.__add__(timedelta(hours=24,minutes=00)).strftime("%d-%m-%Y")).split(' ')[0],
-                      'Status':Status
+                      'Status':Status if datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) > date_obj  else 'Locked',
                       })
+            # print(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) ,'\n', date_obj)
             date_obj = date_obj.__add__(timedelta(hours=24,minutes=00))
         json_content.update({'Days':daysdata})
         date_obj = datetime.strptime(date_obj.__add__(timedelta(hours=24,minutes=00)).strftime("%Y-%m-%d"),"%Y-%m-%d")
