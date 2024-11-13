@@ -48,7 +48,7 @@ def Internship_Home(request):
         tabsScores ={}
         for i in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
             # print( (i))
-            webpages= json.loads(download_blob('Concept/course/'+ str(i)+'.json'))            
+            webpages= json.loads(download_blob2('Internship_days_schema/internshipJSONS/'+ str(i)+'.json',CONTAINER)  )          
             if str(i) == 'Database_setup':
                 tabs.update({(i):{webpages.get('Tabs')[t]:webpages.get('Table_Names')[t] for t in range(0,len(webpages.get('Tabs')))}})
             else:
@@ -90,3 +90,46 @@ def Internship_Home(request):
         print(e)
         ErrorLog(request,e)
         return HttpResponse(f"An error occurred: {e}", status=500)
+
+
+@api_view(['POST'])   
+def getPagesjson(req ):
+    try:
+        res = json.loads(req.body)
+        page = res.get('Page')
+        projectName = res.get('ProjectName')
+        data= json.loads(download_blob2('Internship_days_schema/internshipJSONS/'+ str(page)+'.json',CONTAINER))
+        user = InternshipsDetails.objects.filter(StudentId=res.get('StudentId')).first()
+        if user:
+            print(page+'_Score',user.PythonScore.get(str(projectName).replace(' ', '')).get(page+"_Score","0/0"))
+            if page.startswith('Database'):
+                jdata = {"Response":  user.DatabaseCode.get(str(projectName).replace(' ', ''),{})}
+            else:
+                switch = {
+                        'HTML': lambda: user.HTMLCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
+                        'CSS' : lambda: user.CSSCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
+                        'JS'  : lambda: user.JSCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
+                        'Python':lambda: user.PythonCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
+                        'app.py':lambda: user.AppPyCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
+                    }
+                result = {}#switch.get(data.get('Tabs')[page], lambda: "0/0")()
+                for i in data.get('Tabs'):
+                    result.update({i:switch.get(i, lambda: "0/0")()})
+                jdata = {"Response":result}
+        else:
+            if page.startswith('Database'):
+                jdata = {"Response":  {}}
+            else:
+                jdata = {"Response":{
+                    "HTML":'',
+                    "CSS":'',
+                    "JS":'',
+                    "Python":'',
+                    "App_py":''
+                }}
+ 
+        
+        data.update(jdata)
+        return HttpResponse(json.dumps(data), content_type='application/json') 
+    except Exception as e:
+            return HttpResponse(f"An error occurred: {e}", status=500) 

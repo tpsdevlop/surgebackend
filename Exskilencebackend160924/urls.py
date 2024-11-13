@@ -103,5 +103,6 @@ urlpatterns = [
     path('test/exercise/', intr.test_questions,name= 'test_questions'),
 
     path('internship/', internship.Internship_Home),
+    path('internship/pages/', internship.getPagesjson),
     
 ]
