@@ -6,6 +6,7 @@ import time
 from django.shortcuts import HttpResponse
 import json
 from rest_framework.decorators import api_view
+from Exskilence.sqlviews import addAttempt
 
 @api_view(['POST'])
 def execute_python(request):
@@ -47,6 +48,11 @@ def run_python(request):
             code_data=str(code+'\n'+callfunc).split('\n')
             result=jsondata.get('Result')
             TestCases=jsondata.get('TestCases')
+            Attempt = jsondata.get('Attempt')
+            Subject = jsondata.get ('Subject')
+            studentId = jsondata.get('studentId')
+            Qn = jsondata.get('Qn')
+            Day_no = jsondata.get('Day_no')
             bol=True
             main=[]
             i=0
@@ -122,7 +128,11 @@ def run_python(request):
                 data={"Result" :"False"}
                 bol=False
             main.append(data)
-            Output={'TestCases':main,'Time':[{'Execution_Time':str((datetime.now()-current_time).total_seconds())[0:-2]+" s"}]}
+            addAttempts = addAttempt(studentId,Subject,Qn,Attempt,Day_no)
+            Output={'TestCases':main,
+                    'Time':[{'Execution_Time':str((datetime.now()-current_time).total_seconds())[0:-2]+" s"}]
+                    ,'Attempt':addAttempts
+                    }
             return HttpResponse(json.dumps(Output), content_type='application/json')
         except Exception as e:  
             return HttpResponse(f"An error occurred: {e}", status=500)
