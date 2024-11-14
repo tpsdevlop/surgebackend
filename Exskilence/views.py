@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 13-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 14-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):
@@ -286,6 +286,26 @@ def getdays(req):
                 user.Days_completed.update({data.get('Course'):0})
                 user.Score_lists.update({data.get('Course')+'Score':"0/0"})
                 user.save()
+            else:
+                for day in range(1,json_content.get('Total_Days')+1):
+                    print(user.Qns_lists.get(data.get('Course')+'_Day_'+str(day)))
+                    if user.Qns_lists.get(data.get('Course')+'_Day_'+str(day)) == []:
+                        qnsdata = download_list_blob2('Internship_days_schema/'+data.get('Course')+'/Day_'+str(day)+'/','',CONTAINER)
+                        Easy = [j.get('Qn_name') for j in qnsdata if str(j.get('Qn_name'))[-4] == 'E']
+                        Medium = [j.get('Qn_name') for j in qnsdata if str(j.get('Qn_name'))[-4] == 'M']
+                        Hard = [j.get('Qn_name') for j in qnsdata if str(j.get('Qn_name'))[-4] == 'H']
+                        Easy = random.sample(Easy, len(Easy))
+                        Medium = random.sample(Medium, len(Medium))
+                        Hard = random.sample(Hard, len(Hard))
+                        qlist =[]
+                        [qlist.append(i) for i in Easy]
+                        [qlist.append(i) for i in Medium]   
+                        [qlist.append(i) for i in Hard]
+                        user.Qns_lists.update({data.get('Course')+'_Day_'+str(day):qlist})
+                        user.Qns_status.update({data.get('Course')+'_Day_'+str(day):{i:0 for i in user.Qns_lists.get(data.get('Course')+'_Day_'+str(day))}})
+                        user.save()
+
+ 
             for i in range(json_content.get('Total_Days')): 
                     dayscore =getDaysScore(data.get('Course'),user,QNans,i+1)
                     ScoreList.append({'Score':dayscore[0],'Qn_Ans':dayscore[1]})            
