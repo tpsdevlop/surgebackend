@@ -79,7 +79,7 @@ urlpatterns = [
     path('sent/<str:id>', chat.Sent, name='Sent'),
     path('inbox/<str:id>', chat.Inbox, name='Inbox'),
     #for both
-      path ('send_email_to_tutor/', chat.send_email_to_tutor),
+    path ('send_email_to_tutor/', chat.send_email_to_tutor),
     path('mark-as-read/',chat.mark_as_read,name='mark_as_read'),
 
 
@@ -104,5 +104,12 @@ urlpatterns = [
 
     path('internship/', internship.Internship_Home),
     path('internship/pages/', internship.getPagesjson),
+    path('internship/submit/db/', internship.database_validation),
+    path('internship/submit/html/', internship.html_page_validation),
+    path('internship/submit/css/', internship.css_page_validation),
+    path('internship/submit/js/', internship.js_page_validation),
+    path('internship/submit/python/', internship.python_page_validation),
+    path('internship/submit/app_py/', internship.python_page_validation),
+    
     
 ]

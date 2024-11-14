@@ -958,4 +958,174 @@ def last_submit(ex):
 #             subject_counts[subject] = f"{completed_questions}/200"
     
 #     return subject_counts
+
+@csrf_exempt
+@require_POST
+def single_student_details(request):
+    try:
+        # Get student ID from request body
+        data = json.loads(request.body)
+        student_id = data.get('student_id')
+       
+        # Get student basic details
+        student = StudentDetails.objects.filter(StudentId=student_id).values(
+            'StudentId',
+            'firstName',
+            'lastName',
+            'college_Id',
+            'branch',
+            'CGPA',
+            'score',
+            'Course_Time',
+            'user_Type',
+            'email',
+            'mob_No'
+        ).first()
+       
+        if not student:
+            return JsonResponse({'message': 'Student not found'}, status=404)
+ 
+        # Course duration mapping
+        course_durations = {
+            'HTMLCSS': 10,
+            'Java_Script': 20,
+            'SQL': 10,
+            'Python': 10
+        }
+ 
+        # Get course time from student data
+        course_time = student.get('Course_Time', {})
+ 
+        # Get all required data for the student
+        questions = list(QuestionDetails_Days.objects.filter(
+            Student_id=student_id
+        ).values(
+            'Subject',
+            'DateAndTime',
+            'Score',
+            'Attempts',
+            'Ans',
+            'Result'
+        ))
+ 
+        days_questions = StudentDetails_Days_Questions.objects.filter(
+            Student_id=student_id
+        ).values().first()
+ 
+        # Get end course timings from days_questions
+        end_course_timings = days_questions.get('End_Course', {}) if days_questions else {}
+ 
+        attendance = list(Attendance.objects.filter(
+            SID=student_id
+        ).values('Login_time', 'Duration', 'Last_update'))
+ 
+        rankings = list(Rankings.objects.filter(
+            StudentId=student_id
+        ).values('Course', 'Rank'))
+ 
+        # Convert rankings to a dictionary for easier lookup
+        rankings_dict = {rank['Course']: rank['Rank'] for rank in rankings}
+       
+        # Get delay context data
+        delay_context = {
+            'student_data': student,
+            'questions_data': questions,
+            'days_questions': days_questions,
+            'attendance_data': attendance,
+            'rankings_data': rankings
+        }
+       
+        # Calculate delays for all subjects
+        delays = delay(student_id, delay_context)
+ 
+        # New delay calculation function
+        def calculate_delay(course_start, course_end, duration_days):
+            if course_start and course_end:
+                days_diff = (course_end - course_start).days
+                if days_diff > duration_days:
+                    return days_diff - duration_days
+            return 0
+ 
+        # Create subject-wise data
+        subject_data = []
+        for subject in ["HTMLCSS", "Java_Script", "SQL", "Python", "Internship"]:
+            if subject != "Internships":  # Skip Internship as it's not in course time
+               
+ 
+                if subject == "HTMLCSS":
+                    questions_count = len([q for q in questions if "HTML" in q['Subject'].upper()])
+                else:
+                    questions_count = len([q for q in questions if q['Subject'] == subject])
+ 
+                # Get course start and end times
+                course_start = None
+                course_end = None
+               
+                if course_time and subject in course_time:
+                    course_start = course_time[subject].get('Start')
+               
+                if end_course_timings:
+                    if subject in ['SQL', 'Python']:
+                        day_10_key = f"{subject}_Day_10"
+                        subject_day_10 = end_course_timings.get(day_10_key)
+                        subject_end = end_course_timings.get(subject)
+                        course_end = subject_day_10 or subject_end
+                    else:
+                        course_end = end_course_timings.get(subject)
+               
+                # Calculate delay using the new function
+                delay_value = "--"
+                if course_start and course_end:
+                    delay_value = calculate_delay(course_start, course_end, course_durations.get(subject, 0))
+               
+                # Format course start and end dates
+                course_start_str = course_start.strftime('%Y-%m-%d') if course_start else "--"
+                course_end_str = course_end.strftime('%Y-%m-%d %H:%M:%S') if course_end else "--"
+ 
+                # Get score breakdown and rank
+                score_breakdown = scorescumulation(days_questions).get('Score_Breakdown', {})
+                subject_info = {
+                    "Subject": subject,
+                    "Questions_Answered": questions_count,
+                    "Delay": delay_value,
+                    "Score": score_breakdown.get(f'{subject}Score', 0.0),
+                    "Rank": rankings_dict.get(subject, "--"),
+                    "Course_Start": course_start_str,
+                    "Course_End": course_end_str,
+                    "Duration_Days": course_durations.get(subject, "--")
+                }
+                subject_data.append(subject_info)
+ 
+        # Create response with student basic info and subject details
+        response_data = {
+            "student_info": {
+                "id": student['StudentId'],
+                "name": f"{student['firstName']} {student['lastName']}",
+                "college": student['college_Id'],
+                "branch": student['branch'],
+                "email": student['email'],
+                "phone": student['mob_No']
+            },
+            "subject_details": subject_data
+        }
+ 
+        return JsonResponse(response_data, safe=False)
+ 
+    except Exception as e:
+        print(f"Error in single_student_details: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+ 
+def calculate_delay(course_start, course_end, expected_duration):
+    """Calculate delay based on course start and end dates."""
+    if course_start and course_end:
+        actual_duration = (course_end - course_start).days
+        delay = max(0, actual_duration - expected_duration)
+        return {
+            "total_days": actual_duration,
+            "delay": delay
+        }
+    return {"total_days": "NA", "delay": "NA"}
+ 
+ 
+
     

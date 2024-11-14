@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 02 14-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 14-11-2024'}), content_type='application/json')
 
 @api_view(['POST'])
 def fetch(request):
@@ -333,7 +333,7 @@ def getdays(req):
                 Status ="Attempted"
             else:
                 Status ="Locked"
-            i.update({'Due_date':str(date_obj.__add__(timedelta(hours=24,minutes=00)).strftime("%d-%m-%Y")).split(' ')[0],
+            i.update({'Due_date':str(date_obj.__add__(timedelta(hours=23,minutes=59)).strftime("%d-%m-%Y")).split(' ')[0],
                       'Status':Status if datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) > date_obj  else 'Locked',
                       })
             # print(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) ,'\n', date_obj)

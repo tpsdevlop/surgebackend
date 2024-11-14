@@ -28,4 +28,5 @@ urlpatterns = [
     path('bugs/resolved/<str:period>/', get_bugs_resolved_by_period, name='get_bugs_resolved'),
     path('bugscount/', get_bug_count, name='bugscount'),
     path('active-users/', get_active_users, name='active_users'),
+    path('one_stu_data/', single_student_details, name='single_student_details'),
 ]
