@@ -23,7 +23,16 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 14-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 15-11-2024'}), content_type='application/json')
+
+@api_view(['GET'])   
+def getDevTool(request):
+    try:
+        Switch = Switches.objects.filter(Key='DevTool').first().Value
+        return HttpResponse(json.dumps({'DevTool': Switch}), content_type='application/json')
+    except Exception as e:
+        ErrorLog(request,e)
+        return HttpResponse(f"An error occurred: {e}", status=500)
 
 @api_view(['POST'])
 def fetch(request):
