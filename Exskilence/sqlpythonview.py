@@ -67,10 +67,10 @@ def student_details_day(request, student_id, course):
     try:
         student_details = StudentDetails_Days_Questions.objects.get(Student_id=student_id)
         student = StudentDetails.objects.get(StudentId=student_id)
-
+ 
         if course not in student.Courses:
             return JsonResponse({"error": "Student is not enrolled in this course"}, status=status.HTTP_400_BAD_REQUEST)
-
+ 
         days_data = {}
         for day, questions in student_details.Qns_lists.items():
             if day.startswith(f'{course}_Day_') and not day.endswith('Day_0'):
@@ -85,7 +85,7 @@ def student_details_day(request, student_id, course):
                     }
                 days_data[day_key]["total_questions"] += len(questions)
                 days_data[day_key]["question_ids"].update(questions)
-
+ 
                 for question_id in questions:
                     difficulty = question_id[-4]
                     if difficulty == 'E':
@@ -94,16 +94,16 @@ def student_details_day(request, student_id, course):
                         days_data[day_key]["overall_score"] += 10
                     elif difficulty == 'H':
                         days_data[day_key]["overall_score"] += 15
-
+ 
         for day, answers in student_details.Ans_lists.items():
             if day.startswith(f'{course}_Day_') and not day.endswith('Day_0'):
                 day_num = day.split('_Day_')[1]
                 day_key = f"Day{day_num}"
                 if day_key in days_data:
                     days_data[day_key]["answered_questions"] += len(answers)
-
+ 
         max_day_completed = student_details.Days_completed.get(course, 0)
-
+ 
         formatted_days = []
         for day, data in days_data.items():
             if data["total_questions"] > 0:
@@ -113,7 +113,7 @@ def student_details_day(request, student_id, course):
                     Student_id=student_id,
                     Qn__in=question_ids
                 ).aggregate(total_score=Sum('Score'))['total_score'] or 0
-
+ 
                 formatted_days.append({
                     "day": day,
                     "total_questions": data["total_questions"],
@@ -124,19 +124,21 @@ def student_details_day(request, student_id, course):
                     "overall_score": data["overall_score"],
                     "obtained_score": f"{day_score}/{data['overall_score']}" if data["overall_score"] > 0 else "0/0"
                 })
-
+ 
         formatted_days.sort(key=lambda x: int(x['day'][3:]))
-
+ 
         student_details_data = {
             'Student_id': student_details.Student_id,
             'Name': f"{student.firstName} {student.lastName}",
             'Branch': student.branch,
             'College': student.college_Id,
+            'phone':student.mob_No,
+            'email': student.email,
             'Days': formatted_days,
             'Days_completed': student_details.Days_completed.get(course, 0),
             'Start_Course': student_details.Start_Course.get(course),
         }
-
+ 
         return Response(student_details_data)
     except StudentDetails_Days_Questions.DoesNotExist:
         return JsonResponse({"error": "Student details not found"}, status=status.HTTP_404_NOT_FOUND)
