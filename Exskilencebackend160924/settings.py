@@ -118,33 +118,33 @@ pwd = 'EUServer@sa123'
 escaped_username = quote_plus(uname)
 escaped_password = quote_plus(pwd)
 uri = f"mongodb+srv://{escaped_username}:{escaped_password}@eucluster.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000"
-DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'ExskilenceDb',
-        'ENFORCE_SCHEMA': False,  
-        'CLIENT': {
-            'host': uri,
-            'username': uname,
-            'password': pwd,
-            'authMechanism': 'SCRAM-SHA-256',
-        }
-    }
-}
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'djongo',
-#         'NAME': 'ExskilenceNEW',
+#         'NAME': 'ExskilenceDb',
 #         'ENFORCE_SCHEMA': False,  
 #         'CLIENT': {
-#             'host': 'mongodb+srv://kecoview:FVy5fqqCtQy3KIt6@cluster0.b9wmlid.mongodb.net/',
-#             'username': 'kecoview',
-#             'password': 'FVy5fqqCtQy3KIt6',
-#             'authMechanism': 'SCRAM-SHA-1',
+#             'host': uri,
+#             'username': uname,
+#             'password': pwd,
+#             'authMechanism': 'SCRAM-SHA-256',
 #         }
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'ExskilenceNEW',
+        'ENFORCE_SCHEMA': False,  
+        'CLIENT': {
+            'host': 'mongodb+srv://kecoview:FVy5fqqCtQy3KIt6@cluster0.b9wmlid.mongodb.net/',
+            'username': 'kecoview',
+            'password': 'FVy5fqqCtQy3KIt6',
+            'authMechanism': 'SCRAM-SHA-1',
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
