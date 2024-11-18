@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 05 18-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 06 18-11-2024'}), content_type='application/json')
 
 @api_view(['GET'])   
 def getDevTool(request):
@@ -344,7 +344,18 @@ def getdays(req):
                 Status ="Locked"
             if data.get('Course') == 'Python' and i.get('Day_no') == 'Day-3':
                 date_obj = date_obj.__add__(timedelta(hours=24,minutes=00))
-            i.update({'Due_date':str(date_obj.__add__(timedelta(hours=23,minutes=59)).strftime("%d-%m-%Y")).split(' ')[0],
+                i.update({'Due_date':str(date_obj.__add__(timedelta(hours=23,minutes=59)).strftime("%d-%m-%Y")).split(' ')[0],
+                      'Status':Status if datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) > date_obj  else 'Locked',
+                      })
+            elif data.get('Course') == 'Python' and i.get('Day_no') == 'Day-4':
+                open_date = date_obj.__add__(timedelta(hours=-24,minutes=00))
+                # print('open_date============',open_date)
+                date_obj = date_obj.__add__(timedelta(days=3))
+                i.update({'Due_date':str(date_obj.__add__(timedelta(hours=23,minutes=59)).strftime("%d-%m-%Y")).split(' ')[0],
+                      'Status':Status if datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) > open_date  else 'Locked',
+                      })
+            else:
+                i.update({'Due_date':str(date_obj.__add__(timedelta(hours=23,minutes=59)).strftime("%d-%m-%Y")).split(' ')[0],
                       'Status':Status if datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) > date_obj  else 'Locked',
                       })
             # print(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) ,'\n', date_obj)
@@ -356,11 +367,11 @@ def getdays(req):
                 'Day_User_on' : user.Days_completed.get(data.get('Course'),0),
                 'ScoreList':ScoreList 
                 })
-        attendance_update(data.get('StudentId'))
+        # attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(json_content), content_type='application/json')
     except Exception as e:
-        ErrorLog(req ,e) 
-        attendance_update(data.get('StudentId'))
+        # ErrorLog(req ,e) 
+        # attendance_update(data.get('StudentId'))
         return HttpResponse(f"An error occurred: {e}", status=500)
 
 
