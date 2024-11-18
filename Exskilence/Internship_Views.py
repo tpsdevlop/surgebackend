@@ -381,7 +381,18 @@ def python_page_validation(req):
 
 
 
-
+@api_view(['POST'])
+def download_ZIP_file(req):
+    try:
+        name=json.loads(req.body)['Name']
+        if name=='download_ZIP_file':
+            path='https://storeholder.blob.core.windows.net/tpdata/Concept/course/FlaskSample.zip'
+        else :
+            path='not a valid input...'
+        return HttpResponse(json.dumps({'path':path}), content_type='application/json') 
+    except Exception as e:
+            print(e)
+            return HttpResponse(f"An error occurred: {e}", status=500)
 
 
 

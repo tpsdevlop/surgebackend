@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 15-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 18-11-2024'}), content_type='application/json')
 
 @api_view(['GET'])   
 def getDevTool(request):
@@ -219,7 +219,7 @@ def getcourse(req):
             if spent:
                 for i in spent:
                     Duration = Duration + (i.Last_update - i.Login_time).total_seconds()
-            intcourse.get('Score').append(str(Total_Score)+"/"+str(Total_Score_Outof))
+            intcourse.get('Score').append(str(round(Total_Score,2))+"/"+str(Total_Score_Outof))
             Total_Rank = OverallRankings( intcourse.get('Sub'),data.get('StudentId'))
             Rank.update({'Total_Rank':Total_Rank})
             out.update({"Courses":Enrolled_courses,
@@ -885,22 +885,43 @@ def get_bugs(req):
 
 
 ### TESTING SPACE ####
-def getcountQs():
-    try:
-        mainuser = StudentDetails_Days_Questions.objects.all()
-        if mainuser is None:
-            HttpResponse('No data found')
-        for i in mainuser:
-            data =[ i.Student_id]
-            for j in i.Qns_lists:
-                if j=='HTMLCSS' or j=='Java_Script' or str(j).startswith('Python') or j=='':
-                    continue
-                if len(i.Qns_lists.get(j,[])) > 15:
-                    data.append({j :len(i.Qns_lists.get(j,[])) })
-            if len(data)>1:
-                print(data)
-            else:
-                continue
+# def getcountQs():
+#     try:
+#         mainuser = StudentDetails_Days_Questions.objects.all()
+#         ansdata = QuestionDetails_Days.objects.all().filter(Qn = "QSQ2405010108DEXXHM01")
+#         if ansdata is None:
+#             HttpResponse('No Answer found')
+#         if mainuser is None:
+#             HttpResponse('No data found')
+#         for i in mainuser:
+#             data = []
+#             for j in i.Ans_lists:
+#                 if  str(j).startswith('SQL') :
+#                      if "QSQ2405010108DEXXHM01" in i.Ans_lists.get(j,[]):
+                        
+#                         ans = QuestionDetails_Days.objects.filter(  Student_id = i.Student_id, Qn = "QSQ2405010108DEXXHM01").first()
+#                         if ans is None:
+#                             continue
+#                         else:
+#                             old = ans.Score
+#                             ans.Score = 15
+#                             totalscore = QuestionDetails_Days.objects.filter(  Student_id = i.Student_id, Subject = 'SQL').aggregate(Sum('Score')).get('Score__sum')
+                             
+#                             if totalscore != float(i.Score_lists.get("SQLScore",'0/0').split('/')[0]):
+#                                 print(i.Student_id,j,"QSQ2405010108DEXXHM01" in i.Ans_lists.get(j,[]) ,'\told',old,'\tnew',ans.Score ,'\tOLDTotal',i.Score_lists.get("SQLScore",0),'\tNewTotal',totalscore)
+             
+
+#         # for i in mainuser:
+        #     data =[ i.Student_id]
+        #     for j in i.Qns_lists:
+        #         if j=='HTMLCSS' or j=='Java_Script' or str(j).startswith('Python') or j=='':
+        #             continue
+        #         if len(i.Qns_lists.get(j,[])) > 15:
+        #             data.append({j :len(i.Qns_lists.get(j,[])) })
+        #     if len(data)>1:
+        #         print(data)
+        #     else:
+        #         continue
 
         # for i in mainuser:
         #     data =[ i.Student_id]
@@ -921,11 +942,11 @@ def getcountQs():
         #         print(data)
         #     else:
         #         continue
-            
-        return  'Success'
-    except Exception as e:
-        print(e)
-        return  'An error occurred'+str(e)
+    #     print('end')
+    #     return  'Success'
+    # except Exception as e:
+    #     print(e)
+    #     return  'An error occurred'+str(e)
 
 # @api_view(['GET'])
 # def updateScore(request):

@@ -321,10 +321,10 @@ def  OverallRankings(COURSEs,SID):#COURSEs = ["HTMLCSS", "Java_Script"] , SID = 
         rank = 1
         for student_score in aggregate_scores:
             if student_score['StudentId'] == SID:
-                print('Rank',rank,f"Student: {student_score['StudentId']}, Total Score: {student_score['total_score']}")
+                # print('Rank',rank,f"Student: {student_score['StudentId']}, Total Score: {student_score['total_score']}")
                 return  rank
-            else:
-                  print('Rank',rank,f"Student: {student_score['StudentId']}, Total Score: {student_score['total_score']}")
+            # else:
+            #       print('Rank',rank,f"Student: {student_score['StudentId']}, Total Score: {student_score['total_score']}")
             rank += 1
         return  'N/A'
     except Exception as e:

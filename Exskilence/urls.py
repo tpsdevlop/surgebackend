@@ -8,7 +8,7 @@ from .adminflow import *
 urlpatterns = [
     path('student-details/', create_student_details, name='student-details-create'),
     path('student-details-days-questions/', create_student_details_days_questions, name='student-details-days-questions-create'),
-    # path('testest/',frontpagedeatialsmethod,name='testest'),
+    path('testest/',frontpagedeatialsmethod,name='testest'),
     path('jjjjj/',getSTdDaysdetailes,name='jjjjj'),
     path('per-student-data/',per_student_html_CSS_data,name='per-student-data'),
     path('per-student-JavaScript-data/',per_student_JS_data,name='per-student-JS-data'),
