@@ -117,7 +117,10 @@ def getPagesjson(req ):
                     }
                 result = {}#switch.get(data.get('Tabs')[page], lambda: "0/0")()
                 for i in data.get('Tabs'):
-                    result.update({i:switch.get(i, lambda: "0/0")()})
+                    if i == 'app.py':
+                        result.update({'app_py':switch.get(i, lambda: "0/0")()})
+                    else:
+                        result.update({i:switch.get(i, lambda: "0/0")()})
                 jdata = {"Response":result}
         else:
             if page.startswith('Database'):

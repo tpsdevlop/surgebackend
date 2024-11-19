@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 02 19-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 19-11-2024'}), content_type='application/json')
 
 @api_view(['GET'])   
 def getDevTool(request):
@@ -835,14 +835,21 @@ def getcountQs():
             return 0
         count = 0
         for i in mainuser:
+            # if i.Student_id =='24MRIT0077' or i.Student_id == '24TEST0108':
+            #     continue
             for j in i.Qns_lists:
                 if j == 'Python_Day_5':
                     llin = len(i.Qns_lists[j])
+                    olls = len(i.Qns_status[j])
                     i.Qns_lists[j] = []
-                    print(j + ' OLD ' + str(llin) + ' NEW ' + str(len(i.Qns_lists[j])), i.Student_id)
+                    i.Qns_status[j] = {}
+                    if llin >0:
+                        print(j + ' OLD ' + str(llin) + ' NEW ' + str(len(i.Qns_lists[j])), i.Student_id,olls)
+                        count += 1
+                    # i.save()
             # return count
         # mainuser.save()
-        print('end')
+        print('end', count)
         return  'Success'
     except Exception as e:
         print(e)
