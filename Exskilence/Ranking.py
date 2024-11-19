@@ -32,7 +32,7 @@ def updateRanks(COURSE):
         new_ranks = []
         if COURSE == "HTMLCSS" or COURSE == "HTML" or COURSE == "CSS":
             COURSE = "HTMLCSS"
-        print('COURSE',COURSE)
+        # print('COURSE',COURSE)
         
         maxscore = filterQueryMaxValueScore(std_days_all,COURSE)
         maxdelay1 = filterQueryMaxdelay(std_days_all,COURSE)
@@ -89,7 +89,7 @@ def updateRanks(COURSE):
         new_ranks = sorted(new_ranks, key=lambda x: x['Score'], reverse=True)
         for i in new_ranks:
             i['Rank'] = new_ranks.index(i)+1
-            print(i.get('Rank'),'\t',i.get('StudentId'),'\t',i.get('Score'),'\t',i.get('Course'),'\t',i.get('DateTime'),'\t',i.get('userScore'),'\t',i.get('delay'))
+            # print(i.get('Rank'),'\t',i.get('StudentId'),'\t',i.get('Score'),'\t',i.get('Course'),'\t',i.get('DateTime'),'\t',i.get('userScore'),'\t',i.get('delay'))
          
         oldranks = Rankings.objects.filter(Course = COURSE).order_by('-Rank')
         new_rankings = []
@@ -110,7 +110,7 @@ def updateRanks(COURSE):
         return new_rankings
         
     except Exception as e:
-        print(e) 
+        # print(e) 
         return  'An error occurred  :'+str(e) 
 def updateRanks2(COURSE):
     try:
@@ -120,7 +120,7 @@ def updateRanks2(COURSE):
         new_ranks = []
         if COURSE == "HTMLCSS" or COURSE == "HTML" or COURSE == "CSS":
             COURSE = "HTMLCSS"
-        print('COURSE',COURSE)
+        # print('COURSE',COURSE)
         
         for i in std_days_all:
             for j in ranks:
@@ -200,7 +200,7 @@ def updateRanks2(COURSE):
         new_ranks = sorted(new_ranks, key=lambda x: x['Score'], reverse=True)
         for i in new_ranks:
             i['Rank'] = new_ranks.index(i)+1
-            print(i.get('Rank'),'\t',i.get('StudentId'),'\t',i.get('Score'),'\t',i.get('Course'),'\t',i.get('DateTime'),'\t',i.get('userScore'),'\t',i.get('delay'))
+            # print(i.get('Rank'),'\t',i.get('StudentId'),'\t',i.get('Score'),'\t',i.get('Course'),'\t',i.get('DateTime'),'\t',i.get('userScore'),'\t',i.get('delay'))
          
         oldranks = Rankings.objects.filter(Course = COURSE).order_by('-Rank')
         new_rankings = []
@@ -220,7 +220,7 @@ def updateRanks2(COURSE):
                 new_rankings.append(  r)
         return new_rankings
     except Exception as e:
-        print(e) 
+        # print(e) 
         return  'An error occurred  :'+str(e) 
 
 def getRankings(COURSE,SID):
@@ -231,7 +231,8 @@ def getRankings(COURSE,SID):
         else:
             return 'N/A'
     except Exception as e:
-        print(e)
+        # print(e) 
+        return  'An error occurred'+str(e)
 
 def rankings(allusers,COURSE):
     try:
@@ -312,7 +313,7 @@ def rankings(allusers,COURSE):
                 # print({'Rank':ranks.index(i)+1,"StudentId":i [0], "LastTime":i[1]['HTML_last_Question'],"Total":i[1]['HTMLCSS']})
         return res
     except Exception as e:
-        print(e)
+        # print(e)
         return  'An error occurred'+str(e)
     
 def  OverallRankings(COURSEs,SID):#COURSEs = ["HTMLCSS", "Java_Script"] , SID = "24ADMI0001"
@@ -328,5 +329,5 @@ def  OverallRankings(COURSEs,SID):#COURSEs = ["HTMLCSS", "Java_Script"] , SID = 
             rank += 1
         return  'N/A'
     except Exception as e:
-        print(e)
+        # print(e)
         return  'An error occurred'+str(e)
