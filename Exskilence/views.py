@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 19-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 02 19-11-2024'}), content_type='application/json')
 
 @api_view(['GET'])   
 def getDevTool(request):
@@ -661,9 +661,10 @@ def nextQn(req):
         if nextQn == len(qlist) or nextQn == -1:
             attendance_update(data.get('StudentId'))
             return HttpResponse(json.dumps({"Question":None }), content_type='application/json')
-        qnsdata = json.loads(qnsdata)
+        
         qnsdata = download_blob2('Internship_days_schema_test/'+data.get("Subject")+'/Day_'+str(data.get('Day_no'))+'/'+qlist[nextQn]+'.json',CONTAINER)
         # qnsdata = download_blob2('Internship_days_schema/'+data.get("Subject")+'/Day_'+str(data.get('Day_no'))+'/'+qlist[nextQn]+'.json',CONTAINER)
+        qnsdata = json.loads(qnsdata)
         qnsdata.update({"Qn_name":qlist[nextQn],
                         "Qn_No": nextQn+1,})
         user = QuestionDetails_Days.objects.filter(Student_id=str(data.get("StudentId")),Subject=str(data.get("Subject")),Qn=str(qlist[nextQn])).first()
