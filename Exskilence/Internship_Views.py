@@ -43,6 +43,7 @@ def Internship_Home(request):
             'AppPyScore':{str(projectName).replace(' ',''):{}},
             'DatabaseScore':{str(projectName).replace(' ',''):{}},
             'InternshipScores':{str(projectName).replace(' ',''):0},
+            'ProjectDateAndTime':{str(projectName).replace(' ',''):{}},
             'ProjectStatus':{str(projectName).replace(' ',''):{
                 i:0 for i in data.get('Internship_Overview')[1].get('Project_Web_Pages')
                 }},
@@ -79,12 +80,28 @@ def Internship_Home(request):
                                         "Score": result
                                     })
                 tabsScores.update({str(i)+'_Score':progress})
-
+        dateAndTime = {}
+        if user.ProjectDateAndTime.get(str(projectName).replace(' ','')) == None or user.ProjectDateAndTime.get(str(projectName).replace(' ','')) == {}:
+            print("hello")
+            for i in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
+                user.ProjectDateAndTime.get(str(projectName).replace(' ','')).update({i:{
+                    'Start_Time':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)),
+                    'End_Time':datetime.utcnow().__add__(timedelta(hours=42,minutes=30))
+                }})
+            user.save()
+        for j in user.ProjectDateAndTime.get(str(projectName).replace(' ','')):
+            dateAndTime.update({j:
+                                {
+                                    'Start_Time':str(user.ProjectDateAndTime.get(str(projectName).replace(' ','')).get(j).get('Start_Time')),
+                                    'End_Time':str(user.ProjectDateAndTime.get(str(projectName).replace(' ','')).get(j).get('End_Time'))
+                                } 
+                                })
         out ={
             "Sidebar":data,
             "data":tabs,
             "Status":user.ProjectStatus.get(str(projectName).replace(' ',''),{}),
             "Scores":tabsScores,
+            "DateAndTime":dateAndTime
             
         }
 
@@ -92,7 +109,27 @@ def Internship_Home(request):
     except Exception as e:
         ErrorLog(request,e)
         return HttpResponse(f"An error occurred: {e}", status=500)
-    
+# setInternshipTime TEST
+def setInternshipTime():
+    try:
+        data= json.loads(download_blob2('Internship_days_schema/internshipJSONS/InternshipProject.json',CONTAINER))
+        projectName = data.get('Internship_Project').get('Project_Name')
+        user = InternshipsDetails.objects.filter(StudentId ="24MRIT0011").first()
+ 
+        for i in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
+            user.ProjectDateAndTime.get(str(projectName).replace(' ','')).update({i:{
+                'Start_Time':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)),
+                'End_Time':datetime.utcnow().__add__(timedelta(hours=42,minutes=30))
+            }})
+        user.save()
+        print(data.get('Internship_Overview')[1].get('Project_Web_Pages'))
+        for j in user.ProjectDateAndTime.get(str(projectName).replace(' ','')):
+            print(j,str(user.ProjectDateAndTime.get(str(projectName).replace(' ','')).get(j)))
+        # print(user.ProjectDateAndTime)
+    except Exception as e:
+         print(e)
+         return HttpResponse(f"An error occurred: {e}", status=500)
+ 
 
 #   Retrieve pages
 
