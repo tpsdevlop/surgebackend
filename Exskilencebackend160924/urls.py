@@ -23,6 +23,7 @@ urlpatterns = [
     path('getDevTool/', ex.getDevTool),
     # Swapnodayaplacements
     path ('placement/', include('Exskilence.placements_urls')),
+    path ('internshipreport/', include('Exskilence.urls')),
     path ('Questions/<str:course>',tech.Questions), 
     # ADMIN Flow
     path ('getadminflow/', adminflow.adminflow),
