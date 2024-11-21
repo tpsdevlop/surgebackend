@@ -55,18 +55,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3000',
-#     'https://surgefrontend.azurewebsites.net/',
-#     'https://internship24.azurewebsites.net/',
-#     'https://swapnodayaplacements.azurewebsites.net/',
-#     'https://surgemeetlink.azurewebsites.net/'
-#     'https://placements.exskilence.com/',
-#     'https://placements.exskilence.com',
-#     'https://exskilencetesting.azurewebsites.net/',
-#     'https://exskilence-internships.azurewebsites.net/',
-#     'https://internships.exskilence.com/',
-# ]
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'https://surgefrontend.azurewebsites.net/',
+    'https://internship24.azurewebsites.net/',
+    'https://swapnodayaplacements.azurewebsites.net/',
+    'https://surgemeetlink.azurewebsites.net/'
+    'https://placements.exskilence.com/',
+    'https://placements.exskilence.com',
+    'https://exskilencetesting.azurewebsites.net/',
+    'https://exskilence-internships.azurewebsites.net/',
+    'https://internships.exskilence.com/',
+]
 
 CSRF_TRUSTED_ORIGINS=[ 
     'https://internship24.azurewebsites.net/',
