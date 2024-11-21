@@ -246,3 +246,7 @@ class Rankings(models.Model):
     DateTime    = models.DateTimeField()
     Delay       = models.FloatField()
 
+class ActiveUserCounts(models.Model):
+    Sl_id = models.AutoField(primary_key=True)
+    StatDateTime = models.DateTimeField()
+    ActiveUsers = models.IntegerField()

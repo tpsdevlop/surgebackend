@@ -27,9 +27,7 @@ urlpatterns = [
     path ('Questions/<str:course>',tech.Questions), 
     # ADMIN Flow
     path ('getadminflow/', adminflow.adminflow),
-    # path('active-users/', adminflow.get_active_users, name='active_users'),
-    # path('bugs/reported/<str:period>/', adminflow.get_bugs_reported_by_period, name='get_bugs_reported'),
-    # path('bugs/resolved/<str:period>/', adminflow.get_bugs_resolved_by_period, name='get_bugs_resolved'),
+
     #test
     path ('delay/<str:student_id>', delay.send),
     path('encode/', enc.EncodeView , name='encode'),
