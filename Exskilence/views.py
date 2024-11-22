@@ -22,7 +22,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 
 @api_view(['GET'])   
 def home(request):
-    getcountQs()
+    # getcountQs()
     return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 21-11-2024'}), content_type='application/json')
 
 @api_view(['GET'])   
@@ -328,6 +328,7 @@ def getdays(req):
         # date_obj = datetime.strptime(user.Start_Course.get(data.get('Course'),str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))), "%Y-%m-%d %H:%M:%S.%f")
         # date_obj = datetime.strptime(STARTTIMES.get(data.get('Course') ,str(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)))), "%Y-%m-%d %H:%M:%S.%f")
         date_obj = datetime.strptime(str(dict(StudentObj.Course_Time.get(data.get('Course'))).get('Start'))+".000000", "%Y-%m-%d %H:%M:%S.%f")
+        date_utc_now = datetime.utcnow().__add__(timedelta(days=0,hours=5,minutes=30))
         for i in daysdata:
             Uqnlist =user.Qns_lists.get(data.get('Course')+'_Day_'+str(i.get('Day_no')).split('-')[1],[]) 
             Uanslist =user.Ans_lists.get(data.get('Course')+'_Day_'+str(i.get('Day_no')).split('-')[1],[])
@@ -344,21 +345,22 @@ def getdays(req):
                 Status ="Attempted"
             else:
                 Status ="Locked"
-            if data.get('Course') == 'Python' and i.get('Day_no') == 'Day-3':
-                date_obj = date_obj.__add__(timedelta(hours=24,minutes=00))
+            if data.get('Course') == 'Python' and i.get('Day_no') == 'Day-4':
+                date_obj = date_obj.__add__(timedelta(hours=-24,minutes=00))
                 i.update({'Due_date':str(date_obj.__add__(timedelta(hours=23,minutes=59)).strftime("%d-%m-%Y")).split(' ')[0],
-                      'Status':Status if datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) > date_obj  else 'Locked',
+                      'Status':Status if date_utc_now > date_obj  else 'Locked',
                       })
-            elif data.get('Course') == 'Python' and i.get('Day_no') == 'Day-4':
+            elif data.get('Course') == 'Python' and i.get('Day_no') == 'Day-3':
+               
+                # print('open_date============',date_utc_now)
+                date_obj = date_obj.__add__(timedelta(days=7))
                 open_date = date_obj.__add__(timedelta(hours=-24,minutes=00))
-                # print('open_date============',open_date)
-                date_obj = date_obj.__add__(timedelta(days=3))
                 i.update({'Due_date':str(date_obj.__add__(timedelta(hours=23,minutes=59)).strftime("%d-%m-%Y")).split(' ')[0],
-                      'Status':Status if datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) > open_date  else 'Locked',
+                      'Status':Status if date_utc_now > open_date  else 'Locked',
                       })
             else:
                 i.update({'Due_date':str(date_obj.__add__(timedelta(hours=23,minutes=59)).strftime("%d-%m-%Y")).split(' ')[0],
-                      'Status':Status if datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) > date_obj  else 'Locked',
+                      'Status':Status if date_utc_now > date_obj  else 'Locked',
                       })
             # print(datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) ,'\n', date_obj)
             date_obj = date_obj.__add__(timedelta(hours=24,minutes=00))
@@ -369,11 +371,11 @@ def getdays(req):
                 'Day_User_on' : user.Days_completed.get(data.get('Course'),0),
                 'ScoreList':ScoreList 
                 })
-        # attendance_update(data.get('StudentId'))
+        attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(json_content), content_type='application/json')
     except Exception as e:
-        # ErrorLog(req ,e) 
-        # attendance_update(data.get('StudentId'))
+        ErrorLog(req ,e) 
+        attendance_update(data.get('StudentId'))
         return HttpResponse(f"An error occurred: {e}", status=500)
 
 
@@ -737,122 +739,33 @@ def get_tables(tables):
         return "Error getting tables: " + str(e)
     
 
-# @api_view(['GET'])
-# def get_bugs(req):
+
+# ### TESTING SPACE ####
+# def getcountQs():
 #     try:
-#         bugs = BugDetails.objects.all().values()
-#         if bugs is None:
-#             HttpResponse('No data found')
-#         return HttpResponse(json.dumps( list(bugs) ), content_type='application/json')
-#     except Exception as e:
-#         return HttpResponse('An error occurred'+str(e))
-# @api_view(['GET'])
-# def test_add_new_stds (req):
-#     try:
-#         distinct = {}
-#         data = StudentDetails.objects.all() 
-#         if data is not None:
-#             for i in data:
-#                 if str(i.StudentId)[0:6    ] not in distinct:
-#                     distinct.update({str(i.StudentId)[0:6]:[int(str(i.StudentId)[6:])]})
-#                 else:
-#                     distinct[str(i.StudentId)[0:6]].append(int(str(i.StudentId)[6:]))
-#         for i in distinct:
-#             distinct[i] = max(distinct[i])
-#         with open('testdb.json', 'r') as json_file:
-#         # with open('output1.json', 'r') as json_file:
-#             data1 = json.load(json_file)
-#         for i in list(data1):
-#             cid = i.get('College')[:4]
-#             if len(i.get('College'))<4:
-#                 cid = i.get('College') + 'X'
-#             if len(i.get('College') ) >4:
-#                 cid = i.get('College')[:4]
-#             if distinct.get(str(datetime.utcnow().year)[-2:] + str(cid)) is None:
-#                 distinct.update({str(datetime.utcnow().year)[-2:] + str(cid):0})
-#             idno =distinct.get(str(datetime.utcnow().year)[-2:] + str(cid))+1
-#             distinct.update({str(datetime.utcnow().year)[-2:] + str(cid):idno})
-#             if len(str(idno))==1:
-#                 idno = '000'+str(idno)
-#             if len(str(idno))==2:
-#                 idno = '00'+str(idno)
-#             if len(str(idno))==3:
-#                 idno = '0'+str(idno)
-#             if len(str(idno))==4:
-#                 idno = str(idno)
-#             if len(str(idno))>4:
-#                 Exception('more than 4 digits')
-#             sid = str(datetime.utcnow().year)[-2:] + cid+ idno
-#             u1 = StudentDetails(
-#                 StudentId   = sid,
-#                 firstName   = (i['Student Full Name']).split()[0],
-#                 lastName    = i['Student Full Name'].replace((i['Student Full Name']).split()[0],''),
-#                 college_Id  = i['College'][0:4],
-#                 CollegeName = i['College'],
-#                 Center      = i.get('Center'),
-#                 branch      = i.get('Branch'),
-#                 email       = i.get('Email address'),
-#                 whatsApp_No = i.get('Contact Number'),
-#                 mob_No      = i.get('Contact Number'),
-#                 sem         = i.get('Semester'),
-#                 status      = 'a',
-#                 user_category =  's',
-#                 reg_date    = datetime.utcnow().__add__(timedelta(hours=5,minutes=30)),
-#                 exp_date    = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))+timedelta(days=365),
-#                 score       = 0,
-#                 progress_Id = {},
-#                 Assignments_test = {},
-#                 Courses     = [],
-#                 Course_Time = {},
-#                 CGPA        = i.get('CGPA')
-#             )
-#             u1.save()
-#             l1 = login_data(
-#                 User_ID     = sid,
-#                 User_name   = i['Student Full Name'],
-#                 User_emailID= i.get('Email address'),
-#                 User_category = 's'
-#             )
-#             l1.save()
-#             sd1 =StudentDetails_Days_Questions(
-#                 Student_id = sid
-#             )
-#             sd1.save()
-        
-#         return HttpResponse('Success' + str(distinct))
+#         mainuser = StudentDetails_Days_Questions.objects.all()
+#         if mainuser is None:
+#             return 0
+#         count = 0
+#         for i in mainuser:
+#             # if i.Student_id =='24MRIT0077' or i.Student_id == '24TEST0108':
+#             #     continue
+#             for j in i.Qns_lists:
+#                 if j == 'Python_Day_5':
+#                     llin = len(i.Qns_lists[j])
+#                     olls = len(i.Qns_status[j])
+#                     i.Qns_lists[j] = []
+#                     i.Qns_status[j] = {}
+#                     if llin >0:
+#                         print(j + ' OLD ' + str(llin) + ' NEW ' + str(len(i.Qns_lists[j])), i.Student_id,olls)
+#                         count += 1
+#                     # i.save()
+#             # return count
+#         # mainuser.save()
+#         print('end', count)
+#         return  'Success'
 #     except Exception as e:
 #         print(e)
-#         return HttpResponse('An error occurred'+str(e))
-
-    
+#         return  'An error occurred'+str(e)
 
 
-### TESTING SPACE ####
-def getcountQs():
-    try:
-        mainuser = StudentDetails_Days_Questions.objects.all()
-        if mainuser is None:
-            return 0
-        count = 0
-        for i in mainuser:
-            # if i.Student_id =='24MRIT0077' or i.Student_id == '24TEST0108':
-            #     continue
-            for j in i.Qns_lists:
-                if j == 'Python_Day_5':
-                    llin = len(i.Qns_lists[j])
-                    olls = len(i.Qns_status[j])
-                    i.Qns_lists[j] = []
-                    i.Qns_status[j] = {}
-                    if llin >0:
-                        print(j + ' OLD ' + str(llin) + ' NEW ' + str(len(i.Qns_lists[j])), i.Student_id,olls)
-                        count += 1
-                    # i.save()
-            # return count
-        # mainuser.save()
-        print('end', count)
-        return  'Success'
-    except Exception as e:
-        print(e)
-        return  'An error occurred'+str(e)
-
- 

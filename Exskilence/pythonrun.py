@@ -23,7 +23,7 @@ def execute_python(request):
     else:
         return HttpResponse({'Error': 'Only POST requests are allowed'}, status=405)
     
-def com(data):
+def coms(data):
     try:
         if str(data).__contains__("import subprocess") or str(data).__contains__("import os") or str(data).__contains__("import sys") or str(data).__contains__("import commands"):
             return "Error: Invalid code "
@@ -36,6 +36,36 @@ def com(data):
         return output
     except Exception as e:
             return 'Error:'+ str(e)+'\n'
+
+import io
+import sys
+# from functools import reduce
+
+
+def com(data):
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+    stdout_capture = io.StringIO()
+    stderr_capture = io.StringIO()
+    
+    sys.stdout = stdout_capture
+    sys.stderr = stderr_capture
+    
+    local_context = {}
+    try:
+        if str(data).__contains__("import subprocess") or str(data).__contains__("import os") or str(data).__contains__("import sys") or str(data).__contains__("import commands"):
+            return "Error: Invalid code "
+        if "reduce" in str(data):
+            data = "from functools import reduce\n" + data
+        exec(data, local_context)
+        output = stdout_capture.getvalue()
+        error = stderr_capture.getvalue()
+        return output if output else error
+    except Exception as e:
+        return f'Error========={e}'
+    finally:
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
 
 @api_view(['POST'])
 def run_python(request):
