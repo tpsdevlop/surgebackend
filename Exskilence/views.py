@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 02 25-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 03 25-11-2024'}), content_type='application/json')
 
 @api_view(['GET'])   
 def getDevTool(request):
@@ -755,29 +755,73 @@ def get_tables(tables):
 # def getcountQs():
 #     try:
 #         count = 0
-#         users = QuestionDetails_Days.objects.filter(Attempts = 0).exclude(Ans='')
+#         users = QuestionDetails_Days.objects.filter(Attempts = 0,Subject = 'Python').exclude(Ans='')
 #         count = len(users)
+#         i = 0
+#         passedcases = 0
+#         totalcases = 0
 #         for user in users:
 #             user.Attempts = 1
-#             res = user.Result.split(',')
+#             res = user.Result.get("TestCases")
+#             # print(res)
+#             data = {
+#                 "Result":user.Result,
+#                 "Attempt":user.Attempts,
+#                 "Qn":user.Qn,
+#                 "Score":user.Score,
+#                 "Subject":user.Subject,
+#                 "StudentId":user.Student_id
+#                 }
 #             for r in res:
 #                 i += 1
-#                 if r.get("TestCase" + str(i)) == 'Passed' or r.get("TestCase" + str(i)) == 'Failed':
+#                 if res.get("TestCase" + str(i)) == 'Passed' or res.get("TestCase" + str(i)) == 'Failed':
 #                     totalcases += 1
-#                     if r.get("TestCase" + str(i)) == 'Passed':
+#                     if res.get("TestCase" + str(i)) == 'Passed':
 #                         passedcases += 1
-#                     result.update(r)
-#                 if r.get("Result") == 'True' or r.get("Result") == 'False':
-#                     result.update(r)
+#                 # if r.get("Result") == 'True' or r.get("Result") == 'False':
 #             if passedcases == totalcases and passedcases ==0:
 #                 score = 0
 #             else:
-#                 score = Scoring_logic(passedcases/totalcases,data)
+#                 score = Scoring_logic2(passedcases/totalcases,data)
+#             user.Score = score
 #             user.save()
+#             mainuser = StudentDetails_Days_Questions.objects.filter(Student_id=str(user.Student_id)).first()
+#             if mainuser:
+#                 newscore = QuestionDetails_Days.objects.filter(
+#                         Subject='Python', 
+#                         Student_id=str(user.Student_id)
+#                     ).aggregate(Sum('Score')).get('Score__sum', 0)
+#                 oldscore = mainuser.Score_lists.get("PythonScore","0/0")
+#                 outoff = mainuser.Score_lists.get("PythonScore","0/0").split('/')[1]
+#                 mainuser.Score_lists.update({"PythonScore":str(newscore)+'/'+outoff})
+#                 mainuser.save()
+#             # if str(newscore).split('.')[0] != str(oldscore).split('.')[0]:
+#                 # print(str(newscore).split('/')[0],'oldscore',str(oldscore).split('/')[0],user.Student_id)
+#             print(user.Student_id,'\t',user.Subject,'\t',user.Qn,'\t',user.Score,'\t',passedcases,'\t',totalcases,'\t','oldscore',oldscore,'\t','newscore',mainuser.Score_lists.get("PythonScore","0/0"))
+
 #         print('end', count)
 #         return  'Success'
 #     except Exception as e:
 #         print(e)
-        return  'An error occurred'+str(e)
+#         return  'An error occurred'+str(e)
+# def Scoring_logic2(passedcases,data):
+#     attempt = data.get("Attempt")
+#     if data.get("Subject") == "Python":
+#         user = QuestionDetails_Days.objects.filter(Student_id=str(data.get("StudentId")),Subject=str(data.get("Subject")),Qn=str(data.get("Qn"))).first()
 
+#         # if user :
 
+#         #     attempt = user.Attempts
+
+#         # else:
+
+#         attempt = 1
+#     attempt_scores = {
+#     "E": {1: 5, 2: 5, 3: 3, 4: 2},
+#     "M": {1: 10, 2: 10, 3: 10,  4: 8, 5: 6, 6: 4, 7: 2},
+#     "H": {1: 15, 2: 15, 3: 15, 4: 15 ,5: 15, 6: 12, 7: 12, 8: 10, 9: 8, 10: 6, 11: 4, 12: 2},
+#     }
+#     qn_type = str(data.get('Qn'))[-4]
+#     score = attempt_scores.get(qn_type, {}).get(attempt, 0)
+#     # print(score)
+#     return   round(score*passedcases ,2)

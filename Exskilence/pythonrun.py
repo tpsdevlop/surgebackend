@@ -76,6 +76,7 @@ def run_python(request):
             code=jsondata.get('Code')
             callfunc=jsondata.get('CallFunction')
             code_data=str(code+'\n'+callfunc).split('\n')
+            # print('code_data',code_data)
             result=jsondata.get('Result')
             TestCases=jsondata.get('TestCases')
             Attempt = jsondata.get('Attempt')
