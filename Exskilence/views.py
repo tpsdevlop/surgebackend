@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 21-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 25-11-2024'}), content_type='application/json')
 
 @api_view(['GET'])   
 def getDevTool(request):
@@ -299,7 +299,7 @@ def getdays(req):
             else:
                 change = 0
                 for day in range(1,json_content.get('Total_Days')+1):
-                    if user.Qns_lists.get(data.get('Course')+'_Day_'+str(day)) == []:
+                    if user.Qns_lists.get(data.get('Course')+'_Day_'+str(day)) == [] and user.Days_completed.get(data.get('Course'))+1 == day:
                         qnsdata = download_list_blob2('Internship_days_schema_test/'+data.get('Course')+'/Day_'+str(day)+'/','',CONTAINER)
                         # qnsdata = download_list_blob2('Internship_days_schema/'+data.get('Course')+'/Day_'+str(day)+'/','',CONTAINER)
                         if qnsdata is None or qnsdata == []:
@@ -347,8 +347,9 @@ def getdays(req):
                 Status ="Locked"
             if data.get('Course') == 'Python' and i.get('Day_no') == 'Day-4':
                 date_obj = date_obj.__add__(timedelta(hours=-24,minutes=00))
+                open_date = date_obj.__add__(timedelta(hours=-24,minutes=00))
                 i.update({'Due_date':str(date_obj.__add__(timedelta(hours=23,minutes=59)).strftime("%d-%m-%Y")).split(' ')[0],
-                      'Status':Status if date_utc_now > date_obj  else 'Locked',
+                      'Status':Status if date_utc_now > open_date  else 'Locked',
                       })
             elif data.get('Course') == 'Python' and i.get('Day_no') == 'Day-3':
                
@@ -541,6 +542,16 @@ def submit(request)  :
         return HttpResponse(f"An error occurred: {e}", status=500)
 def Scoring_logic(passedcases,data):
     attempt = data.get("Attempt")
+    if data.get("Subject") == "Python":
+        user = QuestionDetails_Days.objects.filter(Student_id=str(data.get("StudentId")),Subject=str(data.get("Subject")),Qn=str(data.get("Qn"))).first()
+
+        if user :
+
+            attempt = user.Attempts
+
+        else:
+
+            attempt = 1
     attempt_scores = {
     "E": {1: 5, 2: 5, 3: 3, 4: 2},
     "M": {1: 10, 2: 10, 3: 10,  4: 8, 5: 6, 6: 4, 7: 2},
@@ -607,7 +618,7 @@ def add_daysQN_db(data):
             q.save()
         else:
             user.Score = score
-            user.Attempts = attempt
+            # user.Attempts = attempt
             user.DateAndTime = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
             user.Ans = str(data.get("Ans"))
             user.Result = {"TestCases":result}
