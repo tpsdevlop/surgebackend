@@ -23,7 +23,7 @@ from Exskilence.Attendance import attendance_create_login, attendance_update
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
-    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 01 25-11-2024'}), content_type='application/json')
+    return HttpResponse(json.dumps({'Message': 'Welcome to the Home Page of STAGEING 02 25-11-2024'}), content_type='application/json')
 
 @api_view(['GET'])   
 def getDevTool(request):
@@ -754,29 +754,30 @@ def get_tables(tables):
 # ### TESTING SPACE ####
 # def getcountQs():
 #     try:
-#         mainuser = StudentDetails_Days_Questions.objects.all()
-#         if mainuser is None:
-#             return 0
 #         count = 0
-#         for i in mainuser:
-#             # if i.Student_id =='24MRIT0077' or i.Student_id == '24TEST0108':
-#             #     continue
-#             for j in i.Qns_lists:
-#                 if j == 'Python_Day_5':
-#                     llin = len(i.Qns_lists[j])
-#                     olls = len(i.Qns_status[j])
-#                     i.Qns_lists[j] = []
-#                     i.Qns_status[j] = {}
-#                     if llin >0:
-#                         print(j + ' OLD ' + str(llin) + ' NEW ' + str(len(i.Qns_lists[j])), i.Student_id,olls)
-#                         count += 1
-#                     # i.save()
-#             # return count
-#         # mainuser.save()
+#         users = QuestionDetails_Days.objects.filter(Attempts = 0).exclude(Ans='')
+#         count = len(users)
+#         for user in users:
+#             user.Attempts = 1
+#             res = user.Result.split(',')
+#             for r in res:
+#                 i += 1
+#                 if r.get("TestCase" + str(i)) == 'Passed' or r.get("TestCase" + str(i)) == 'Failed':
+#                     totalcases += 1
+#                     if r.get("TestCase" + str(i)) == 'Passed':
+#                         passedcases += 1
+#                     result.update(r)
+#                 if r.get("Result") == 'True' or r.get("Result") == 'False':
+#                     result.update(r)
+#             if passedcases == totalcases and passedcases ==0:
+#                 score = 0
+#             else:
+#                 score = Scoring_logic(passedcases/totalcases,data)
+#             user.save()
 #         print('end', count)
 #         return  'Success'
 #     except Exception as e:
 #         print(e)
-#         return  'An error occurred'+str(e)
+        return  'An error occurred'+str(e)
 
 

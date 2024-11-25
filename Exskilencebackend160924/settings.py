@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
     'https://surgefrontend.azurewebsites.net/',
     'https://internship24.azurewebsites.net/',
     'https://swapnodayaplacements.azurewebsites.net/',
