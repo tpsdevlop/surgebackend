@@ -146,11 +146,11 @@ def getPagesjson(req ):
                 jdata = {"Response":  user.DatabaseCode.get(str(projectName).replace(' ', ''),{})}
             else:
                 switch = {
-                        'HTML': lambda: user.HTMLCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
-                        'CSS' : lambda: user.CSSCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
-                        'JS'  : lambda: user.JSCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
-                        'Python':lambda: user.PythonCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
-                        'app.py':lambda: user.AppPyCode.get(str(projectName).replace(' ', '')).get(page+"_Score",""),
+                        'HTML': lambda: user.HTMLCode.get(str(projectName).replace(' ', '')).get(page),
+                        'CSS' : lambda: user.CSSCode.get(str(projectName).replace(' ', '')).get(page),
+                        'JS'  : lambda: user.JSCode.get(str(projectName).replace(' ', '')).get(page ),
+                        'Python':lambda: user.PythonCode.get(str(projectName).replace(' ', '')).get(page ),
+                        'app.py':lambda: user.AppPyCode.get(str(projectName).replace(' ', '')).get(page ),
                     }
                 result = {}#switch.get(data.get('Tabs')[page], lambda: "0/0")()
                 for i in data.get('Tabs'):
@@ -426,7 +426,8 @@ def download_ZIP_file(req):
     try:
         name=json.loads(req.body)['Name']
         if name=='download_ZIP_file':
-            path='https://storeholder.blob.core.windows.net/tpdata/Concept/course/FlaskSample.zip'
+            # path='https://storeholder.blob.core.windows.net/tpdata/Concept/course/FlaskSample.zip'
+            path=  'https://storeholder.blob.core.windows.net/internship/Internship_days_schema/internshipJSONS/FlaskSample.zip'
         else :
             path='not a valid input...'
         return HttpResponse(json.dumps({'path':path}), content_type='application/json') 
