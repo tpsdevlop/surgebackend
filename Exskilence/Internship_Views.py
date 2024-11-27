@@ -146,11 +146,11 @@ def getPagesjson(req ):
                 jdata = {"Response":  user.DatabaseCode.get(str(projectName).replace(' ', ''),{})}
             else:
                 switch = {
-                        'HTML': lambda: user.HTMLCode.get(str(projectName).replace(' ', '')).get(page),
-                        'CSS' : lambda: user.CSSCode.get(str(projectName).replace(' ', '')).get(page),
-                        'JS'  : lambda: user.JSCode.get(str(projectName).replace(' ', '')).get(page ),
-                        'Python':lambda: user.PythonCode.get(str(projectName).replace(' ', '')).get(page ),
-                        'app.py':lambda: user.AppPyCode.get(str(projectName).replace(' ', '')).get(page ),
+                        'HTML': lambda: user.HTMLCode.get(str(projectName).replace(' ', '')).get(page,''),
+                        'CSS' : lambda: user.CSSCode.get(str(projectName).replace(' ', '')).get(page,''),
+                        'JS'  : lambda: user.JSCode.get(str(projectName).replace(' ', '')).get(page,'' ),
+                        'Python':lambda: user.PythonCode.get(str(projectName).replace(' ', '')).get(page,''),
+                        'app.py':lambda: user.AppPyCode.get(str(projectName).replace(' ', '')).get(page,'' ),
                     }
                 result = {}#switch.get(data.get('Tabs')[page], lambda: "0/0")()
                 for i in data.get('Tabs'):
