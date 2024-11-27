@@ -22,7 +22,7 @@ STARTTIMES = {
             },
             'Python':{
                 'Start':datetime.strptime('2024-11-15 00:00:00', "%Y-%m-%d %H:%M:%S"),
-                'End':datetime.strptime('2024-11-24 23:59:59', "%Y-%m-%d %H:%M:%S")
+                'End':datetime.strptime('2024-12-01 23:59:59', "%Y-%m-%d %H:%M:%S")
             }
         }
 def updateRanks(COURSE):
@@ -41,6 +41,8 @@ def updateRanks(COURSE):
             maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('Start')).total_seconds()/60*60
         elif COURSE == 'Java_Script' :
             maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('Start')).total_seconds()/60*60
+        elif COURSE == 'Python' :
+            maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('End')).total_seconds()/60*60
         else:
             maxdelay = (datetime.strptime(str(maxdelay1).split('.')[0], "%Y-%m-%d %H:%M:%S")-STARTTIMES.get(COURSE).get('Start')).total_seconds()/60*60
 
@@ -66,11 +68,11 @@ def updateRanks(COURSE):
                     userDelay = user.End_Course.get(COURSE) if user.End_Course.get(COURSE) is not None else user.Start_Course.get(COURSE,STARTTIMES.get(COURSE).get('Start') if COURSE != 'HTMLCSS' and COURSE != 'Java_Script' else STARTTIMES.get(COURSE).get('End'))
 
 
-            startdate = STARTTIMES.get(COURSE).get('Start') #if COURSE != 'HTMLCSS' and COURSE != 'Java_Script' else STARTTIMES.get(COURSE).get('Start')
+            startdate = STARTTIMES.get(COURSE).get('Start') if COURSE != 'Python' else STARTTIMES.get(COURSE).get('End')
             delay =(datetime.strptime(str(userDelay).split('.')[0], "%Y-%m-%d %H:%M:%S")-startdate).total_seconds()/60*60
             # print('delay',delay,'maxdelay',maxdelay,'userScore',userScore,'maxscore',maxscore,'COURSE',COURSE,'startdate',startdate,'userDelay',userDelay,'delay',)
-            # if delay < 0:
-            #     delay = 0
+            if delay < 0:
+                delay = 0
             # if  maxdelay == 0:  
             #     Scorevalue = (0.8 * (userScore/maxscore))-0
             # else:

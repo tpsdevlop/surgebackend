@@ -115,82 +115,111 @@ def no_of_q_ans(data):
  
         for course in started_courses:
             if course=="Python":
-                python_end = [
-                    "2024-11-15", "2024-11-16", "2024-11-24", "2024-11-24",
-                    "2024-11-25", "2024-11-26", "2024-11-27", "2024-11-28",
-                    "2024-11-29", "2024-11-30"
-                ]
-                python_days=[1,1,8,8,1,1,1,1,1,1]
-                last = datetime.strptime(python_end[9], "%Y-%m-%d")
+                end_date='2024-12-01'
+                end_time=datetime.strptime(str(end_date).split(' ')[0], "%Y-%m-%d")
+                # print(end_time)
                 current=datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
                 current=datetime.strptime(str(current).split(' ')[0],"%Y-%m-%d")
-                no=0
-                for time in python_end:
-                    last = datetime.strptime(time, "%Y-%m-%d")
-                    if last<current:
-                        no+=1
-                print('no',no)
-                if no>10:
-                    no=10
-                jam={}
-                for i in range(no):
-                    d=course+'_Day_'+str(i+1)
-                    if d=="Python_Day_3" or d=="Python_Day_4":
-                        jam[d]={
-                            'total_days':'N/A',
-                            'delay':"N/A"
+                if current>end_time:
+                    # print("done")
+                    total=0
+                    for i in range(1,11):
+                        day='Python_Day_'+str(i)
+                        total+=len(days.Ans_lists.get(day,[]))
+                    if total==150:
+                        submit_time=days.End_Course.get(course,0)
+                        delay=(submit_time-end_time).days
+ 
+                        result[course]={
+                                'total_days':10,
+                                'delay':delay if delay>0 else 0
+                            }
+                    else:
+                        delay=(current-end_time).days
+                        result[course]={
+                            'total_days':10,
+                            'delay':delay
                         }
-                        result[d]=jam[d]
-                        continue
+                else:
+                    pass
+                    # print("not done")
+               
+                # python_end = [
+                #     "2024-11-15", "2024-11-16", "2024-11-24", "2024-11-24",
+                #     "2024-11-25", "2024-11-26", "2024-11-27", "2024-11-28",
+                #     "2024-11-29", "2024-11-30"
+                # ]
+                # python_days=[1,1,8,8,1,1,1,1,1,1]
+                # last = datetime.strptime(python_end[9], "%Y-%m-%d")
+                # current=datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
+                # current=datetime.strptime(str(current).split(' ')[0],"%Y-%m-%d")
+                # no=0
+                # for time in python_end:
+                #     last = datetime.strptime(time, "%Y-%m-%d")
+                #     if last<current:
+                #         no+=1
+                # print('no',no)
+                # if no>10:
+                #     no=10
+                # jam={}
+                # for i in range(no):
+                #     d=course+'_Day_'+str(i+1)
+                #     if d=="Python_Day_3" or d=="Python_Day_4":
+                #         jam[d]={
+                #             'total_days':'N/A',
+                #             'delay':"N/A"
+                #         }
+                #         result[d]=jam[d]
+                #         continue
                    
  
-                    current=datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
+                #     current=datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
  
-                    current=datetime.strptime(str(current).split(' ')[0],"%Y-%m-%d")
-                    # print("current",current)
-                    time=started_courses[course]['Start Time']
-                    end_time=python_end[i]
-                    end_time=datetime.strptime(str(end_time).split(' ')[0], "%Y-%m-%d")
-                    existing=datetime.strptime(str(time).split(' ')[0], "%Y-%m-%d")
-                    d_days=(current-end_time).days
-                    if d == "Python_Day_1" or d == "Python_Day_2":
-                         mindays= 6
-                         jam[d] = {
-                            'total_days': python_days[i],
-                            'delay':  d_days - mindays
-                        }
-                    else:
-                        jam[d]={
-                            'total_days':python_days[i],
-                            'delay':d_days
-                        }
-                    result[d]=jam[d]
+                #     current=datetime.strptime(str(current).split(' ')[0],"%Y-%m-%d")
+                #     # print("current",current)
+                #     time=started_courses[course]['Start Time']
+                #     end_time=python_end[i]
+                #     end_time=datetime.strptime(str(end_time).split(' ')[0], "%Y-%m-%d")
+                #     existing=datetime.strptime(str(time).split(' ')[0], "%Y-%m-%d")
+                #     d_days=(current-end_time).days
+                #     if d == "Python_Day_1" or d == "Python_Day_2":
+                #          mindays= 6
+                #          jam[d] = {
+                #             'total_days': python_days[i],
+                #             'delay':  d_days - mindays
+                #         }
+                #     else:
+                #         jam[d]={
+                #             'total_days':python_days[i],
+                #             'delay':d_days
+                #         }
+                #     result[d]=jam[d]
  
-                    if d in days.Qns_lists and d in days.Ans_lists:
-                        if len(days.Qns_lists[d]) == len(days.Ans_lists[d]):
-                            st_time = days.End_Course.get(d,'')
-                            end_time = datetime.strptime(python_end[i], "%Y-%m-%d")
-                            if str(d).split('_')[-1] == '1' or str(d).split('_')[-1] == '2':
-                                if str(st_time).split(' ')[0] >='2024-11-19' and str(st_time).split(' ')[0] <='2024-11-24':
-                                    st_time=datetime.strptime(str('2024-11-18'), "%Y-%m-%d")
-                                else:
-                                    if str(st_time).split(' ')[0] <='2024-11-18'  :
-                                        pass
-                                    else:
-                                        print( int(str(st_time).split(' ')[0].split('-')[-1]),int('2024-11-24'.split('-')[-1]))
-                                        updated_time = st_time - timedelta(days=(6))
-                                        st_time=updated_time
-                                    
-                            if end_time<st_time:
-                                    print('f')
-                                    delays=(st_time-end_time).days
-                                    print(st_time,end_time)
-                                    jam[d]['delay'] = delays
-                                    result[d]['delay'] = delays
-                            else:  
-                                delays = "N/A"
-                                jam[d]['delay'] = delays
-                                result[d]['delay'] = delays
+                #     if d in days.Qns_lists and d in days.Ans_lists:
+                #         if len(days.Qns_lists[d]) == len(days.Ans_lists[d]):
+                #             st_time = days.End_Course.get(d,'')
+                #             end_time = datetime.strptime(python_end[i], "%Y-%m-%d")
+                #             if str(d).split('_')[-1] == '1' or str(d).split('_')[-1] == '2':
+                #                 if str(st_time).split(' ')[0] >='2024-11-19' and str(st_time).split(' ')[0] <='2024-11-24':
+                #                     st_time=datetime.strptime(str('2024-11-18'), "%Y-%m-%d")
+                #                 else:
+                #                     if str(st_time).split(' ')[0] <='2024-11-18'  :
+                #                         pass
+                #                     else:
+                #                         print( int(str(st_time).split(' ')[0].split('-')[-1]),int('2024-11-24'.split('-')[-1]))
+                #                         updated_time = st_time - timedelta(days=(6))
+                #                         st_time=updated_time
+                                   
+                #             if end_time<st_time:
+                #                     print('f')
+                #                     delays=(st_time-end_time).days
+                #                     print(st_time,end_time)
+                #                     jam[d]['delay'] = delays
+                #                     result[d]['delay'] = delays
+                #             else:  
+                #                 delays = "N/A"
+                #                 jam[d]['delay'] = delays
+                #                 result[d]['delay'] = delays
                            
          
             elif course=="SQL":
