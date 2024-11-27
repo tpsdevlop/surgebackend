@@ -193,9 +193,9 @@ def database_validation(req):
         common_keywords = [i for i in list if any(str(j).__contains__(i.replace(' ','')) for j in ans)]
         user = InternshipsDetails.objects.filter(StudentId=data.get('StudentId')).first()
         if user:
-            oldscore=user.DatabaseScore.get(str(projectName).replace(' ', ''),{}).get(table+'_Score',0)
+            oldscore=user.DatabaseScore.get(str(projectName).replace(' ', ''),{}).get(table+'_Score','0/0').split('/')[0]
             user.DatabaseCode.get(str(projectName).replace(' ', ''),{}).update({table:input_string})
-            user.DatabaseScore.get(str(projectName).replace(' ', ''),{}).update({table+'_Score':len(common_keywords)*5})
+            user.DatabaseScore.get(str(projectName).replace(' ', ''),{}).update({table+'_Score':str(len(common_keywords)*5)+'/'+str(len(list)*5)})
             user.InternshipScores.update({str(projectName).replace(' ', ''):user.InternshipScores.get(str(projectName).replace(' ', ''),0)+len(common_keywords)*5-int(oldscore)})#=user.Score+len(common_keywords)*5-int(oldscore)
             user.save()
             output = {}
@@ -255,7 +255,7 @@ def html_page_validation(request):
 
             score = f'{len(common_keywords) }/{len(sample_elements) }'
             output.update({"score": score,
-                       "Status": addCodeToDb(1,data.get('Page'),htmlcode,data.get('StudentId'),len(common_keywords),data.get('ProjectName'))
+                       "Status": addCodeToDb(1,data.get('Page'),htmlcode,data.get('StudentId'),len(common_keywords),len(sample_elements),data.get('ProjectName'))
                        })
             return HttpResponse(json.dumps(output), content_type='application/json')
 
@@ -345,7 +345,7 @@ def css_page_validation(req    ):
             output.update({"valid": False,"message": "CSS code is Not valid."})
         score = f'{len(common_keywords) }/{len(css_tuples_a) }'
         output.update({"score": score,
-                       "Status": addCodeToDb(2,data.get('Page'),css_code,data.get('StudentId'),len(common_keywords),data.get('ProjectName'))
+                       "Status": addCodeToDb(2,data.get('Page'),css_code,data.get('StudentId'),len(common_keywords),len(css_tuples_a),data.get('ProjectName'))
                        })
         return HttpResponse(json.dumps(output), content_type='application/json')
     except Exception as e:
@@ -369,7 +369,7 @@ def js_page_validation(req):
             "valid": len(common_keywords) == len(sam),
             "message": "JS code is valid." if len(common_keywords) == len(sam) else "JS code is Not valid.",
             "score": f"{len(common_keywords)}/{len(sam)}",
-            "Status": addCodeToDb(3,data.get('Page'),js_code,data.get('StudentId'),len(common_keywords),data.get('ProjectName'))
+            "Status": addCodeToDb(3,data.get('Page'),js_code,data.get('StudentId'),len(common_keywords),len(sam),data.get('ProjectName'))
         }
         return HttpResponse(json.dumps(output), content_type='application/json')
     
@@ -404,11 +404,11 @@ def python_page_validation(req):
         score = f'{len(c_keys) }/{len(list) }'
         if data.get('File_name')=='Python':
              output.update({"score": score,
-                    "Status": addCodeToDb(4,data.get('Page'),input_string,data.get('StudentId'),len(c_keys),data.get('ProjectName'))
+                    "Status": addCodeToDb(4,data.get('Page'),input_string,data.get('StudentId'),len(c_keys),len(list),data.get('ProjectName'))
                     })
         if data.get('File_name')=='app_py':
              output.update({"score": score,
-                    "Status": addCodeToDb(5,data.get('Page'),input_string,data.get('StudentId'),len(c_keys),data.get('ProjectName'))
+                    "Status": addCodeToDb(5,data.get('Page'),input_string,data.get('StudentId'),len(c_keys),len(list),data.get('ProjectName'))
                     })
         if len(c_keys)>0:
             return HttpResponse(json.dumps(output), content_type='application/json')
@@ -447,31 +447,31 @@ def download_ZIP_file(req):
 
 
 
-def addCodeToDb(type,page,code,id,score,projectName):
+def addCodeToDb(type,page,code,id,score,outof,projectName):
     try:
         user = InternshipsDetails.objects.filter(StudentId=id).first()
         if user:
             match type:
                 case 1: 
-                    oldscore =user.HTMLScore.get(str(projectName.replace(' ', ''))).get(page+'_Score',0)
+                    oldscore =user.HTMLScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.HTMLCode.get(str(projectName.replace(' ', ''))).update({page:code})
-                    user.HTMLScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':score*5})
+                    user.HTMLScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
                 case 2:
-                    oldscore =user.CSSScore.get(str(projectName.replace(' ', ''))).get(page+'_Score',0)
+                    oldscore =user.CSSScore.get(str(projectName.replace(' ', ''))).get(page+'_Score',   '0/0').split('/')[0]
                     user.CSSCode.get(str(projectName.replace(' ', ''))).update({page:code})
-                    user.CSSScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':score*5})
+                    user.CSSScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
                 case 3:
-                    oldscore =user.JSScore.get(str(projectName.replace(' ', ''))).get(page+'_Score',0)
+                    oldscore =user.JSScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.JSCode.get(str(projectName.replace(' ', ''))).update({page:code})
-                    user.JSScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':score*5})
+                    user.JSScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
                 case 4:
-                    oldscore =user.PythonScore.get(str(projectName.replace(' ', ''))).get(page+'_Score',0)
+                    oldscore =user.PythonScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.PythonCode.get(str(projectName.replace(' ', ''))).update({page:code})
-                    user.PythonScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':score*5})
+                    user.PythonScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
                 case 5:
-                    oldscore =user.AppPyScore.get(str(projectName.replace(' ', ''))).get(page+'_Score',0)
+                    oldscore =user.AppPyScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.AppPyCode.get(str(projectName.replace(' ', ''))).update({page:code})
-                    user.AppPyScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':score*5})
+                    user.AppPyScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
             user.InternshipScores.update({str(projectName.replace(' ', '')):user.InternshipScores.get(str(projectName.replace(' ', '')),0)+int(score*5)-int(oldscore)})
             user.save()
             return ("done")
