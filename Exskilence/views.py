@@ -826,3 +826,22 @@ def get_tables(tables):
 #     score = attempt_scores.get(qn_type, {}).get(attempt, 0)
 #     # print(score)
 #     return   round(score*passedcases ,2)
+# def getcountQs():
+#     try:
+#         count = 0
+#         users = QuestionDetails_Days.objects.filter(Student_id = '24GMIT0008',Subject = 'Python',
+#                                                     Qn__in =[
+#       "QPY2405050012AXXEM02",      "QPY2405050013AXXEM02",      "QPY2405050012AXXEM03",      "QPY2405050012AXXEM01",
+#       "QPY2405050012AXXEM04",      "QPY2405050013AXXEM01",      "QPY2405050013AXXEM05",      "QPY2405050013AXXEM04",
+#       "QPY2405050012BXXMM05",      "QPY2405050013BXXMM10",      "QPY2405050013BXXMM07",      "QPY2405050013BXXMM09",
+#       "QPY2405050013BXXMM06",      "QPY2405050013BXXMM03",      "QPY2405050013CXXHM08",      "QPY2405050011AXXEM09",
+#       "QPY2405050011AXXEM03",      "QPY2405050010AXXEM08",      "QPY2405050011AXXEM06",      "QPY2405050011AXXEM01",
+#       "QPY2405050011AXXEM08",      "QPY2405050011AXXEM07",      "QPY2405050010AXXEM10",      "QPY2405050011AXXEM02",
+#       "QPY2405050010AXXEM06",      "QPY2405050011BXXMM05",      "QPY2405050011BXXMM10",      "QPY2405050011BXXMM04",
+#       "QPY2405050010BXXMM09",      "QPY2405050010BXXMM07"    ]).aaggregate(sum=Sum('Score'))
+#         # count = len(users)
+#         print('end', count,users)
+#         return count
+#     except Exception as e: 
+#         print(e) 
+#         return "Error getting tables: " + str(e)

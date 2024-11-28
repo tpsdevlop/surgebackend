@@ -63,7 +63,7 @@ def Internship_Home(request):
                      progress.append({
                                         "Tables": t+1,
                                         "Name": webpages.get('Table_Names')[t],
-                                        "Score": user.DatabaseScore.get(str(projectName).replace(' ','')).get(str(webpages.get('Table_Names')[t])+'_Score','0/0')
+                                        "Score": user.DatabaseScore.get(str(projectName).replace(' ','')).get(str(webpages.get('Tabs')[t])+'_Score','0/0')
                                     })
                 else:
                     switch = {
