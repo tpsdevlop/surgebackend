@@ -650,16 +650,26 @@ def download_ZIP_file(req):
             return HttpResponse(f"An error occurred: {e}", status=500)
 
 
-
-
-
-
-
-
-
-
-
-
+@api_view(['POST'])
+def  updateScore(request):
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        codedata = data['Ans']
+        score = data['Score']
+        data.update({"Score": score if int(str(score).split('/')[0])<=int(str(score).split('/')[1]) else str(score).split('/')[1]+"/"+str(score).split('/')[1],"Result":score})
+        # print(data.get('Score'))        
+        output={}
+        if int(str(score).split('/')[0]) ==  int(str(score).split('/')[1]):
+           output.update({"valid": True,"message": data.get('Subject')+" code is valid."})
+        else:
+            output.update({"valid": False,"message": data.get('Subject')+" code is Not valid."})
+        subject_mapping = {'HTML': 1,'CSS': 2,'JS': 3,'Java_Script':  3,'Python': 4,'app_py': 5,'App_py': 5,'db': 6}
+        output.update({"score": score,
+                       "Status": addCodeToDb(subject_mapping.get(data.get('Subject'), 0),data.get('Page'),codedata,data.get('StudentId'),int(str(score).split('/')[0]),int(str(score).split('/')[1]),data.get('ProjectName'))
+                       })
+        return HttpResponse(json.dumps(output), content_type='application/json')
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {e}", status=500)
 
 def addCodeToDb(type,page,code,id,score,outof,projectName):
     try:
@@ -686,6 +696,10 @@ def addCodeToDb(type,page,code,id,score,outof,projectName):
                     oldscore =user.AppPyScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.AppPyCode.get(str(projectName.replace(' ', ''))).update({page:code})
                     user.AppPyScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
+                case 6:
+                    oldscore =user.DatabaseScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
+                    user.DatabaseCode.get(str(projectName.replace(' ', ''))).update({page:code})
+                    user.DatabaseScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
             user.InternshipScores.update({str(projectName.replace(' ', '')):user.InternshipScores.get(str(projectName.replace(' ', '')),0)+int(score*5)-int(oldscore)})
             user.save()
             return ("done")

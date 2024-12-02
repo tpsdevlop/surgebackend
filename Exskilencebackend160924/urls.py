@@ -110,6 +110,6 @@ urlpatterns = [
     path('internship/submit/python/', internship.python_page_validation),
     path('internship/submit/app_py/', internship.python_page_validation),
     path('internship/zip-file/', internship.download_ZIP_file),
-    
+    path('internship/submit/', internship.updateScore),
     
 ]
