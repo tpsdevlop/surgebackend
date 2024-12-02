@@ -112,5 +112,6 @@ urlpatterns = [
     path('internship/zip-file/', internship.download_ZIP_file),
     path('internship/submit/', internship.updateScore),
     path('internship/score/',internship.get_score),
+    path('internship/project/score/',internship.project_score),
     
 ]

@@ -782,3 +782,27 @@ def get_score(req):
             return HttpResponse('Error! User does not exist', status=404)
     except Exception as e:
             return HttpResponse(f"An error occurred: {e}", status=500)
+    
+@api_view(['POST']) 
+def  project_score(req):
+    try:
+        data = json.loads(req.body)
+        email = data.get('StudentId')
+        projectName=data.get('ProjectName')
+
+        user = InternshipsDetails.objects.filter(StudentId=email).first()
+        if user:
+            user_data = {
+                "Score":user.InternshipScores.get(str(projectName.replace(' ', '')),0),
+                "HTML":user.HTMLScore.get(str(projectName.replace(' ', '')),0),
+                "CSS":user.CSSScore.get(str(projectName.replace(' ', '')),0),
+                "JS":user.JSScore.get(str(projectName.replace(' ', '')),0),
+                "Python":user.PythonScore.get(str(projectName.replace(' ', '')),0),
+                "App_py":user.AppPyScore.get(str(projectName.replace(' ', '')),0),
+                "Database_Score":user.DatabaseScore.get(str(projectName.replace(' ', '')),0)
+            }
+            return HttpResponse(json.dumps(user_data), content_type='application/json') 
+        else:
+            return HttpResponse('Error! User does not exist', status=404)
+    except Exception as e:
+            return HttpResponse(f"An error occurred: {e}", status=500)
