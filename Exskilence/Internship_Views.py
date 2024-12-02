@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import cssutils
 from django.http import HttpResponse
 import jsbeautifier
+from Exskilence.Attendance import attendance_update
 from Exskilencebackend160924.settings import *
 from rest_framework.decorators import api_view
 from datetime import date, datetime, time, timedelta
@@ -104,9 +105,10 @@ def Internship_Home(request):
             "DateAndTime":dateAndTime
             
         }
-
+        attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(out), content_type='application/json')
     except Exception as e:
+        attendance_update(data.get('StudentId'))
         ErrorLog(request,e)
         return HttpResponse(f"An error occurred: {e}", status=500)
 # setInternshipTime TEST
@@ -173,8 +175,10 @@ def getPagesjson(req ):
  
         
         data.update(jdata)
+        attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(data), content_type='application/json') 
     except Exception as e:
+            attendance_update(data.get('StudentId'))
             ErrorLog(req,e)
             return HttpResponse(f"An error occurred: {e}", status=500) 
 
@@ -205,11 +209,14 @@ def database_validation(req):
                 output.update({"valid": False,"message": "Database_setup code is Not valid."})
             score = f'{len(common_keywords) }/{len(list) }'
             output.update({"score": score})
+            attendance_update(data.get('StudentId'))
             return HttpResponse(json.dumps(output), content_type='application/json')
 
         else:
+            attendance_update(data.get('StudentId'))
             return HttpResponse('User does not exist', status=404)
     except Exception as e:
+            attendance_update(data.get('StudentId'))
             ErrorLog(req,e)
             return HttpResponse(f"An error occurred: {e}", status=500)
     
@@ -374,7 +381,7 @@ def html_page_validation(request):
                 sample_elements=(jsonToTuple(keys))
                 score = f'0/{len(sample_elements) }'
                 data.update({"Score": score,"Result":score})
-                 
+                attendance_update(data.get('StudentId'))
                 return HttpResponse(json.dumps(output), content_type='application/json')
             
             user_soup = BeautifulSoup(htmlcode, 'html.parser')
@@ -426,9 +433,11 @@ def html_page_validation(request):
             output.update({"score": score,
                        "Status": addCodeToDb(1,data.get('Page'),htmlcode,data.get('StudentId'),len(common_keywords),len(sample_elements),data.get('ProjectName'))
                        })
+            attendance_update(data.get('StudentId'))
             return HttpResponse(json.dumps(output), content_type='application/json')
 
         except Exception as e:
+            attendance_update(data.get('StudentId'))
             ErrorLog(request,e)
             return HttpResponse(f"An error occurred: {e}", status=500)
     else:
@@ -561,8 +570,10 @@ def css_page_validation(req    ):
         output.update({"score": score,
                        "Status": addCodeToDb(2,data.get('Page'),css_code,data.get('StudentId'),len(common_keywords),len(css_tuples_a),data.get('ProjectName'))
                        })
+        attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(output), content_type='application/json')
     except Exception as e:
+        attendance_update(data.get('StudentId'))
         ErrorLog(req,e)
         return HttpResponse(f"An error occurred: {e}", status=500)
 
@@ -585,9 +596,11 @@ def js_page_validation(req):
             "score": f"{len(common_keywords)}/{len(sam)}",
             "Status": addCodeToDb(3,data.get('Page'),js_code,data.get('StudentId'),len(common_keywords),len(sam),data.get('ProjectName'))
         }
+        attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(output), content_type='application/json')
     
     except Exception as e:
+        attendance_update(data.get('StudentId'))
         ErrorLog(req,e)
         return HttpResponse(f"An error occurred: {e}", status=500)
 
@@ -625,11 +638,14 @@ def python_page_validation(req):
                     "Status": addCodeToDb(5,data.get('Page'),input_string,data.get('StudentId'),len(c_keys),len(list),data.get('ProjectName'))
                     })
         if len(c_keys)>0:
+            attendance_update(data.get('StudentId'))
             return HttpResponse(json.dumps(output), content_type='application/json')
         else:
+            attendance_update(data.get('StudentId'))
             return HttpResponse(json.dumps({"valid": False,"message":"Method not found","score":'0/'+str(len(list))}), content_type='application/json')
         
     except Exception as e :
+        attendance_update(data.get('StudentId'))
         ErrorLog(req,e)
         return HttpResponse(f"An error occurred: {e}", status=500)
 
@@ -644,9 +660,11 @@ def download_ZIP_file(req):
             path=  'https://storeholder.blob.core.windows.net/internship/Internship_days_schema/internshipJSONS/FlaskSample.zip'
         else :
             path='not a valid input...'
+        attendance_update(json.loads(req.body)['StudentId'])
         return HttpResponse(json.dumps({'path':path}), content_type='application/json') 
     except Exception as e:
-            print(e)
+            attendance_update(json.loads(req.body)['StudentId'])
+            ErrorLog(req,e)
             return HttpResponse(f"An error occurred: {e}", status=500)
 
 
@@ -657,7 +675,7 @@ def  updateScore(request):
         codedata = data['Ans']
         score = data['Score']
         data.update({"Score": score if int(str(score).split('/')[0])<=int(str(score).split('/')[1]) else str(score).split('/')[1]+"/"+str(score).split('/')[1],"Result":score})
-        # print(data.get('Score'))        
+        print(data.get('Score'))        
         output={}
         if int(str(score).split('/')[0]) ==  int(str(score).split('/')[1]):
            output.update({"valid": True,"message": data.get('Subject')+" code is valid."})
@@ -667,8 +685,11 @@ def  updateScore(request):
         output.update({"score": score,
                        "Status": addCodeToDb(subject_mapping.get(data.get('Subject'), 0),data.get('Page'),codedata,data.get('StudentId'),int(str(score).split('/')[0]),int(str(score).split('/')[1]),data.get('ProjectName'))
                        })
+        attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(output), content_type='application/json')
     except Exception as e:
+        attendance_update(data.get('StudentId'))
+        ErrorLog(request,e)
         return HttpResponse(f"An error occurred: {e}", status=500)
 
 def addCodeToDb(type,page,code,id,score,outof,projectName):
@@ -707,4 +728,57 @@ def addCodeToDb(type,page,code,id,score,outof,projectName):
             return ('User not found...')
         
     except Exception as e:
-            return HttpResponse(f"An error occurred: {e}", status=500) 
+            return f"An error occurred: {e}"
+    
+@api_view(['POST']) 
+def get_score(req):
+    try:
+        data = json.loads(req.body)
+        id = data.get('StudentId')
+        pagename=data.get('Page_name')
+        projectName=data.get('ProjectName')
+
+        user = InternshipsDetails.objects.filter(StudentId=id).first()
+        if user:
+            if str(pagename).startswith('Database_'):
+                user_data = {
+                    "Page_name":pagename,
+                    "Score":user.InternshipScores.get(str(projectName.replace(' ', '')),0),
+                }
+                user_data.update(user.DatabaseCode.get(str(projectName.replace(' ', '')),''))
+                user_data.update(user.DatabaseScore.get(str(projectName.replace(' ', '')),'')) 
+            else:
+                user_data = {
+                    "Page_name":pagename,
+                    "Score":user.InternshipScores.get(str(projectName.replace(' ', '')),0),
+                }
+                if user.HTMLCode.get(str(projectName.replace(' ', '')),{}).get(pagename,'')!="":
+                    user_data.update({
+                        "HTML_Code":user.HTMLCode.get(str(projectName.replace(' ', '')),{}).get(pagename,''),
+                        "HTML_Score": user.HTMLScore.get(str(projectName.replace(' ', '')),{}).get(str(pagename)+'_Score',0) 
+                    })
+                if user.CSSCode.get(str(projectName.replace(' ', '')),{}).get(pagename,'')!="":
+                    user_data.update({
+                        "CSS_Code":user.CSSCode.get(str(projectName.replace(' ', '')),{}).get(pagename,''),
+                        "CSS_Score": user.CSSScore.get(str(projectName.replace(' ', '')),{}).get(str(pagename)+'_Score',0)
+                        })
+                if user.JSCode.get(str(projectName.replace(' ', '')),{}).get(pagename,'')!="":
+                    user_data.update({
+                        "JS_Code":user.JSCode.get(str(projectName.replace(' ', '')),{}).get(pagename,''),
+                        "JS_Score": user.JSScore.get(str(projectName.replace(' ', '')),{}).get(str(pagename)+'_Score',0)
+                     })
+                if user.PythonCode.get(str(projectName.replace(' ', '')),{}).get(pagename,'')!="":
+                    user_data.update({
+                        "Python_Code":user.PythonCode.get(str(projectName.replace(' ', '')),{}).get(pagename,''),
+                        "Python_Score": user.PythonScore.get(str(projectName.replace(' ', '')),{}).get(str(pagename)+'_Score',0)
+                     })
+                if user.AppPyCode.get(str(projectName.replace(' ', '')),{}).get(pagename,'')!="":
+                    user_data.update({
+                        "App_py_Code":user.AppPyCode.get(str(projectName.replace(' ', '')),{}).get(pagename,''),
+                        "App_py_Score": user.AppPyScore.get(str(projectName.replace(' ', '')),{}).get(str(pagename)+'_Score',0)
+                     })
+            return HttpResponse(json.dumps(user_data), content_type='application/json') 
+        else:
+            return HttpResponse('Error! User does not exist', status=404)
+    except Exception as e:
+            return HttpResponse(f"An error occurred: {e}", status=500)
