@@ -704,34 +704,34 @@ def addCodeToDb(type,page,code,id,score,outof,projectName):
                     oldscore =user.HTMLScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.HTMLCode.get(str(projectName.replace(' ', ''))).update({page:code})
                     user.HTMLScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
-                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_HTML':datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_HTML':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
                 case 2:
                     oldscore =user.CSSScore.get(str(projectName.replace(' ', ''))).get(page+'_Score',   '0/0').split('/')[0]
                     user.CSSCode.get(str(projectName.replace(' ', ''))).update({page:code})
                     user.CSSScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
-                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_CSS':datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_CSS':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
                 case 3:
                     oldscore =user.JSScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.JSCode.get(str(projectName.replace(' ', ''))).update({page:code})
                     user.JSScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
-                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_JS':datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_JS':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
                 case 4:
                     oldscore =user.PythonScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.PythonCode.get(str(projectName.replace(' ', ''))).update({page:code})
                     user.PythonScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
-                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_Python':datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_Python':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
                 case 5:
                     oldscore =user.AppPyScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.AppPyCode.get(str(projectName.replace(' ', ''))).update({page:code})
                     user.AppPyScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
-                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_AppPy':datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_AppPy':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
                 case 6:
                     oldscore =user.DatabaseScore.get(str(projectName.replace(' ', ''))).get(page+'_Score','0/0').split('/')[0]
                     user.DatabaseCode.get(str(projectName.replace(' ', ''))).update({page:code})
                     user.DatabaseScore.get(str(projectName.replace(' ', ''))).update({page+'_Score':str(score*5)+'/'+str(outof*5)})
-                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_Database':datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
-            user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page if type!=6 else 'Database':datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
-            user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({'DateAndTime':datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                    user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page+'_Database':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
+            user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page if type!=6 else 'Database':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
+            user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({'DateAndTime':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
             user.InternshipScores.update({str(projectName.replace(' ', '')):user.InternshipScores.get(str(projectName.replace(' ', '')),0)+int(score*5)-int(oldscore)})
             user.save()
             return ("done")
