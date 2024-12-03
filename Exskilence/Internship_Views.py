@@ -691,6 +691,7 @@ def  updateScore(request):
         attendance_update(data.get('StudentId'))
         return HttpResponse(json.dumps(output), content_type='application/json')
     except Exception as e:
+        data = json.loads(request.body.decode('utf-8'))
         attendance_update(data.get('StudentId'))
         ErrorLog(request,e)
         return HttpResponse(f"An error occurred: {e}", status=500)
@@ -733,24 +734,24 @@ def addCodeToDb(type,page,code,id,score,outof,projectName,alltabs):
             user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({page if type!=6 else 'Database':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
             user.SubmissionDates.get(str(projectName.replace(' ', ''))).update({'DateAndTime':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)).strftime("%Y-%m-%d %H:%M:%S")})
             user.InternshipScores.update({str(projectName.replace(' ', '')):user.InternshipScores.get(str(projectName.replace(' ', '')),0)+int(score*5)-int(oldscore)})
-            keys = user.SubmissionDates.get(str(projectName.replace(' ', ''))).keys()
-            submited = 0
-            if type!=6:
-                   for tab in alltabs:
-                       key = page+'_'+tab if tab != 'app.py' else page+'_'+'AppPy'
-                       if (key in keys):
-                        submited = submited +1
+            # keys = user.SubmissionDates.get(str(projectName.replace(' ', ''))).keys()
+            # submited = 0
+            # if type!=6:
+            #        for tab in alltabs:
+            #            key = page+'_'+tab if tab != 'app.py' else page+'_'+'AppPy'
+            #            if (key in keys):
+            #             submited = submited +1
 
-            else:
-                for tab in alltabs:
-                       key = tab+'_Database'
-                       if (key in keys):
-                        submited = submited +1
+            # else:
+            #     for tab in alltabs:
+            #            key = tab+'_Database'
+            #            if (key in keys):
+            #             submited = submited +1
 
-            if submited == len(alltabs):
-                user.ProjectStatus.get(str(projectName.replace(' ', ''))).update({
-                    page if type!= 6 else 'Database_setup':2
-                })
+            # if submited == len(alltabs):
+            #     user.ProjectStatus.get(str(projectName.replace(' ', ''))).update({
+            #         page if type!= 6 else 'Database_setup':2
+            #     })
             user.save()
             return ("done")
         else:
@@ -834,4 +835,7 @@ def  project_score(req):
         else:
             return HttpResponse('Error! User does not exist', status=404)
     except Exception as e:
+            data = json.loads(req.body.decode('utf-8'))
+            attendance_update(data.get('StudentId'))
+            ErrorLog(req,e)
             return HttpResponse(f"An error occurred: {e}", status=500)
