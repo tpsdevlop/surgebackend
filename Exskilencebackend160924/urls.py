@@ -96,7 +96,7 @@ urlpatterns = [
     path('intr/app_py/', intr.python_page),
     path('intr/json/', intr.json_for_validation),
     path('intr/get/file/',intr.download_files),
-    path('intr/score/',internship.get_score),
+    path('intr/score/',intr.get_score),
     path('intr/project/score/',intr.project_score),
     path('intr/db/',intr.database_validation),
     path('test/exercise/', intr.test_questions,name= 'test_questions'),
