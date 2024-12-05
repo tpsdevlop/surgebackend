@@ -36,8 +36,8 @@ def Internship_Home(request):
     try:
         req =json.loads(request.body)
         StudentId = req.get('StudentId')
-        # data= LISTOFJSON.get('InternshipProject')#
-        data=json.loads(download_blob2('Internship_days_schema/internshipJSONS/InternshipProject.json',CONTAINER))
+        data= LISTOFJSON.get('InternshipProject')#
+        # data=json.loads(download_blob2('Internship_days_schema/internshipJSONS/InternshipProject.json',CONTAINER))
         projectName = data.get('Internship_Project').get('Project_Name')
 
         user,created = InternshipsDetails.objects.get_or_create(StudentId=StudentId,defaults = {
@@ -64,8 +64,8 @@ def Internship_Home(request):
         tabs ={}
         tabsScores ={}
         for i in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
-            # webpages= LISTOFJSON.get(str(i))#
-            webpages=json.loads(download_blob2('Internship_days_schema/internshipJSONS/'+ str(i)+'.json',CONTAINER)  )###########      
+            webpages= LISTOFJSON.get(str(i))#
+            # webpages=json.loads(download_blob2('Internship_days_schema/internshipJSONS/'+ str(i)+'.json',CONTAINER)  )###########      
             if str(i) == 'Database_setup':
                 tabs.update({(i):{webpages.get('Tabs')[t]:webpages.get('Table_Names')[t] for t in range(0,len(webpages.get('Tabs')))}})
             else:
