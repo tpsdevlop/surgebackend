@@ -55,32 +55,32 @@ class StudentDetails(models.Model):
     CGPA            = models.FloatField()
     user_Type       = models.CharField(max_length=3, default="SW")
 
-class InternshipDetails(models.Model):
-    sl_id           = models.AutoField(primary_key=True)
-    Student_id      = models.CharField(max_length=25)
-    Name            = models.CharField(max_length=55)
-    email           = models.EmailField(unique=True)
-    Project_name    = models.CharField(max_length=50)
+# class InternshipDetails(models.Model):
+#     sl_id           = models.AutoField(primary_key=True)
+#     Student_id      = models.CharField(max_length=25)
+#     Name            = models.CharField(max_length=55)
+#     email           = models.EmailField(unique=True)
+#     Project_name    = models.CharField(max_length=50)
     
-    HTML_Code       = models.JSONField(default=dict)
-    HTML_Score      = models.JSONField(default=dict)
+#     HTML_Code       = models.JSONField(default=dict)
+#     HTML_Score      = models.JSONField(default=dict)
 
-    CSS_Code        = models.JSONField(default=dict)
-    CSS_Score       = models.JSONField(default=dict)
+#     CSS_Code        = models.JSONField(default=dict)
+#     CSS_Score       = models.JSONField(default=dict)
 
-    JS_Code         = models.JSONField(default=dict)
-    JS_Score        = models.JSONField(default=dict)
+#     JS_Code         = models.JSONField(default=dict)
+#     JS_Score        = models.JSONField(default=dict)
 
-    Python_Code     = models.JSONField(default=dict)
-    Python_Score    = models.JSONField(default=dict)
+#     Python_Code     = models.JSONField(default=dict)
+#     Python_Score    = models.JSONField(default=dict)
 
-    AppPy_Code      = models.JSONField(default=dict)
-    AppPy_Score     = models.JSONField(default=dict)
+#     AppPy_Code      = models.JSONField(default=dict)
+#     AppPy_Score     = models.JSONField(default=dict)
 
-    Database_Code   = models.JSONField(default=dict)
-    Database_Score  = models.JSONField(default=dict)
+#     Database_Code   = models.JSONField(default=dict)
+#     Database_Score  = models.JSONField(default=dict)
 
-    Score           = models.IntegerField(default=0)
+#     Score           = models.IntegerField(default=0)
 
 class InternshipsDetails(models.Model):###
     ID             = models.AutoField( primary_key=True)

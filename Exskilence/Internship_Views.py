@@ -94,12 +94,14 @@ def Internship_Home(request):
                                     })
                 tabsScores.update({str(i)+'_Score':progress})
         dateAndTime = {}
+        c =0
         if user.ProjectDateAndTime.get(str(projectName).replace(' ','')) == None or user.ProjectDateAndTime.get(str(projectName).replace(' ','')) == {}:
             for i in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
                 user.ProjectDateAndTime.get(str(projectName).replace(' ','')).update({i:{
-                    'Start_Time':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)),
-                    'End_Time':datetime.utcnow().__add__(timedelta(hours=42,minutes=30))
+                    'Start_Time':datetime.utcnow().__add__(timedelta(days=c,hours=5,minutes=30)),
+                    'End_Time':datetime.utcnow().__add__(timedelta(days=c,hours=42,minutes=30))
                 }})
+                c = c+1
             user.save()
         for j in user.ProjectDateAndTime.get(str(projectName).replace(' ','')):
             dateAndTime.update({j:
@@ -111,7 +113,7 @@ def Internship_Home(request):
             
         Statuses = {
             'Progress':{},
-            'status':{}
+            'Status':{}
         }
         for i in user.ProjectStatus.get(str(projectName).replace(' ','')):
             stat =(user.ProjectStatus.get(str(projectName).replace(' ','')).get(i))
@@ -138,11 +140,22 @@ def Internship_Home(request):
                         Statuses.get('Progress').update({i:'Completed'})
                     else:
                         Statuses.get('Progress').update({i:str((submited/len( webpages.get('Tabs')))*100)})
-            Statuses.get('status').update({i:(stat)})
+            dateobj = user.ProjectDateAndTime.get(str(projectName).replace(' ','')).get(i)
+            if datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) >= dateobj.get('Start_Time')  :
+                Statuses.get('Status').update({i:'Opened'})
+            else:
+                keys = list(user.ProjectStatus.get(str(projectName).replace(' ','')).keys())
+                index = keys.index(i)
+                if index-1 < 0:
+                    Statuses.get('Status').update({i:"Locked"})
+                elif user.ProjectStatus.get(str(projectName).replace(' ','')).get(keys[index-1]) == 2:
+                    Statuses.get('Status').update({i:"Opened"})
+                else:
+                    Statuses.get('Status').update({i:'Locked'})
         out ={
             "Sidebar":data,
             "data":tabs,
-            "Status":Statuses,#user.ProjectStatus.get(str(projectName).replace(' ',''),{}),
+            "Status_Data":Statuses,#user.ProjectStatus.get(str(projectName).replace(' ',''),{}),
             "Scores":tabsScores,
             "DateAndTime":dateAndTime
             
@@ -159,12 +172,14 @@ def setInternshipTime():
         data= LISTOFJSON.get('InternshipProject')#json.loads(download_blob2('Internship_days_schema/internshipJSONS/InternshipProject.json',CONTAINER))
         projectName = data.get('Internship_Project').get('Project_Name')
         user = InternshipsDetails.objects.filter(StudentId ="24MRIT0011").first()
- 
+        c =0
         for i in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
+
             user.ProjectDateAndTime.get(str(projectName).replace(' ','')).update({i:{
-                'Start_Time':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)),
-                'End_Time':datetime.utcnow().__add__(timedelta(hours=42,minutes=30))
+                'Start_Time':datetime.utcnow().__add__(timedelta(days=c,hours=5,minutes=30)),
+                'End_Time':datetime.utcnow().__add__(timedelta(days=c,hours=42,minutes=30))
             }})
+            c = c+1
         user.save()
         print(data.get('Internship_Overview')[1].get('Project_Web_Pages'))
         for j in user.ProjectDateAndTime.get(str(projectName).replace(' ','')):
