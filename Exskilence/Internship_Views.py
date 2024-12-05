@@ -109,13 +109,16 @@ def Internship_Home(request):
                                 } 
                                 })
             
-        Statuses = {}
+        Statuses = {
+            'Progress':{},
+            'status':{}
+        }
         for i in user.ProjectStatus.get(str(projectName).replace(' ','')):
             stat =(user.ProjectStatus.get(str(projectName).replace(' ','')).get(i))
             if stat == 0  :
-                Statuses.update({i:'0'})
+                Statuses.get('Progress').update({i:'0'})
             elif stat == 2:
-                Statuses.update({i:'100'})
+                Statuses.get('Progress').update({i:'100'})
             else:
                 for page in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
                     keys = user.SubmissionDates.get(str(projectName.replace(' ', ''))).keys()
@@ -132,10 +135,10 @@ def Internship_Home(request):
                                 submited = submited +1
 
                     if submited == len( webpages.get('Tabs')):
-                        Statuses.update({i:'Completed'})
+                        Statuses.get('Progress').update({i:'Completed'})
                     else:
-                        Statuses.update({i:str((submited/len( webpages.get('Tabs')))*100)})
-
+                        Statuses.get('Progress').update({i:str((submited/len( webpages.get('Tabs')))*100)})
+            Statuses.get('status').update({i:(stat)})
         out ={
             "Sidebar":data,
             "data":tabs,
@@ -149,7 +152,6 @@ def Internship_Home(request):
     except Exception as e:
         attendance_update(data.get('StudentId'))
         ErrorLog(request,e)
-        print(e)
         return HttpResponse(f"An error occurred: {e}", status=500)
 # setInternshipTime TEST
 def setInternshipTime():
