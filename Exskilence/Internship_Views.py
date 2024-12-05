@@ -13,7 +13,7 @@ from Exskilencebackend160924.settings import *
 from rest_framework.decorators import api_view
 from datetime import date, datetime, time, timedelta
 from Exskilence.models import *
-from Exskilencebackend160924.Blob_service import download_blob2, get_blob_service_client, download_list_blob2
+from Exskilencebackend160924.Blob_service import download_blob2, get_blob_service_client, download_list_blob2, download_list_json
 import pyodbc
 from Exskilence.sqlrun import *
 from django.core.cache import cache
@@ -21,12 +21,23 @@ from Exskilence.filters import *
 from Exskilence.ErrorLog import ErrorLog
 from Exskilence.Ranking import *
 CONTAINER ="internship"
+LISTOFJSON = download_list_json('Internship_days_schema/internshipJSONS/',CONTAINER)
+@api_view(['GET'])
+def updateJsonList(request):    
+    try:
+        global LISTOFJSON 
+        LISTOFJSON = download_list_json('Internship_days_schema/internshipJSONS/',CONTAINER)
+        return HttpResponse("success")
+    except Exception as e:
+        ErrorLog(request,e)
+        return HttpResponse(f"An error occurred: {e}", status=500)
 @api_view(['POST'])
 def Internship_Home(request):
     try:
         req =json.loads(request.body)
         StudentId = req.get('StudentId')
-        data= json.loads(download_blob2('Internship_days_schema/internshipJSONS/InternshipProject.json',CONTAINER))
+        # data= LISTOFJSON.get('InternshipProject')#
+        data=json.loads(download_blob2('Internship_days_schema/internshipJSONS/InternshipProject.json',CONTAINER))
         projectName = data.get('Internship_Project').get('Project_Name')
 
         user,created = InternshipsDetails.objects.get_or_create(StudentId=StudentId,defaults = {
@@ -53,8 +64,8 @@ def Internship_Home(request):
         tabs ={}
         tabsScores ={}
         for i in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
-            # print( (i))
-            webpages= json.loads(download_blob2('Internship_days_schema/internshipJSONS/'+ str(i)+'.json',CONTAINER)  )          
+            # webpages= LISTOFJSON.get(str(i))#
+            webpages=json.loads(download_blob2('Internship_days_schema/internshipJSONS/'+ str(i)+'.json',CONTAINER)  )###########      
             if str(i) == 'Database_setup':
                 tabs.update({(i):{webpages.get('Tabs')[t]:webpages.get('Table_Names')[t] for t in range(0,len(webpages.get('Tabs')))}})
             else:
@@ -65,17 +76,17 @@ def Internship_Home(request):
                      progress.append({
                                         "Tables": t+1,
                                         "Name": webpages.get('Table_Names')[t],
-                                        "Score": user.DatabaseScore.get(str(projectName).replace(' ','')).get(str(webpages.get('Tabs')[t])+'_Score','0/0')
+                                        "Score": user.DatabaseScore.get(str(projectName).replace(' ','')).get(str(webpages.get('Tabs')[t])+'_Score','0/'+str(len(webpages.get('Code_Validation').get(webpages.get('Tabs')[t]))*5))
                                     })
                 else:
                     switch = {
-                        'HTML': lambda: user.HTMLScore.get(str(projectName).replace(' ', '')).get(i+"_Score","0/0"),
-                        'CSS' : lambda: user.CSSScore.get(str(projectName).replace(' ', '')).get(i+"_Score","0/0"),
-                        'JS'  : lambda: user.JSScore.get(str(projectName).replace(' ', '')).get(i+"_Score","0/0"),
-                        'Python':lambda: user.PythonScore.get(str(projectName).replace(' ', '')).get(i+"_Score","0/0"),
-                        'app.py':lambda: user.AppPyScore.get(str(projectName).replace(' ', '')).get(i+"_Score","0/0"),
+                        'HTML': lambda: user.HTMLScore.get(str(projectName).replace(' ', '')).get(i+"_Score",'0/'+str(len(webpages.get('Code_Validation').get('HTML'))*5)),
+                        'CSS' : lambda: user.CSSScore.get(str(projectName).replace(' ', '')).get(i+"_Score",'0/'+str(len(webpages.get('Code_Validation').get("CSS"))*5)),
+                        'JS'  : lambda: user.JSScore.get(str(projectName).replace(' ', '')).get(i+"_Score",'0/'+str(len(webpages.get('Code_Validation').get('JS'))*5)),
+                        'Python':lambda: user.PythonScore.get(str(projectName).replace(' ', '')).get(i+"_Score",'0/'+str(len(webpages.get('Code_Validation').get('Python' ))*5)),
+                        'app.py':lambda: user.AppPyScore.get(str(projectName).replace(' ', '')).get(i+"_Score",'0/'+str(len(webpages.get('Code_Validation').get('App_py'))*5))
                     }
-                    result = switch.get(webpages.get('Tabs')[t], lambda: "0/0")()
+                    result = switch.get(webpages.get('Tabs')[t], lambda: "---")()
                     progress.append({
                                         "Sl_No": t+1,
                                         "Pages": webpages.get('Tabs')[t],
@@ -84,7 +95,6 @@ def Internship_Home(request):
                 tabsScores.update({str(i)+'_Score':progress})
         dateAndTime = {}
         if user.ProjectDateAndTime.get(str(projectName).replace(' ','')) == None or user.ProjectDateAndTime.get(str(projectName).replace(' ','')) == {}:
-            print("hello")
             for i in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
                 user.ProjectDateAndTime.get(str(projectName).replace(' ','')).update({i:{
                     'Start_Time':datetime.utcnow().__add__(timedelta(hours=5,minutes=30)),
@@ -98,10 +108,38 @@ def Internship_Home(request):
                                     'End_Time':str(user.ProjectDateAndTime.get(str(projectName).replace(' ','')).get(j).get('End_Time'))
                                 } 
                                 })
+            
+        Statuses = {}
+        for i in user.ProjectStatus.get(str(projectName).replace(' ','')):
+            stat =(user.ProjectStatus.get(str(projectName).replace(' ','')).get(i))
+            if stat == 0  :
+                Statuses.update({i:'0'})
+            elif stat == 2:
+                Statuses.update({i:'100'})
+            else:
+                for page in data.get('Internship_Overview')[1].get('Project_Web_Pages'):
+                    keys = user.SubmissionDates.get(str(projectName.replace(' ', ''))).keys()
+                    submited = 0
+                    if page != 'Database_setup':
+                        for tab in webpages.get('Tabs'):
+                            key = page+'_'+tab if tab != 'app.py' else page+'_'+'AppPy'
+                            if (key in keys):
+                                submited = submited +1
+                    else:
+                        for tab in  webpages.get('Tabs'):
+                            key = tab+'_Database'
+                            if (key in keys):
+                                submited = submited +1
+
+                    if submited == len( webpages.get('Tabs')):
+                        Statuses.update({i:'Completed'})
+                    else:
+                        Statuses.update({i:str((submited/len( webpages.get('Tabs')))*100)})
+
         out ={
             "Sidebar":data,
             "data":tabs,
-            "Status":user.ProjectStatus.get(str(projectName).replace(' ',''),{}),
+            "Status":Statuses,#user.ProjectStatus.get(str(projectName).replace(' ',''),{}),
             "Scores":tabsScores,
             "DateAndTime":dateAndTime
             
@@ -111,11 +149,12 @@ def Internship_Home(request):
     except Exception as e:
         attendance_update(data.get('StudentId'))
         ErrorLog(request,e)
+        print(e)
         return HttpResponse(f"An error occurred: {e}", status=500)
 # setInternshipTime TEST
 def setInternshipTime():
     try:
-        data= json.loads(download_blob2('Internship_days_schema/internshipJSONS/InternshipProject.json',CONTAINER))
+        data= LISTOFJSON.get('InternshipProject')#json.loads(download_blob2('Internship_days_schema/internshipJSONS/InternshipProject.json',CONTAINER))
         projectName = data.get('Internship_Project').get('Project_Name')
         user = InternshipsDetails.objects.filter(StudentId ="24MRIT0011").first()
  
@@ -142,7 +181,7 @@ def getPagesjson(req ):
         res = json.loads(req.body)
         page = res.get('Page')
         projectName = res.get('ProjectName')
-        data= json.loads(download_blob2('Internship_days_schema/internshipJSONS/'+ str(page)+'.json',CONTAINER))
+        data= LISTOFJSON.get(str(page))#json.loads(download_blob2('Internship_days_schema/internshipJSONS/'+ str(page)+'.json',CONTAINER))
         user = InternshipsDetails.objects.filter(StudentId=res.get('StudentId')).first()
         if user:
             if page.startswith('Database'):

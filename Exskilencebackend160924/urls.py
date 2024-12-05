@@ -20,6 +20,7 @@ from Exskilence import coursecreatiton as pkgs,trainerflowQn as tech ,ENYCRP as 
 from Exskilence import StudentDelay as delay ,Internship_Views as internship
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('internship/update/Json/', internship.updateJsonList),
     path('getDevTool/', ex.getDevTool),
     # Swapnodayaplacements
     path ('placement/', include('Exskilence.placements_urls')),
