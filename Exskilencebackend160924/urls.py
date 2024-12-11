@@ -51,7 +51,8 @@ urlpatterns = [
     # Sql
     path ('runsql/',sql.sql_query ),
     # Python
-    path ('runpy/',ex_py.run_python ),
+    path ('runpy/',ex_py.run_python2 ),
+    path ('runpy12/',ex_py.run_python ),
     # Frontend
     
     path ('html/',html_css.html_page ),
