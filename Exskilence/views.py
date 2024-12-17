@@ -4,7 +4,7 @@ import json
 import math
 import random
 import re
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from Exskilencebackend160924.settings import *
 from rest_framework.decorators import api_view
 from datetime import date, datetime, time, timedelta
@@ -749,99 +749,270 @@ def get_tables(tables):
                 return tabs
     except Exception as e:  
         return "Error getting tables: " + str(e)
-    
 
+USERDATA= StudentDetails.objects.filter(StudentId='24ADMI0002').first()
+USERSCOREDATA=StudentDetails_Days_Questions.objects.filter(Student_id='24ADMI0002').first()
+COURSESDATA =CourseDetails.objects.filter().order_by('SubjectId').values()
+SPENTDATA=Attendance.objects.filter(SID= '24ADMI0002') .filter(Login_time__range=[datetime.utcnow().__add__(timedelta(hours=5, minutes=30)), datetime.utcnow().__add__(timedelta(hours=5, minutes=30))],Last_update__range=[datetime.utcnow().__add__(timedelta(hours=5, minutes=30)), datetime.utcnow().__add__(timedelta(hours=5, minutes=30))])  
 
-# ### TESTING SPACE ####
-# def getcountQs():
-#     try:
-#         count = 0
-#         users = QuestionDetails_Days.objects.filter(Attempts = 0,Subject = 'Python').exclude(Ans='')
-#         count = len(users)
-#         i = 0
-#         passedcases = 0
-#         totalcases = 0
-#         for user in users:
-#             user.Attempts = 1
-#             res = user.Result.get("TestCases")
-#             # print(res)
-#             data = {
-#                 "Result":user.Result,
-#                 "Attempt":user.Attempts,
-#                 "Qn":user.Qn,
-#                 "Score":user.Score,
-#                 "Subject":user.Subject,
-#                 "StudentId":user.Student_id
-#                 }
-#             for r in res:
-#                 i += 1
-#                 if res.get("TestCase" + str(i)) == 'Passed' or res.get("TestCase" + str(i)) == 'Failed':
-#                     totalcases += 1
-#                     if res.get("TestCase" + str(i)) == 'Passed':
-#                         passedcases += 1
-#                 # if r.get("Result") == 'True' or r.get("Result") == 'False':
-#             if passedcases == totalcases and passedcases ==0:
-#                 score = 0
-#             else:
-#                 score = Scoring_logic2(passedcases/totalcases,data)
-#             user.Score = score
-#             user.save()
-#             mainuser = StudentDetails_Days_Questions.objects.filter(Student_id=str(user.Student_id)).first()
-#             if mainuser:
-#                 newscore = QuestionDetails_Days.objects.filter(
-#                         Subject='Python', 
-#                         Student_id=str(user.Student_id)
-#                     ).aggregate(Sum('Score')).get('Score__sum', 0)
-#                 oldscore = mainuser.Score_lists.get("PythonScore","0/0")
-#                 outoff = mainuser.Score_lists.get("PythonScore","0/0").split('/')[1]
-#                 mainuser.Score_lists.update({"PythonScore":str(newscore)+'/'+outoff})
-#                 mainuser.save()
-#             # if str(newscore).split('.')[0] != str(oldscore).split('.')[0]:
-#                 # print(str(newscore).split('/')[0],'oldscore',str(oldscore).split('/')[0],user.Student_id)
-#             print(user.Student_id,'\t',user.Subject,'\t',user.Qn,'\t',user.Score,'\t',passedcases,'\t',totalcases,'\t','oldscore',oldscore,'\t','newscore',mainuser.Score_lists.get("PythonScore","0/0"))
-
-#         print('end', count)
-#         return  'Success'
-#     except Exception as e:
-#         print(e)
-#         return  'An error occurred'+str(e)
-# def Scoring_logic2(passedcases,data):
-#     attempt = data.get("Attempt")
-#     if data.get("Subject") == "Python":
-#         user = QuestionDetails_Days.objects.filter(Student_id=str(data.get("StudentId")),Subject=str(data.get("Subject")),Qn=str(data.get("Qn"))).first()
-
-#         # if user :
-
-#         #     attempt = user.Attempts
-
-#         # else:
-
-#         attempt = 1
-#     attempt_scores = {
-#     "E": {1: 5, 2: 5, 3: 3, 4: 2},
-#     "M": {1: 10, 2: 10, 3: 10,  4: 8, 5: 6, 6: 4, 7: 2},
-#     "H": {1: 15, 2: 15, 3: 15, 4: 15 ,5: 15, 6: 12, 7: 12, 8: 10, 9: 8, 10: 6, 11: 4, 12: 2},
-#     }
-#     qn_type = str(data.get('Qn'))[-4]
-#     score = attempt_scores.get(qn_type, {}).get(attempt, 0)
-#     # print(score)
-#     return   round(score*passedcases ,2)
-# def getcountQs():
-#     try:
-#         count = 0
-#         users = QuestionDetails_Days.objects.filter(Student_id = '24GMIT0008',Subject = 'Python',
-#                                                     Qn__in =[
-#       "QPY2405050012AXXEM02",      "QPY2405050013AXXEM02",      "QPY2405050012AXXEM03",      "QPY2405050012AXXEM01",
-#       "QPY2405050012AXXEM04",      "QPY2405050013AXXEM01",      "QPY2405050013AXXEM05",      "QPY2405050013AXXEM04",
-#       "QPY2405050012BXXMM05",      "QPY2405050013BXXMM10",      "QPY2405050013BXXMM07",      "QPY2405050013BXXMM09",
-#       "QPY2405050013BXXMM06",      "QPY2405050013BXXMM03",      "QPY2405050013CXXHM08",      "QPY2405050011AXXEM09",
-#       "QPY2405050011AXXEM03",      "QPY2405050010AXXEM08",      "QPY2405050011AXXEM06",      "QPY2405050011AXXEM01",
-#       "QPY2405050011AXXEM08",      "QPY2405050011AXXEM07",      "QPY2405050010AXXEM10",      "QPY2405050011AXXEM02",
-#       "QPY2405050010AXXEM06",      "QPY2405050011BXXMM05",      "QPY2405050011BXXMM10",      "QPY2405050011BXXMM04",
-#       "QPY2405050010BXXMM09",      "QPY2405050010BXXMM07"    ]).aaggregate(sum=Sum('Score'))
-#         # count = len(users)
-#         print('end', count,users)
-#         return count
-#     except Exception as e: 
-#         print(e) 
-#         return "Error getting tables: " + str(e)
+@api_view(['POST'])
+def getcourse2(req):
+    try:
+        data = json.loads(req.body)
+        user = USERDATA#StudentDetails.objects.filter(StudentId=data.get('StudentId')).first()
+        userscore = USERSCOREDATA#StudentDetails_Days_Questions.objects.filter(Student_id=data.get('StudentId')).first()
+        courseinfo ={}
+        for i in user.Courses:
+            if userscore.Qns_lists.get(i, None) is None:
+                courseinfo.update({i: True})
+            else:
+                courseinfo.update({i: False})
+        Scolist = [str(l).replace("Score","") for l in list(userscore.Score_lists.keys())]
+        if Scolist.__contains__("HTML") or Scolist.__contains__("CSS"):
+            if Scolist.__contains__("HTML"):
+                Scolist.remove("HTML")
+            if Scolist.__contains__("CSS"):
+                Scolist.remove("CSS")
+            Scolist.append("HTMLCSS")
+        if len(Scolist)  != len(user.Courses):
+            for i in user.Courses:
+                if i == "HTMLCSS":
+                    if userscore.Score_lists.get("HTMLScore",None) is None:
+                        userscore.Score_lists.update({ "HTMLScore":"0/0"})
+                    if userscore.Score_lists.get("CSSScore",None) is None:
+                        userscore.Score_lists.update({ "CSSScore":"0/0"})
+                else:
+                    if userscore.Score_lists.get(str(i)+"Score",None) is None:
+                        userscore.Score_lists.update({str(i)+"Score":"0/0"})
+            # userscore.save()
+        out = {}
+        Rank = {}
+        intcourse ={
+            "Sub":[],
+            "SubScore":[],
+            "Score":[],
+        }
+        Enrolled_courses = []
+        Total_Score = 0
+        Total_Score_Outof = 0
+        Startmost =datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
+        Endmost = datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
+        if user:
+            def getdays(date):
+                    date = datetime.strptime(str(date), "%Y-%m-%d %H:%M:%S")
+                    day = int(date.strftime("%d"))
+                    month = int(date.strftime("%m"))
+                    if 4 <= day <= 20 or 24 <= day <= 30:
+                        suffix = "th"
+                    else:
+                        suffix = ["st", "nd", "rd"][day % 10 - 1]
+                    formatted_date =  (f"{day}{suffix} {calendar.month_abbr[month]}")
+                    return formatted_date
+            courses=COURSESDATA#CourseDetails.objects.filter().order_by('SubjectId').values()
+            timestart = user.Course_Time
+            for course in courses:
+                if course.get('SubjectName') in user.Courses  :
+                    starttime = timestart.get(course.get('SubjectName')).get('Start')
+                    endtime = timestart.get(course.get('SubjectName')).get('End')
+                    if course.get('SubjectName') == "HTMLCSS":
+                        Enrolled_courses.append({
+                        "SubjectId":course.get('SubjectId')  ,
+                        "SubjectName":course.get('SubjectName') ,
+                        "Name":course.get('Description')  ,
+                        "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
+                        'Progress':str(round(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] ))/len(userscore.Qns_lists.get(course.get('SubjectName'),[]))*100))+"%" if len(userscore.Qns_lists.get(course.get('SubjectName'),[])) != 0 else '0%',
+                        'Assignment':str(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] )))+"/"+str(len(userscore.Qns_lists.get(course.get('SubjectName'),[]))),
+                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Closed',
+                        'CourseInfo':courseinfo.get(course.get('SubjectName'))
+                        })
+                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)):
+                            intcourse.get('Sub').append("HTMLCSS")
+                            htmldata=userscore.Score_lists.get("HTMLScore").split('/')
+                            cssdata=userscore.Score_lists.get("CSSScore").split('/')
+                            intcourse.get('SubScore').append(str(round(float((float(htmldata[0])+float(cssdata[0]))/2),2))+"/"+str(subScore(userscore.Qns_lists,"HTMLCSS")))
+                            Total_Score = float(Total_Score) + float(intcourse.get('SubScore')[-1].split('/')[0])
+                            Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
+ 
+                    else:
+                        courseprogressTotalQns = userscore.Qns_lists
+                        numQns = [len(courseprogressTotalQns.get(i)) for i in dict(courseprogressTotalQns).keys() if str(i).startswith(course.get('SubjectName'))]
+                        numAns = [len(userscore.Ans_lists.get(i)) for i in dict(userscore.Ans_lists).keys() if str(i).startswith(course.get('SubjectName'))]
+                        Enrolled_courses.append({
+                        "SubjectId":course.get('SubjectId')  ,
+                        "SubjectName":course.get('SubjectName') ,
+                        "Name":course.get('Description')  ,
+                        "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
+                        'Progress': str(round(sum(numAns)/sum(numQns)*100))+'%' if sum(numQns)!= 0 else "0%" ,
+                        'Assignment':str(sum(numAns))+"/"+str(sum(numQns)),
+                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Closed',
+                        })
+                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)):
+                            intcourse.get('Sub').append(course.get('SubjectName'))
+                            intcourse.get('SubScore').append(str(round(float(str(userscore.Score_lists.get(str(course.get('SubjectName'))+'Score')).split('/')[0]),2))+"/"+str(subScore(userscore.Qns_lists,course.get('SubjectName'))))
+                            Total_Score = round(float(Total_Score),2) + float(intcourse.get('SubScore')[-1].split('/')[0])
+                            Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
+                    if Startmost > starttime:
+                        Startmost = starttime
+                    Rank.update({course.get('SubjectName'):getRankings(course.get('SubjectName'), data.get('StudentId'))})
+            spent = SPENTDATA#Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, Endmost],Last_update__range=[Startmost, Endmost])  
+            Duration = 0
+            if spent:
+                for i in spent:
+                    Duration = Duration + (i.Last_update - i.Login_time).total_seconds()
+            intcourse.get('Score').append(str(round(Total_Score,2))+"/"+str(Total_Score_Outof))
+            Total_Rank = OverallRankings( intcourse.get('Sub'),data.get('StudentId'))
+            Rank.update({'Total_Rank':Total_Rank})
+            out.update({"Courses":Enrolled_courses,
+                        "Intenship":intcourse,
+                        "Prograss":{
+                            "Start_date":str(Startmost).split()[0].split('-')[2]+"-"+str(Startmost).split()[0].split('-')[1]+"-"+str(Startmost).split()[0].split('-')[0],
+                            "End_date":str(Endmost).split()[0].split('-')[2]+"-"+str(Endmost).split()[0].split('-')[1]+"-"+str(Endmost).split()[0].split('-')[0],
+                            "Duration":Duration
+                        },
+                        "Rank": Rank,
+                        "StudentName":user.firstName})
+            user.score =round(float(str(intcourse.get('Score')[0]).split('/')[0]),2)
+            # user.save()
+            # attendance_update(data.get('StudentId'))
+            return HttpResponse(json.dumps(out), content_type='application/json')
+        else:
+            # attendance_update(data.get('StudentId'))
+            return HttpResponse('Error! User does not exist', status=404)
+    except Exception as e:
+        # ErrorLog(req,e)
+        # attendance_update(data.get('StudentId'))
+        return HttpResponse(f"An error occurred: {e}", status=500)
+@api_view(['POST'])
+def test(req):
+    try:
+        out = {}
+        data = json.loads(req.body)
+        data = data.get('data')
+        for i in range(1,data):
+            data =   i
+            out .update({i:i})
+        out = {"test":out}
+        return HttpResponse(json.dumps(out), content_type='application/json')
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {e}", status=500) 
+@api_view(['POST'])
+def getCourse1(req):
+    try:
+        data = json.loads(req.body)
+        user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
+        courses = CourseDetails.objects.all().order_by('SubjectId').values()
+        userscore = StudentDetails_Days_Questions.objects.get(Student_id=data.get('StudentId'))
+        courseinfo ={}
+        for i in user.Courses:
+            if userscore.Qns_lists.get(i, None) is None:
+                courseinfo.update({i: True})
+            else:
+                courseinfo.update({i: False})
+        Enrolled_courses = []
+        Total_Score = 0
+        Total_Score_Outof = 0
+        intcourse ={
+            "Sub":[],
+            "SubScore":[],
+            "Score":[],
+        }
+        timestart = user.Course_Time
+        for course in courses:
+                if course.get('SubjectName') in user.Courses  :
+                    starttime = timestart.get(course.get('SubjectName')).get('Start')
+                    endtime = timestart.get(course.get('SubjectName')).get('End')
+                    if course.get('SubjectName') == "HTMLCSS":
+                        def getdays(date):
+                            date = datetime.strptime(str(date), "%Y-%m-%d %H:%M:%S")
+                            day = int(date.strftime("%d"))
+                            month = int(date.strftime("%m"))
+                            if 4 <= day <= 20 or 24 <= day <= 30:
+                                suffix = "th"
+                            else:
+                                suffix = ["st", "nd", "rd"][day % 10 - 1]
+                            formatted_date =  (f"{day}{suffix} {calendar.month_abbr[month]}")
+                            return formatted_date
+                        Enrolled_courses.append({
+                        "SubjectId":course.get('SubjectId')  ,
+                        "SubjectName":course.get('SubjectName') ,
+                        "Name":course.get('Description')  ,
+                        "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
+                        'Progress':str(round(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] ))/len(userscore.Qns_lists.get(course.get('SubjectName'),[]))*100))+"%" if len(userscore.Qns_lists.get(course.get('SubjectName'),[])) != 0 else '0%',
+                        'Assignment':str(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] )))+"/"+str(len(userscore.Qns_lists.get(course.get('SubjectName'),[]))),
+                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Closed',
+                        'CourseInfo':courseinfo.get(course.get('SubjectName'))
+                        })
+                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)):
+                            intcourse.get('Sub').append("HTMLCSS")
+                            htmldata=userscore.Score_lists.get("HTMLScore").split('/')
+                            cssdata=userscore.Score_lists.get("CSSScore").split('/')
+                            intcourse.get('SubScore').append(str(round(float((float(htmldata[0])+float(cssdata[0]))/2),2))+"/"+str(subScore(userscore.Qns_lists,"HTMLCSS")))
+                            Total_Score = float(Total_Score) + float(intcourse.get('SubScore')[-1].split('/')[0])
+                            Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
+                    else:
+                        courseprogressTotalQns = userscore.Qns_lists
+                        numQns = [len(courseprogressTotalQns.get(i)) for i in dict(courseprogressTotalQns).keys() if str(i).startswith(course.get('SubjectName'))]
+                        numAns = [len(userscore.Ans_lists.get(i)) for i in dict(userscore.Ans_lists).keys() if str(i).startswith(course.get('SubjectName'))]
+                        Enrolled_courses.append({
+                        "SubjectId":course.get('SubjectId')  ,
+                        "SubjectName":course.get('SubjectName') ,
+                        "Name":course.get('Description')  ,
+                        "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
+                        'Progress': str(round(sum(numAns)/sum(numQns)*100))+'%' if sum(numQns)!= 0 else "0%" ,
+                        'Assignment':str(sum(numAns))+"/"+str(sum(numQns)),
+                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Closed',
+                        })
+                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)):
+                            intcourse.get('Sub').append(course.get('SubjectName'))
+                            intcourse.get('SubScore').append(str(round(float(str(userscore.Score_lists.get(str(course.get('SubjectName'))+'Score')).split('/')[0]),2))+"/"+str(subScore(userscore.Qns_lists,course.get('SubjectName'))))
+                            Total_Score = round(float(Total_Score),2) + float(intcourse.get('SubScore')[-1].split('/')[0])
+                            Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
+        out = {"Courses":Enrolled_courses,
+                        "Intenship":intcourse,}
+        return HttpResponse(json.dumps(out), content_type='application/json')
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {e}", status=500)
+@api_view(['POST'])
+def getCourse2(req):
+    try:
+        data = json.loads(req.body)
+        user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
+        Startmost =datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
+        Endmost = datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
+        courses = CourseDetails.objects.all().filter().order_by('SubjectId').values()
+        timestart = user.Course_Time
+        for course in courses:
+                if course.get('SubjectName') in user.Courses  :
+                    starttime = timestart.get(course.get('SubjectName')).get('Start')
+                    if Startmost > starttime:
+                        Startmost = starttime
+        spent = Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, Endmost],Last_update__range=[Startmost, Endmost])  
+        Duration = 0
+        if spent:
+                for i in spent:
+                    Duration = Duration + (i.Last_update - i.Login_time).total_seconds()
+        return HttpResponse(json.dumps({"Prograss":
+            {
+            "Start_date":str(Startmost).split()[0].split('-')[2]+"-"+str(Startmost).split()[0].split('-')[1]+"-"+str(Startmost).split()[0].split('-')[0],
+            "End_date":str(Endmost).split()[0].split('-')[2]+"-"+str(Endmost).split()[0].split('-')[1]+"-"+str(Endmost).split()[0].split('-')[0],
+            "Duration":Duration},
+            "StudentName":user.firstName}), content_type='application/json')
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {e}", status=500)
+@api_view(['POST']) 
+def getCourse3(req):
+    try:
+        data = json.loads(req.body)
+        courses = CourseDetails.objects.all().filter().order_by('SubjectId').values()
+        Rank = {}
+        intcourse = {"Sub":[]}
+        for course in courses:
+                Rank.update({course.get('SubjectName'):getRankings(course.get('SubjectName'), data.get('StudentId'))})
+                intcourse.get('Sub').append(course.get('SubjectName'))
+        Total_Rank = OverallRankings( intcourse.get('Sub'),data.get('StudentId'))
+        Rank.update({'Total_Rank':Total_Rank})
+         
+        return HttpResponse(json.dumps({"Rank": Rank,}), content_type='application/json')
+            
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {e}", status=500)
