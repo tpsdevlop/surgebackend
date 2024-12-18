@@ -899,6 +899,7 @@ def test(req):
 def getCourse1(req):
     try:
         data = json.loads(req.body)
+        current_time = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
         user =cache.get('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')')
         if user is None:
             #  ("not in cache user")
@@ -951,10 +952,10 @@ def getCourse1(req):
                         "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
                         'Progress':str(round(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] ))/len(userscore.Qns_lists.get(course.get('SubjectName'),[]))*100))+"%" if len(userscore.Qns_lists.get(course.get('SubjectName'),[])) != 0 else '0%',
                         'Assignment':str(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] )))+"/"+str(len(userscore.Qns_lists.get(course.get('SubjectName'),[]))),
-                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Closed',
+                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < current_time and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > current_time else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < current_time else 'Closed',
                         'CourseInfo':courseinfo.get(course.get('SubjectName'))
                         })
-                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)):
+                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < current_time:
                             intcourse.get('Sub').append("HTMLCSS")
                             htmldata=userscore.Score_lists.get("HTMLScore").split('/')
                             cssdata=userscore.Score_lists.get("CSSScore").split('/')
@@ -972,9 +973,9 @@ def getCourse1(req):
                         "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
                         'Progress': str(round(sum(numAns)/sum(numQns)*100))+'%' if sum(numQns)!= 0 else "0%" ,
                         'Assignment':str(sum(numAns))+"/"+str(sum(numQns)),
-                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Closed',
+                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < current_time and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > current_time else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < current_time else 'Closed',
                         })
-                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)):
+                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < current_time:
                             intcourse.get('Sub').append(course.get('SubjectName'))
                             intcourse.get('SubScore').append(str(round(float(str(userscore.Score_lists.get(str(course.get('SubjectName'))+'Score')).split('/')[0]),2))+"/"+str(subScore(userscore.Qns_lists,course.get('SubjectName'))))
                             Total_Score = round(float(Total_Score),2) + float(intcourse.get('SubScore')[-1].split('/')[0])
@@ -988,14 +989,15 @@ def getCourse1(req):
 def getCourse2(req):
     try:
         data = json.loads(req.body)
+        current_time = datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
         user =cache.get('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')')
         if user is None:
             # ('not in cache user')
             user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
             cache.set('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')', user,60)
         
-        Startmost =datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
-        Endmost = datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
+        Startmost =current_time
+        Endmost = current_time
         courses =  cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
         if courses is None:
             # ('not in cache course')
