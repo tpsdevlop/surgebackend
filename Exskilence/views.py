@@ -899,9 +899,21 @@ def test(req):
 def getCourse1(req):
     try:
         data = json.loads(req.body)
-        user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
-        courses = CourseDetails.objects.all().order_by('SubjectId').values()
-        userscore = StudentDetails_Days_Questions.objects.get(Student_id=data.get('StudentId'))
+        user =cache.get('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')')
+        if user is None:
+            #  ("not in cache user")
+            user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
+            cache.set('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')', user,60)
+        courses =  cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
+        if courses is None:
+            #  ("not in cache courses")
+            courses = CourseDetails.objects.all().order_by('SubjectId').values()
+            cache.set("CourseDetails.objects.all().order_by('SubjectId').values()", courses,60)
+        userscore = cache.get("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")")
+        if userscore is None:
+            # ("not in cache userscore")
+            userscore = StudentDetails_Days_Questions.objects.get(Student_id=data.get('StudentId'))
+            cache.set("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")", userscore,60)
         courseinfo ={}
         for i in user.Courses:
             if userscore.Qns_lists.get(i, None) is None:
@@ -976,10 +988,20 @@ def getCourse1(req):
 def getCourse2(req):
     try:
         data = json.loads(req.body)
-        user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
+        user =cache.get('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')')
+        if user is None:
+            # ('not in cache user')
+            user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
+            cache.set('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')', user,60)
+        
         Startmost =datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
         Endmost = datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
-        courses = CourseDetails.objects.all().filter().order_by('SubjectId').values()
+        courses =  cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
+        if courses is None:
+            # ('not in cache course')
+            courses = CourseDetails.objects.all().order_by('SubjectId').values()
+            cache.set("CourseDetails.objects.all().order_by('SubjectId').values()", courses,60)
+
         timestart = user.Course_Time
         for course in courses:
                 if course.get('SubjectName') in user.Courses  :
@@ -1003,7 +1025,11 @@ def getCourse2(req):
 def getCourse3(req):
     try:
         data = json.loads(req.body)
-        courses = CourseDetails.objects.all().filter().order_by('SubjectId').values()
+        courses = cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
+        if courses is None:
+            # ('not in cache course')
+            courses =  CourseDetails.objects.all().order_by('SubjectId').values()
+            cache.set("CourseDetails.objects.all().order_by('SubjectId').values()", courses,60)
         Rank = {}
         intcourse = {"Sub":[]}
         for course in courses:
