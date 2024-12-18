@@ -1015,12 +1015,16 @@ def getCourse2(req):
         if spent:
                 for i in spent:
                     Duration = Duration + (i.Last_update - i.Login_time).total_seconds()
-        return HttpResponse(json.dumps({"Prograss":
+        return HttpResponse(json.dumps(
             {
-            "Start_date":str(Startmost).split()[0].split('-')[2]+"-"+str(Startmost).split()[0].split('-')[1]+"-"+str(Startmost).split()[0].split('-')[0],
-            "End_date":str(Endmost).split()[0].split('-')[2]+"-"+str(Endmost).split()[0].split('-')[1]+"-"+str(Endmost).split()[0].split('-')[0],
-            "Duration":Duration},
-            "StudentName":user.firstName}), content_type='application/json')
+                "Prograss":{
+                    "Start_date":str(Startmost).split()[0].split('-')[2]+"-"+str(Startmost).split()[0].split('-')[1]+"-"+str(Startmost).split()[0].split('-')[0],
+                    "End_date":str(Endmost).split()[0].split('-')[2]+"-"+str(Endmost).split()[0].split('-')[1]+"-"+str(Endmost).split()[0].split('-')[0],
+                    "Duration":Duration
+                    },
+                "StudentName":user.firstName
+            }
+            ), content_type='application/json')
     except Exception as e:
         return HttpResponse(f"An error occurred: {e}", status=500)
 @api_view(['POST']) 

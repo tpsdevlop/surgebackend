@@ -229,7 +229,7 @@ def updateRanks2(COURSE):
 def getRankings(COURSE,SID):
     try:
         userRank = cache.get ("Rankings.objects.filter(Course = '"+COURSE+"',StudentId = '"+SID+"').first()")
-        if userRank is not None:
+        if userRank is  None:
             userRank = Rankings.objects.filter(Course = COURSE,StudentId = SID).first()
             cache.set("Rankings.objects.filter(Course = '"+COURSE+"',StudentId = '"+SID+"').first()",userRank,60)
         if userRank is not None:
@@ -325,7 +325,7 @@ def rankings(allusers,COURSE):
 def  OverallRankings(COURSEs,SID):#COURSEs = ["HTMLCSS", "Java_Script"] , SID = "24ADMI0001"
     try:
         aggregate_scores = cache.get("Rankings.objects.filter(Course__in=COURSEs).values('StudentId').annotate(total_score=Sum('Score')).order_by('-total_score')")
-        if aggregate_scores is not None:
+        if aggregate_scores is None:
             aggregate_scores = Rankings.objects.filter(Course__in=COURSEs).values('StudentId').annotate(total_score=Sum('Score')).order_by('-total_score')
             cache.set("Rankings.objects.filter(Course__in=COURSEs).values('StudentId').annotate(total_score=Sum('Score')).order_by('-total_score')", aggregate_scores, 60 )
         rank = 1
