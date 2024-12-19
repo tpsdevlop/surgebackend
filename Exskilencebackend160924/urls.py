@@ -41,7 +41,8 @@ urlpatterns = [
     path ('logout/', ex.logout),
     path ('duration/', ex.get_duration),
     path ('courseInfo/', ex.courseInfo),
-    path ('get/course/',ex.getcourse ),
+    # path ('get/course/',ex.getcourse ),
+    path ('get/course/',ex.getallcourse ),    
     path ('getdays/',ex.getdays ),
     path ('days/qns/',ex.getQnslist ),
     path ('get/qn/data/',ex.getQn ),
@@ -117,7 +118,7 @@ urlpatterns = [
     path('internship/project/score/',internship.project_score),
     
     #test
-    path('test/',ex.test),#
+    # path('test/',ex.test),#
     # path('getDevTool2/', ex.getDevTool12),#
     path ('get/course1/',ex.getCourse1 ),#
     path ('get/course2/',ex.getCourse2 ),#

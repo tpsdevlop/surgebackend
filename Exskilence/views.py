@@ -13,6 +13,7 @@ from Exskilencebackend160924.Blob_service import download_blob2, get_blob_servic
 import pyodbc
 from Exskilence.sqlrun import *
 from django.core.cache import cache
+from Exskilence.cache import *
 from Exskilence.filters import *
 from Exskilence.ErrorLog import ErrorLog
 from Exskilence.Ranking import *
@@ -750,177 +751,11 @@ def get_tables(tables):
     except Exception as e:  
         return "Error getting tables: " + str(e)
 
-USERDATA= StudentDetails.objects.filter(StudentId='24ADMI0002').first()
-USERSCOREDATA=StudentDetails_Days_Questions.objects.filter(Student_id='24ADMI0002').first()
-COURSESDATA =CourseDetails.objects.filter().order_by('SubjectId').values()
-SPENTDATA=Attendance.objects.filter(SID= '24ADMI0002') .filter(Login_time__range=[datetime.utcnow().__add__(timedelta(hours=5, minutes=30)), datetime.utcnow().__add__(timedelta(hours=5, minutes=30))],Last_update__range=[datetime.utcnow().__add__(timedelta(hours=5, minutes=30)), datetime.utcnow().__add__(timedelta(hours=5, minutes=30))])  
 
-@api_view(['POST'])
-def getcourse2(req):
+
+def _getCourse1(current_time, user ,courses,userscore ):
     try:
-        data = json.loads(req.body)
-        user = USERDATA#StudentDetails.objects.filter(StudentId=data.get('StudentId')).first()
-        userscore = USERSCOREDATA#StudentDetails_Days_Questions.objects.filter(Student_id=data.get('StudentId')).first()
-        courseinfo ={}
-        for i in user.Courses:
-            if userscore.Qns_lists.get(i, None) is None:
-                courseinfo.update({i: True})
-            else:
-                courseinfo.update({i: False})
-        Scolist = [str(l).replace("Score","") for l in list(userscore.Score_lists.keys())]
-        if Scolist.__contains__("HTML") or Scolist.__contains__("CSS"):
-            if Scolist.__contains__("HTML"):
-                Scolist.remove("HTML")
-            if Scolist.__contains__("CSS"):
-                Scolist.remove("CSS")
-            Scolist.append("HTMLCSS")
-        if len(Scolist)  != len(user.Courses):
-            for i in user.Courses:
-                if i == "HTMLCSS":
-                    if userscore.Score_lists.get("HTMLScore",None) is None:
-                        userscore.Score_lists.update({ "HTMLScore":"0/0"})
-                    if userscore.Score_lists.get("CSSScore",None) is None:
-                        userscore.Score_lists.update({ "CSSScore":"0/0"})
-                else:
-                    if userscore.Score_lists.get(str(i)+"Score",None) is None:
-                        userscore.Score_lists.update({str(i)+"Score":"0/0"})
-            # userscore.save()
-        out = {}
-        Rank = {}
-        intcourse ={
-            "Sub":[],
-            "SubScore":[],
-            "Score":[],
-        }
-        Enrolled_courses = []
-        Total_Score = 0
-        Total_Score_Outof = 0
-        Startmost =datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
-        Endmost = datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
-        if user:
-            def getdays(date):
-                    date = datetime.strptime(str(date), "%Y-%m-%d %H:%M:%S")
-                    day = int(date.strftime("%d"))
-                    month = int(date.strftime("%m"))
-                    if 4 <= day <= 20 or 24 <= day <= 30:
-                        suffix = "th"
-                    else:
-                        suffix = ["st", "nd", "rd"][day % 10 - 1]
-                    formatted_date =  (f"{day}{suffix} {calendar.month_abbr[month]}")
-                    return formatted_date
-            courses=COURSESDATA#CourseDetails.objects.filter().order_by('SubjectId').values()
-            timestart = user.Course_Time
-            for course in courses:
-                if course.get('SubjectName') in user.Courses  :
-                    starttime = timestart.get(course.get('SubjectName')).get('Start')
-                    endtime = timestart.get(course.get('SubjectName')).get('End')
-                    if course.get('SubjectName') == "HTMLCSS":
-                        Enrolled_courses.append({
-                        "SubjectId":course.get('SubjectId')  ,
-                        "SubjectName":course.get('SubjectName') ,
-                        "Name":course.get('Description')  ,
-                        "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
-                        'Progress':str(round(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] ))/len(userscore.Qns_lists.get(course.get('SubjectName'),[]))*100))+"%" if len(userscore.Qns_lists.get(course.get('SubjectName'),[])) != 0 else '0%',
-                        'Assignment':str(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] )))+"/"+str(len(userscore.Qns_lists.get(course.get('SubjectName'),[]))),
-                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Closed',
-                        'CourseInfo':courseinfo.get(course.get('SubjectName'))
-                        })
-                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)):
-                            intcourse.get('Sub').append("HTMLCSS")
-                            htmldata=userscore.Score_lists.get("HTMLScore").split('/')
-                            cssdata=userscore.Score_lists.get("CSSScore").split('/')
-                            intcourse.get('SubScore').append(str(round(float((float(htmldata[0])+float(cssdata[0]))/2),2))+"/"+str(subScore(userscore.Qns_lists,"HTMLCSS")))
-                            Total_Score = float(Total_Score) + float(intcourse.get('SubScore')[-1].split('/')[0])
-                            Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
- 
-                    else:
-                        courseprogressTotalQns = userscore.Qns_lists
-                        numQns = [len(courseprogressTotalQns.get(i)) for i in dict(courseprogressTotalQns).keys() if str(i).startswith(course.get('SubjectName'))]
-                        numAns = [len(userscore.Ans_lists.get(i)) for i in dict(userscore.Ans_lists).keys() if str(i).startswith(course.get('SubjectName'))]
-                        Enrolled_courses.append({
-                        "SubjectId":course.get('SubjectId')  ,
-                        "SubjectName":course.get('SubjectName') ,
-                        "Name":course.get('Description')  ,
-                        "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
-                        'Progress': str(round(sum(numAns)/sum(numQns)*100))+'%' if sum(numQns)!= 0 else "0%" ,
-                        'Assignment':str(sum(numAns))+"/"+str(sum(numQns)),
-                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)) else 'Closed',
-                        })
-                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < datetime.utcnow().__add__(timedelta(hours=5,minutes=30)):
-                            intcourse.get('Sub').append(course.get('SubjectName'))
-                            intcourse.get('SubScore').append(str(round(float(str(userscore.Score_lists.get(str(course.get('SubjectName'))+'Score')).split('/')[0]),2))+"/"+str(subScore(userscore.Qns_lists,course.get('SubjectName'))))
-                            Total_Score = round(float(Total_Score),2) + float(intcourse.get('SubScore')[-1].split('/')[0])
-                            Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
-                    if Startmost > starttime:
-                        Startmost = starttime
-                    Rank.update({course.get('SubjectName'):getRankings(course.get('SubjectName'), data.get('StudentId'))})
-            spent = SPENTDATA#Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, Endmost],Last_update__range=[Startmost, Endmost])  
-            Duration = 0
-            if spent:
-                for i in spent:
-                    Duration = Duration + (i.Last_update - i.Login_time).total_seconds()
-            intcourse.get('Score').append(str(round(Total_Score,2))+"/"+str(Total_Score_Outof))
-            Total_Rank = OverallRankings( intcourse.get('Sub'),data.get('StudentId'))
-            Rank.update({'Total_Rank':Total_Rank})
-            out.update({"Courses":Enrolled_courses,
-                        "Intenship":intcourse,
-                        "Prograss":{
-                            "Start_date":str(Startmost).split()[0].split('-')[2]+"-"+str(Startmost).split()[0].split('-')[1]+"-"+str(Startmost).split()[0].split('-')[0],
-                            "End_date":str(Endmost).split()[0].split('-')[2]+"-"+str(Endmost).split()[0].split('-')[1]+"-"+str(Endmost).split()[0].split('-')[0],
-                            "Duration":Duration
-                        },
-                        "Rank": Rank,
-                        "StudentName":user.firstName})
-            user.score =round(float(str(intcourse.get('Score')[0]).split('/')[0]),2)
-            # user.save()
-            # attendance_update(data.get('StudentId'))
-            return HttpResponse(json.dumps(out), content_type='application/json')
-        else:
-            # attendance_update(data.get('StudentId'))
-            return HttpResponse('Error! User does not exist', status=404)
-    except Exception as e:
-        # ErrorLog(req,e)
-        # attendance_update(data.get('StudentId'))
-        return HttpResponse(f"An error occurred: {e}", status=500)
-@api_view(['POST'])
-def test(req):
-    try:
-        out = {}
-        data = json.loads(req.body)
-        data = data.get('data')
-        for i in range(1,data):
-            data =   i
-            out .update({i:i})
-        out = {"test":out}
-        return HttpResponse(json.dumps(out), content_type='application/json')
-    except Exception as e:
-        return HttpResponse(f"An error occurred: {e}", status=500) 
-@api_view(['POST'])
-def getCourse1(req):
-    try:
-        data = json.loads(req.body)
-        current_time = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
-        user =cache.get('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')')
-        if user is None:
-            #  ("not in cache user")
-            user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
-            cache.set('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')', user,60)
-        courses =  cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
-        if courses is None:
-            #  ("not in cache courses")
-            courses = CourseDetails.objects.all().order_by('SubjectId').values()
-            cache.set("CourseDetails.objects.all().order_by('SubjectId').values()", courses,60)
-        userscore = cache.get("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")")
-        if userscore is None:
-            # ("not in cache userscore")
-            userscore = StudentDetails_Days_Questions.objects.get(Student_id=data.get('StudentId'))
-            cache.set("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")", userscore,60)
-        courseinfo ={}
-        for i in user.Courses:
-            if userscore.Qns_lists.get(i, None) is None:
-                courseinfo.update({i: True})
-            else:
-                courseinfo.update({i: False})
+        courseinfo = {i: userscore.Qns_lists.get(i) is None for i in user.Courses}
         Enrolled_courses = []
         Total_Score = 0
         Total_Score_Outof = 0
@@ -980,71 +815,137 @@ def getCourse1(req):
                             intcourse.get('SubScore').append(str(round(float(str(userscore.Score_lists.get(str(course.get('SubjectName'))+'Score')).split('/')[0]),2))+"/"+str(subScore(userscore.Qns_lists,course.get('SubjectName'))))
                             Total_Score = round(float(Total_Score),2) + float(intcourse.get('SubScore')[-1].split('/')[0])
                             Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
-        out = {"Courses":Enrolled_courses,
+        intcourse.get('Score').append(str(round(Total_Score,2))+"/"+str(Total_Score_Outof))
+        return{"Courses":Enrolled_courses,
                         "Intenship":intcourse,}
-        return HttpResponse(json.dumps(out), content_type='application/json')
     except Exception as e:
+        return f"An error occurred: {e}"
+@api_view(['POST'])
+def getallcourse(req):
+    try:
+        data = json.loads(req.body)
+        current_time = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
+        user =cache.get('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')')
+        if user is None:
+            print("not in cache user")
+            user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
+            cache.set('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')', user,60)
+        courses =  cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
+        if courses is None:
+            print("not in cache courses")
+            courses = CourseDetails.objects.all().order_by('SubjectId').values()
+            cache.set("CourseDetails.objects.all().order_by('SubjectId').values()", courses,60)
+        userscore = cache.get("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")")
+        if userscore is None:
+            print("not in cache userscore")
+            userscore = StudentDetails_Days_Questions.objects.get(Student_id=data.get('StudentId'))
+            cache.set("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")", userscore,60)
+        # out1 = getCourse1(current_time,user,courses,userscore)
+        # out2 = getCourse2(current_time,user,courses,userscore,data)
+        # out3 = getCourse3(courses,data)
+        # out1.update(out2)
+        # out1.update(out3)
+        # print(out3)
+        return HttpResponse(json.dumps({
+            **_getCourse1(current_time, user, courses, userscore),
+            **_getCourse2(current_time, user, courses, userscore, data),
+         }), content_type='application/json')
+    except Exception as e:  
         return HttpResponse(f"An error occurred: {e}", status=500)
+def _getCourse2(current_time, user ,courses,userscore ,data):
+    try:
+        timestart = user.Course_Time
+        Startmost = min((timestart.get(course.get('SubjectName')).get('Start') for course in courses if course.get('SubjectName') in user.Courses), default=current_time)
+        spent = Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, current_time], Last_update__range=[Startmost, current_time])
+        Duration = sum((i.Last_update - i.Login_time).total_seconds() for i in spent)
+
+        return {
+            "Prograss": {
+                "Start_date": f"{Startmost.strftime("%d-%m-%Y")}",
+                "End_date": f"{current_time.strftime("%d-%m-%Y")}",
+                "Duration": Duration
+            },
+            "StudentName": user.firstName,
+            "Rank": {**{course.get('SubjectName'): getRankings(course.get('SubjectName'), data.get('StudentId')) for course in courses}, "Total_Rank": OverallRankings([course.get('SubjectName') for course in courses], data.get('StudentId'))}
+        }
+
+            
+    except Exception as e:
+        return   f"An error occurred: {e}" 
+def _getCourse3(courses,data):
+    try:
+         
+        # intcourse = {"Sub": [course.get('SubjectName') for course in courses]}
+        # rank = {course.get('SubjectName'): getRankings(course.get('SubjectName'), data.get('StudentId')) for course in courses}
+        # rank['Total_Rank'] = OverallRankings([course.get('SubjectName') for course in courses], data.get('StudentId'))
+
+        # return {"Rank": rank}
+        return {"Rank": {**{course.get('SubjectName'): getRankings(course.get('SubjectName'), data.get('StudentId')) for course in courses}, "Total_Rank": OverallRankings([course.get('SubjectName') for course in courses], data.get('StudentId'))}}
+    except Exception as e:
+        return  f"An error occurred: {e}" 
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@api_view(['POST'])
+def getCourse3(req):
+    try:
+        courses =  cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
+        if courses is None:
+            print("not in cache courses")
+            courses = CourseDetails.objects.all().order_by('SubjectId').values()
+            cache.set("CourseDetails.objects.all().order_by('SubjectId').values()", courses,60)
+        return HttpResponse(json.dumps({
+            **_getCourse3(courses,json.loads(req.body)),
+         }), content_type='application/json')
+    except Exception as e:
+        return  f"An error occurred: {e}" 
+
+@api_view(['POST'])
+def getCourse1(req):
+    try:
+        data = json.loads(req.body)
+        current_time = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
+        user =cache.get('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')')
+        if user is None:
+            print("not in cache user")
+            user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
+            cache.set('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')', user,60)
+        courses =  cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
+        if courses is None:
+            print("not in cache courses")
+            courses = CourseDetails.objects.all().order_by('SubjectId').values()
+            cache.set("CourseDetails.objects.all().order_by('SubjectId').values()", courses,60)
+        userscore = cache.get("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")")
+        if userscore is None:
+            print("not in cache userscore")
+            userscore = StudentDetails_Days_Questions.objects.get(Student_id=data.get('StudentId'))
+            cache.set("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")", userscore,60)
+        return HttpResponse(json.dumps({
+            **_getCourse1(current_time, user, courses, userscore),
+         }), content_type='application/json')
+    except Exception as e:
+        return  f"An error occurred: {e}" 
+    
 @api_view(['POST'])
 def getCourse2(req):
     try:
         data = json.loads(req.body)
-        current_time = datetime.utcnow().__add__(timedelta(hours=5, minutes=30))
+        current_time = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
         user =cache.get('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')')
         if user is None:
-            # ('not in cache user')
+            print("not in cache user")
             user = StudentDetails.objects.get(StudentId=data.get('StudentId'))
             cache.set('StudentDetails.get(StudentId='+str(data.get('StudentId'))+')', user,60)
-        
-        Startmost =current_time
-        Endmost = current_time
         courses =  cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
         if courses is None:
-            # ('not in cache course')
+            print("not in cache courses")
             courses = CourseDetails.objects.all().order_by('SubjectId').values()
             cache.set("CourseDetails.objects.all().order_by('SubjectId').values()", courses,60)
-
-        timestart = user.Course_Time
-        for course in courses:
-                if course.get('SubjectName') in user.Courses  :
-                    starttime = timestart.get(course.get('SubjectName')).get('Start')
-                    if Startmost > starttime:
-                        Startmost = starttime
-        spent = Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, Endmost],Last_update__range=[Startmost, Endmost])  
-        Duration = 0
-        if spent:
-                for i in spent:
-                    Duration = Duration + (i.Last_update - i.Login_time).total_seconds()
-        return HttpResponse(json.dumps(
-            {
-                "Prograss":{
-                    "Start_date":str(Startmost).split()[0].split('-')[2]+"-"+str(Startmost).split()[0].split('-')[1]+"-"+str(Startmost).split()[0].split('-')[0],
-                    "End_date":str(Endmost).split()[0].split('-')[2]+"-"+str(Endmost).split()[0].split('-')[1]+"-"+str(Endmost).split()[0].split('-')[0],
-                    "Duration":Duration
-                    },
-                "StudentName":user.firstName
-            }
-            ), content_type='application/json')
+        userscore = cache.get("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")")
+        if userscore is None:
+            print("not in cache userscore")
+            userscore = StudentDetails_Days_Questions.objects.get(Student_id=data.get('StudentId'))
+            cache.set("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")", userscore,60)
+        return HttpResponse(json.dumps({
+            **_getCourse2(current_time, user, courses, userscore,data),
+         }), content_type='application/json')
     except Exception as e:
-        return HttpResponse(f"An error occurred: {e}", status=500)
-@api_view(['POST']) 
-def getCourse3(req):
-    try:
-        data = json.loads(req.body)
-        courses = cache.get("CourseDetails.objects.all().order_by('SubjectId').values()")
-        if courses is None:
-            # ('not in cache course')
-            courses =  CourseDetails.objects.all().order_by('SubjectId').values()
-            cache.set("CourseDetails.objects.all().order_by('SubjectId').values()", courses,60)
-        Rank = {}
-        intcourse = {"Sub":[]}
-        for course in courses:
-                Rank.update({course.get('SubjectName'):getRankings(course.get('SubjectName'), data.get('StudentId'))})
-                intcourse.get('Sub').append(course.get('SubjectName'))
-        Total_Rank = OverallRankings( intcourse.get('Sub'),data.get('StudentId'))
-        Rank.update({'Total_Rank':Total_Rank})
-         
-        return HttpResponse(json.dumps({"Rank": Rank,}), content_type='application/json')
-            
-    except Exception as e:
-        return HttpResponse(f"An error occurred: {e}", status=500)
+        return  f"An error occurred: {e}" 
