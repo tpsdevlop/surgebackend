@@ -66,4 +66,4 @@ jobs:
         with:
           app-name: 'surgebackend'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CCDCA00F5CB14B9BB9B69FA60D9F59E9 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_51335CF37E7E4E19B9F57AC840816896 }}
