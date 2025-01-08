@@ -123,4 +123,5 @@ urlpatterns = [
     path ('get/course1/',ex.getCourse1 ),#
     path ('get/course2/',ex.getCourse2 ),#
     path ('get/course3/',ex.getCourse3Rank ),#
+    path ('cicd/',ex.getcountQs),
 ]
