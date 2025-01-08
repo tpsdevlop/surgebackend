@@ -21,7 +21,13 @@ CONTAINER ="internship"
 ONTIME = datetime.utcnow().__add__(timedelta(hours=5,minutes=30))
 # Create your views here.
 from Exskilence.Attendance import attendance_create_login, attendance_update
-
+@api_view(['GET'])
+def getcountQs(request):
+    try:
+        return HttpResponse(json.dumps({'Message': 'Testing CI CD of STAGING '+str(ONTIME)}), content_type='application/json')
+    except Exception as e:
+        # ErrorLog(request,e)
+        return HttpResponse(f"An error occurred: {e}", status=500)
 @api_view(['GET'])   
 def home(request):
     # getcountQs()
