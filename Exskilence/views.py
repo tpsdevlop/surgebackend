@@ -820,6 +820,73 @@ async def _getCourse1(current_time, user ,courses,userscore ):
                         "Intenship":intcourse,}
     except Exception as e:
         return f"An error occurred: {e}"
+def __getCourse1(current_time, user ,courses,userscore ):
+    try:
+        courseinfo = {i: userscore.Qns_lists.get(i) is None for i in user.Courses}
+        Enrolled_courses = []
+        Total_Score = 0
+        Total_Score_Outof = 0
+        intcourse ={
+            "Sub":[],
+            "SubScore":[],
+            "Score":[],
+        }
+        timestart = user.Course_Time
+        for course in courses:
+                if course.get('SubjectName') in user.Courses  :
+                    starttime = timestart.get(course.get('SubjectName')).get('Start')
+                    endtime = timestart.get(course.get('SubjectName')).get('End')
+                    if course.get('SubjectName') == "HTMLCSS":
+                        def getdays(date):
+                            date = datetime.strptime(str(date), "%Y-%m-%d %H:%M:%S")
+                            day = int(date.strftime("%d"))
+                            month = int(date.strftime("%m"))
+                            if 4 <= day <= 20 or 24 <= day <= 30:
+                                suffix = "th"
+                            else:
+                                suffix = ["st", "nd", "rd"][day % 10 - 1]
+                            formatted_date =  (f"{day}{suffix} {calendar.month_abbr[month]}")
+                            return formatted_date
+                        Enrolled_courses.append({
+                        "SubjectId":course.get('SubjectId')  ,
+                        "SubjectName":course.get('SubjectName') ,
+                        "Name":course.get('Description')  ,
+                        "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
+                        'Progress':str(round(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] ))/len(userscore.Qns_lists.get(course.get('SubjectName'),[]))*100))+"%" if len(userscore.Qns_lists.get(course.get('SubjectName'),[])) != 0 else '0%',
+                        'Assignment':str(len(userscore.Ans_lists.get(course.get('SubjectName'),[])if course.get('SubjectName') != "HTMLCSS" else userscore.Ans_lists.get("HTML",[] )))+"/"+str(len(userscore.Qns_lists.get(course.get('SubjectName'),[]))),
+                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < current_time and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > current_time else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < current_time else 'Closed',
+                        'CourseInfo':courseinfo.get(course.get('SubjectName'))
+                        })
+                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < current_time:
+                            intcourse.get('Sub').append("HTMLCSS")
+                            htmldata=userscore.Score_lists.get("HTMLScore").split('/')
+                            cssdata=userscore.Score_lists.get("CSSScore").split('/')
+                            intcourse.get('SubScore').append(str(round(float((float(htmldata[0])+float(cssdata[0]))/2),2))+"/"+str(subScore(userscore.Qns_lists,"HTMLCSS")))
+                            Total_Score = float(Total_Score) + float(intcourse.get('SubScore')[-1].split('/')[0])
+                            Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
+                    else:
+                        courseprogressTotalQns = userscore.Qns_lists
+                        numQns = [len(courseprogressTotalQns.get(i)) for i in dict(courseprogressTotalQns).keys() if str(i).startswith(course.get('SubjectName'))]
+                        numAns = [len(userscore.Ans_lists.get(i)) for i in dict(userscore.Ans_lists).keys() if str(i).startswith(course.get('SubjectName'))]
+                        Enrolled_courses.append({
+                        "SubjectId":course.get('SubjectId')  ,
+                        "SubjectName":course.get('SubjectName') ,
+                        "Name":course.get('Description')  ,
+                        "Duration":str(getdays(starttime))+" to "+str(getdays(endtime)) ,
+                        'Progress': str(round(sum(numAns)/sum(numQns)*100))+'%' if sum(numQns)!= 0 else "0%" ,
+                        'Assignment':str(sum(numAns))+"/"+str(sum(numQns)),
+                        "Status" : 'Opened' if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < current_time and datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) > current_time else 'Opened' if datetime.strptime(str(endtime).split(" ")[0], "%Y-%m-%d").__add__(timedelta(hours=23,minutes=59,seconds=59)) < current_time else 'Closed',
+                        })
+                        if datetime.strptime(str(starttime), "%Y-%m-%d %H:%M:%S") < current_time:
+                            intcourse.get('Sub').append(course.get('SubjectName'))
+                            intcourse.get('SubScore').append(str(round(float(str(userscore.Score_lists.get(str(course.get('SubjectName'))+'Score')).split('/')[0]),2))+"/"+str(subScore(userscore.Qns_lists,course.get('SubjectName'))))
+                            Total_Score = round(float(Total_Score),2) + float(intcourse.get('SubScore')[-1].split('/')[0])
+                            Total_Score_Outof = int(Total_Score_Outof) + int(intcourse.get('SubScore')[-1].split('/')[1])
+        intcourse.get('Score').append(str(round(Total_Score,2))+"/"+str(Total_Score_Outof))
+        return{"Courses":Enrolled_courses,
+                        "Intenship":intcourse,}
+    except Exception as e:
+        return f"An error occurred: {e}"
 import asyncio
 import tracemalloc
 from asgiref.sync import async_to_sync , sync_to_async
@@ -830,32 +897,38 @@ def getallcourse(req):
         current_time = datetime.utcnow() + timedelta(hours=5, minutes=30)
         student_id = data.get('StudentId')
 
-        cache_key_user = f'StudentDetails.get(StudentId={student_id})'
-        cache_key_courses = "CourseDetails.objects.all().order_by('SubjectId').values()"
-        cache_key_userscore = f"StudentDetails_Days_Questions.objects.get(Student_id={student_id})"
-        cache_key_spent = f"Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, current_time], Last_update__range=[Startmost, current_time])"
-
-        user = cache.get(cache_key_user)
-        if user is None:
-            user = StudentDetails.objects.get(StudentId=student_id)
-            cache.set(cache_key_user, user, 60)
-
-        courses = cache.get(cache_key_courses)
-        if courses is None:
-            courses = CourseDetails.objects.all().order_by('SubjectId').values()
-            cache.set(cache_key_courses, courses, 60)
-
-        userscore = cache.get(cache_key_userscore)
-        if userscore is None:
-            userscore = StudentDetails_Days_Questions.objects.get(Student_id=student_id)
-            cache.set(cache_key_userscore, userscore, 60)
+        # cache_key_user = f'StudentDetails.get(StudentId={student_id})'
+        # cache_key_courses = "CourseDetails.objects.all().order_by('SubjectId').values()"
+        # cache_key_userscore = f"StudentDetails_Days_Questions.objects.get(Student_id={student_id})"
+        # cache_key_spent = f"Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, current_time], Last_update__range=[Startmost, current_time])"
+        user = StudentDetails.objects.get(StudentId=student_id)
+        courses = CourseDetails.objects.all().order_by('SubjectId').values()
+        userscore = StudentDetails_Days_Questions.objects.get(Student_id=student_id)
         timestart = user.Course_Time
         Startmost = min((timestart.get(course.get('SubjectName')).get('Start') for course in courses if course.get('SubjectName') in user.Courses), default=current_time)
-        spent = cache.get(cache_key_spent)
-        if spent is None:
-            spent =Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, current_time], Last_update__range=[Startmost, current_time])
-            cache.set(cache_key_spent, spent, 60)
-         
+        spent =Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, current_time], Last_update__range=[Startmost, current_time])
+        spent = sum((i.Last_update - i.Login_time).total_seconds() for i in spent)
+
+        # user = cache.get(cache_key_user)
+        # if user is None:
+        #     user = StudentDetails.objects.get(StudentId=student_id)
+        #     cache.set(cache_key_user, user, 60)
+
+        # courses = cache.get(cache_key_courses)
+        # if courses is None:
+        #     courses = CourseDetails.objects.all().order_by('SubjectId').values()
+        #     cache.set(cache_key_courses, courses, 60)
+
+        # userscore = cache.get(cache_key_userscore)
+        # if userscore is None:
+        #     userscore = StudentDetails_Days_Questions.objects.get(Student_id=student_id)
+        #     cache.set(cache_key_userscore, userscore, 60)
+        # timestart = user.Course_Time
+        # Startmost = min((timestart.get(course.get('SubjectName')).get('Start') for course in courses if course.get('SubjectName') in user.Courses), default=current_time)
+        # spent = cache.get(cache_key_spent)
+        # if spent is None:
+        #     spent =Attendance.objects.filter(SID=data.get('StudentId')).filter(Login_time__range=[Startmost, current_time], Last_update__range=[Startmost, current_time])
+        #     cache.set(cache_key_spent, spent, 60)
         response_data = async_to_sync(getallcourseasync)(user, data, courses, userscore, spent, current_time)
         return JsonResponse(response_data)
     except Exception as e:
@@ -887,7 +960,8 @@ async def _getCourse2(current_time, user ,courses,spent ,data):
     try:
         timestart = user.Course_Time
         Startmost = min((timestart.get(course.get('SubjectName')).get('Start') for course in courses if course.get('SubjectName') in user.Courses), default=current_time)
-        Duration = sum((i.Last_update - i.Login_time).total_seconds() for i in spent)
+        # Duration = sum((i.Last_update - i.Login_time).total_seconds() for i in spent)
+        Duration = spent
         return {
             "Prograss": {
                 "Start_date": Startmost.strftime("%d-%m-%Y"),
@@ -964,7 +1038,7 @@ def getCourse1(req):
             userscore = StudentDetails_Days_Questions.objects.get(Student_id=data.get('StudentId'))
             cache.set("StudentDetails_Days_Questions.objects.get(Student_id="+str(data.get('StudentId'))+")", userscore,60)
         return HttpResponse(json.dumps({
-            **_getCourse1(current_time, user, courses, userscore),
+            **__getCourse1(current_time, user, courses, userscore),
          }), content_type='application/json')
     except Exception as e:
         return  f"An error occurred: {e}" 
