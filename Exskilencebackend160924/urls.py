@@ -19,7 +19,7 @@ from Exskilence import views as ex,sqlviews as sql,pythonrun as ex_py,HTML_CSS_v
 from Exskilence import coursecreatiton as pkgs,trainerflowQn as tech ,ENYCRP as enc, Chatbox as chat ,adminflow as adminflow ,internship as intr
 from Exskilence import StudentDelay as delay ,Internship_Views as internship
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     path('internship/update/Json/', internship.updateJsonList),
     path('getDevTool/', ex.getDevTool),
     # Swapnodayaplacements
