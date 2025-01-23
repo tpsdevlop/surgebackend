@@ -504,7 +504,7 @@ def getQn(req):
         if qnsdata is None:
             return HttpResponse(json.dumps({"Question":None }), content_type='application/json')
         qnsdata = json.loads(qnsdata)
-        qnsdata.update({"Query":""}) if data.get('Course') == 'SQL' else  qnsdata.update({"Ans":''})
+        # qnsdata.update({"Query":""}) if data.get('Course') == 'SQL' else  qnsdata.update({"Ans":''})
         qnsdata.update({"Qn_name":data.get('Qn_name'),
                         "Qn_No": int(mainUser.Qns_lists.get(data.get('Course')+'_Day_'+str(data.get('Day'))).index(data.get('Qn_name')))+1,})
         if user:
